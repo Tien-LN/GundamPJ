@@ -29,12 +29,12 @@ const startServer = async () => {
     // Routes
     app.use("/api/auth", routes.auth);
     app.use("/api/users", routes.users);
-    app.use("/api/courses", routes.courses);
-    app.use("/api/enrollments", routes.enrollments);
-    app.use("/api/exams", routes.exams);
-    app.use("/api/docs", routes.docs);
-    app.use("/api/announcements", routes.announcements);
-    app.use("/api/statistics", routes.statistics);
+    // app.use("/api/courses", routes.courses);
+    // app.use("/api/enrollments", routes.enrollments);
+    // app.use("/api/exams", routes.exams);
+    // app.use("/api/docs", routes.docs);
+    // app.use("/api/announcements", routes.announcements);
+    // app.use("/api/statistics", routes.statistics);
 
     // Home route
     app.get("/", (req, res) => res.send("API is running"));
