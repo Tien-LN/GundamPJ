@@ -6,7 +6,7 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const existingUser = prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "email đã tồn tại" });
     }
@@ -32,8 +32,7 @@ const registerUser = async (req, res) => {
 const registerMultipleUsers = async (req, res) => {
   try {
     const users = req.body.users;
-
-    if (!users || Array.isArray(users) || users.length === 0) {
+    if (!users || !Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ message: "Dữ liệu không hợp lệ" });
     }
 
@@ -80,4 +79,40 @@ const registerMultipleUsers = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, registerMultipleUsers };
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Invalid email or password bla bla" });
+    }
+
+    const token = await jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.json({
+      token,
+      user: { id: user.id, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error("Login error: ", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { registerUser, registerMultipleUsers, login };
