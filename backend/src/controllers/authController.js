@@ -1,17 +1,25 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { prisma } = require("../config/db.js");
+const hashPassword = require("../utils/hashPassword.js");
+const { sendEmail, validateEmail } = require("../utils/emailService.js");
 
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+
+    const emailCheck = await validateEmail(email);
+    // console.log(emailCheck);
+    if (!emailCheck.valid) {
+      return res.status(400).json({ message: emailCheck.message });
+    }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "email đã tồn tại" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
 
     const newUser = await prisma.user.create({
       data: {
@@ -21,6 +29,16 @@ const registerUser = async (req, res) => {
         role,
       },
     });
+
+    await sendEmail(
+      email,
+      "Chào mừng bạn đến với PSTUDY!",
+      `Xin chào ${name}, cảm ơn bạn đã đăng ký khóa học của chúng tôi!`,
+      `<p><strong>Đây là thông tin đăng nhập của tài khoản học viên của bạn:</strong></p>
+        <br><strong>Email:</strong> ${email} 
+        <br><strong>Mật khẩu:</strong> ${password}`
+    );
+
     res
       .status(201)
       .json({ message: "tạo người dùng thành công", user: newUser });
@@ -60,7 +78,7 @@ const registerMultipleUsers = async (req, res) => {
     const hashedUsers = await Promise.all(
       newUsers.map(async (user) => ({
         ...user, // sao chep tat ca thuoc tinh cua object sau do chi thay doi 1 tt
-        password: await bcrypt.hash(user.password, 10),
+        password: await hashPassword(user.password),
       }))
     );
 
@@ -91,9 +109,7 @@ const login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res
-        .status(400)
-        .json({ message: "Invalid email or password bla bla" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const token = await jwt.sign(
