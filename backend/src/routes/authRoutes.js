@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAdmin } = require("../middleware/authMiddleware.js");
+const { verifyAdmin, verifyUser } = require("../middleware/authMiddleware.js");
 const {
   registerUser,
   registerMultipleUsers,
@@ -11,9 +11,9 @@ const {
 const route = express.Router();
 
 // Register
-route.post("/register", isAdmin, registerUser);
+route.post("/register", verifyAdmin, registerUser);
 
-route.post("/register-multiple", isAdmin, registerMultipleUsers);
+route.post("/register-multiple", verifyAdmin, registerMultipleUsers);
 
 // login
 route.post("/login", login);
