@@ -1,4 +1,72 @@
+const { prisma } = require("../../config/db.js");
 // [GET] /api/courses
-module.exports.index = (req, res) => {
-    res.send("Đây là trang khóa học");
+module.exports.index = async (req, res) => {
+    const courses = await prisma.course.findMany({
+        where: {deleted: false},
+    });
+    // Đợi gửi dữ liệu lên frontend  
+    res.send(courses);
+}
+
+// [POST] /api/courses/create 
+module.exports.createPost = async(req, res) => {
+    if(req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
+    if(req.body.exams && req.body.exams.length == 0) delete req.body.exams;
+
+    await prisma.course.create({
+        data: req.body
+    });
+    res.send("OK");
+}
+
+// [DELETE] /api/courses/:id 
+module.exports.deleteCourse = async(req, res) => {
+    try{
+        const id = req.params.id;
+
+        await prisma.course.update({
+            where: {id: id},
+            data: {
+                deleted: true
+            },
+        });
+        // Gửi lên FrontEnd Tình trạng 
+        res.send("Đã xóa thành công");
+    } catch(error) {
+        //Gửi lỗi lên Frontend 
+
+        if (error.code === "P2025") {
+            return res.status(404).json({ success: false, message: "Course not found!" });
+        }
+      
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
+// [PATCH] /api/courses/:id 
+module.exports.coursePatch = async (req, res) => {
+    try{
+        const id = req.params.id;
+
+        if(req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
+        if(req.body.exams && req.body.exams.length == 0) delete req.body.exams;
+
+        await prisma.course.update({
+            where: {
+                id: id,
+                deleted: false
+            },
+            data: req.body
+        });
+        // Gửi lên FrontEnd Tình trạng 
+        res.send("Đã sửa thành công!");
+    } catch(error) {
+        //Gửi lỗi lên Frontend 
+
+        if (error.code === "P2025") {
+            return res.status(404).json({ success: false, message: "Course not found!" });
+        }
+      
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
 }
