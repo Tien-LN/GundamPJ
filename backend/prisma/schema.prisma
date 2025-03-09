@@ -15,18 +15,22 @@ datasource db {
 
 enum Role {
   ADMIN
-  STUDENT 
+  STUDENT
 }
 
 model User {
-  id         String       @id @default(uuid())
-  email      String       @unique
-  name       String
-  password   String
-  role       Role @default(STUDENT)
-  enrollments Enrollment[] // Add relation to Enrollment
-  userAnswers UserAnswer[] // Relation to UserAnswer
-  userExams   UserExam[] // Relation to UserExam
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  name               String
+  password           String
+  status             String
+  role               Role           @default(STUDENT)
+  enrollments        Enrollment[] // Add relation to Enrollment
+  userAnswers        UserAnswer[] // Relation to UserAnswer
+  userExams          UserExam[] // Relation to UserExam
+  Announcement       Announcement[]
+  deleted            Boolean        @default(false)
+  mustChangePassword Boolean        @default(true)
 }
 
 model Course {
@@ -37,32 +41,36 @@ model Course {
   endDate     DateTime
   enrollments Enrollment[] // Add relation to Enrollment
   exams       Exam[] // Relation to Exam
+  deleted     Boolean      @default(false)
 }
 
 enum EnrollmentStatus {
-  PENDING 
-  APPROVED 
+  PENDING
+  APPROVED
   REJECTED
 }
 
 model Enrollment {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  course    Course   @relation(fields: [courseId], references: [id])
-  courseId  String
-  status    EnrollmentStatus @default(PENDING)
-  
+  id       String           @id @default(uuid())
+  user     User             @relation(fields: [userId], references: [id])
+  userId   String
+  course   Course           @relation(fields: [courseId], references: [id])
+  courseId String
+  status   EnrollmentStatus @default(PENDING)
+  deleted  Boolean          @default(false)
+
   @@unique([userId, courseId]) // Prevent duplicate enrollments
 }
 
 model Exam {
-  id        String   @id @default(uuid())
-  course    Course   @relation(fields: [courseId], references: [id])
+  id        String     @id @default(uuid())
+  course    Course     @relation(fields: [courseId], references: [id])
   courseId  String
   startDate DateTime
   endDate   DateTime
   questions Question[]
+  UserExam  UserExam[]
+  deleted   Boolean    @default(false)
 }
 
 enum QuestionType {
@@ -74,20 +82,22 @@ enum QuestionType {
 }
 
 model Question {
-  id        String   @id @default(uuid())
-  exam      Exam     @relation(fields: [examId], references: [id])
-  examId    String
-  type      QuestionType
-  content   String // Question content (TinyMCE or text)
-  options   QuestionOption[]
+  id         String           @id @default(uuid())
+  exam       Exam             @relation(fields: [examId], references: [id])
+  examId     String
+  type       QuestionType
+  content    String // Question content (TinyMCE or text)
+  options    QuestionOption[]
+  UserAnswer UserAnswer[]
 }
 
 model QuestionOption {
-  id         String   @id @default(uuid())
-  question   Question @relation(fields: [questionId], references: [id])
+  id         String       @id @default(uuid())
+  question   Question     @relation(fields: [questionId], references: [id])
   questionId String
   content    String
-  isCorrect  Boolean 
+  isCorrect  Boolean
+  UserAnswer UserAnswer[]
 }
 
 enum ExamStatus {
@@ -96,26 +106,29 @@ enum ExamStatus {
 }
 
 model UserExam {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  exam      Exam     @relation(fields: [examId], references: [id])
-  examId    String
-  startTime DateTime
-  endTime   DateTime?
-  duration  Int?
-  status    ExamStatus @default(IN_PROGRESS)
+  id          String       @id @default(uuid())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
+  exam        Exam         @relation(fields: [examId], references: [id])
+  examId      String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?
+  status      ExamStatus   @default(IN_PROGRESS)
   userAnswers UserAnswer[]
 }
 
 model UserAnswer {
-  id                String   @id @default(uuid())
-  userExam          UserExam @relation(fields: [userExamId], references: [id])
-  userExamId        String
-  question          Question @relation(fields: [questionId], references: [id])
-  questionId        String
-  questionOption    QuestionOption? @relation(fields: [questionOptionId], references: [id])
-  questionOptionId  String?
+  id               String          @id @default(uuid())
+  userExam         UserExam        @relation(fields: [userExamId], references: [id])
+  userExamId       String
+  question         Question        @relation(fields: [questionId], references: [id])
+  questionId       String
+  questionOption   QuestionOption? @relation(fields: [questionOptionId], references: [id])
+  questionOptionId String?
+  User             User?           @relation(fields: [userId], references: [id])
+  userId           String?
+  deleted          Boolean         @default(false)
 }
 
 enum AnnouncementVisibility {
@@ -125,12 +138,21 @@ enum AnnouncementVisibility {
 }
 
 model Announcement {
-  id             String   @id @default(uuid())
+  id             String                 @id @default(uuid())
   title          String
   content        String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  author         User     @relation(fields: [authorId], references: [id])
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  author         User                   @relation(fields: [authorId], references: [id])
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
+  deleted        Boolean                @default(false)
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  permissions String[] // Mảng chứa danh sách quyền
+  deleted     Boolean  @default(false)
 }
