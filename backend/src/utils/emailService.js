@@ -26,22 +26,21 @@ const sendEmail = async (to, subject, text, html) => {
 
 const validateEmail = async (email) => {
   try {
-    const API_KEY = process.env.ZEROBOUNCE_API_KEY;
+    const API_KEY = process.env.MAILBOX_API_KEY;
     const response = await axios.get(
-      `https://api.zerobounce.net/v2/validate?api_key=${API_KEY}&email=${email}`
+      `https://apilayer.net/api/check?access_key=${API_KEY}&email=${email}`
     );
-    // console.log(response);
-    const { status, sub_status } = response.data;
+    console.log(response);
+    const { format_valid, mx_found, smtp_check, score } = response.data;
 
-    if (status === "valid") {
-      return { valid: true, message: "Email hợp lệ" };
-    } else if (sub_status === "disposable") {
-      return { valid: false, message: "Email dùng một lần (disposable email)" };
-    } else if (status === "invalid") {
-      return { valid: false, message: "Email không hợp lệ" };
-    } else {
-      return { valid: false, message: `Lỗi: ${status}, ${sub_status}` };
+    if (!format_valid || !mx_found || !smtp_check) {
+      return {
+        valid: false,
+        message: "❌ Email không hợp lệ hoặc không tồn tại",
+      };
     }
+
+    return { valid: true, message: "✅ Email hợp lệ" };
   } catch (error) {
     console.error("Lỗi kiểm tra email: ", error.message);
     return { valid: false, message: "Lỗi server khi kiểm tra email" };
