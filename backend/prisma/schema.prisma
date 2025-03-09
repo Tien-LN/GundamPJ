@@ -20,15 +20,18 @@ enum Role {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  email        String         @unique
-  name         String
-  password     String
-  role         Role           @default(STUDENT)
-  enrollments  Enrollment[] // Add relation to Enrollment
-  userAnswers  UserAnswer[] // Relation to UserAnswer
-  userExams    UserExam[] // Relation to UserExam
-  Announcement Announcement[]
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  name               String
+  password           String
+  status             String
+  role               Role           @default(STUDENT)
+  enrollments        Enrollment[] // Add relation to Enrollment
+  userAnswers        UserAnswer[] // Relation to UserAnswer
+  userExams          UserExam[] // Relation to UserExam
+  Announcement       Announcement[]
+  deleted            Boolean        @default(false)
+  mustChangePassword Boolean        @default(true)
 }
 
 model Course {
@@ -39,6 +42,7 @@ model Course {
   endDate     DateTime
   enrollments Enrollment[] // Add relation to Enrollment
   exams       Exam[] // Relation to Exam
+  deleted     Boolean      @default(false)
 }
 
 enum EnrollmentStatus {
@@ -54,6 +58,8 @@ model Enrollment {
   course   Course           @relation(fields: [courseId], references: [id])
   courseId String
   status   EnrollmentStatus @default(PENDING)
+  deleted  Boolean          @default(false)
+
 
   @@unique([userId, courseId]) // Prevent duplicate enrollments
 }
@@ -66,6 +72,8 @@ model Exam {
   endDate   DateTime
   questions Question[]
   UserExam  UserExam[]
+  deleted   Boolean    @default(false)
+
 }
 
 enum QuestionType {
@@ -123,6 +131,7 @@ model UserAnswer {
   questionOptionId String?
   User             User?           @relation(fields: [userId], references: [id])
   userId           String?
+  deleted          Boolean         @default(false)
 }
 
 enum AnnouncementVisibility {
@@ -140,4 +149,13 @@ model Announcement {
   author         User                   @relation(fields: [authorId], references: [id])
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
+  deleted        Boolean                @default(false)
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  permissions String[] // Mảng chứa danh sách quyền
+  deleted     Boolean  @default(false)
 }
