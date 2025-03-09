@@ -39,6 +39,7 @@ model Course {
   enrollments Enrollment[] // Add relation to Enrollment
   exams       Exam[] // Relation to Exam
   deleted     Boolean      @default(false)
+  docs        doc[]
 }
 
 enum EnrollmentStatus {
@@ -153,4 +154,12 @@ model Roles {
   permissions String[] // Mảng chứa danh sách quyền
   deleted     Boolean  @default(false)
   User        User[]
+}
+
+model doc {
+  id         String @id @default(uuid())
+  title      String
+  courseId   String
+  content    String
+  linkCourse Course @relation(fields: [courseId], references: [id])
 }

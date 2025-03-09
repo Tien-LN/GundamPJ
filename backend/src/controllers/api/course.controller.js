@@ -115,3 +115,27 @@ module.exports.enrollGet = async(req, res) => {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 }
+
+// [POST] /api/courses/:id/doc/create 
+module.exports.docCreatePost = async(req,res) => {
+    try{
+        const courseId = req.params.id;
+
+        const courseExist = await prisma.course.findUnique({
+            where: {id: courseId}
+        });
+
+        if(!courseExist){
+            res.send("khóa học không tồn tại");
+        } else {
+            req.body.courseId = courseId;
+            await prisma.doc.create({
+                data: req.body
+            });
+            res.send("Đã thêm bài giảng");
+        }
+    } catch(error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+
+}
