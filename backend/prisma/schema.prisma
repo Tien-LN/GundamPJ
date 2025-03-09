@@ -13,19 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  TEACHER
-  STUDENT
-}
-
 model User {
   id                 String         @id @default(uuid())
   email              String         @unique
   name               String
   password           String
   status             String
-  role               Role           @default(STUDENT)
+  role_id               String
+  role     Roles   @relation(fields: [role_id], references: [id])
   enrollments        Enrollment[] // Add relation to Enrollment
   userAnswers        UserAnswer[] // Relation to UserAnswer
   userExams          UserExam[] // Relation to UserExam
@@ -60,7 +55,6 @@ model Enrollment {
   status   EnrollmentStatus @default(PENDING)
   deleted  Boolean          @default(false)
 
-
   @@unique([userId, courseId]) // Prevent duplicate enrollments
 }
 
@@ -73,7 +67,6 @@ model Exam {
   questions Question[]
   UserExam  UserExam[]
   deleted   Boolean    @default(false)
-
 }
 
 enum QuestionType {

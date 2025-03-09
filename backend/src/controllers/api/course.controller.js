@@ -3,6 +3,14 @@ const { prisma } = require("../../config/db.js");
 module.exports.index = async (req, res) => {
     const courses = await prisma.course.findMany({
         where: {deleted: false},
+        select: {
+            id: false,
+            name: true,
+            description: true,
+            startDate: true,
+            endDate: true,
+            deleted: false
+        }
     });
     // Đợi gửi dữ liệu lên frontend  
     res.send(courses);

@@ -7,6 +7,7 @@ const examRoutes = require('./exam.route');
 const userRoutes = require('./user.route');
 const statisticRoutes = require('./statistics.route');
 const systemConfig = require("../../config/dotenv");
+const roleRoutes = require("./role.route");
 
 module.exports = (app) => {
     app.use(systemConfig.API_route + "/announcements", announRoutes);
@@ -25,5 +26,6 @@ module.exports = (app) => {
 
     app.use(systemConfig.API_route + "/statistics", statisticRoutes);
 
+    app.use(systemConfig.API_route + "/roles", roleRoutes);
 
 }
