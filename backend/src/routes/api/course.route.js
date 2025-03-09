@@ -9,4 +9,6 @@ router.post("/create", controller.createPost);
 router.delete("/:id", controller.deleteCourse);
 
 router.patch("/:id", controller.coursePatch);
+
+router.get("/:id/enrollments", controller.enrollGet);
 module.exports = router;

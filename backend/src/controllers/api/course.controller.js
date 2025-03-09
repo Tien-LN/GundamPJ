@@ -78,3 +78,40 @@ module.exports.coursePatch = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
+
+// [GET] /api/courses/:id/enrollments 
+module.exports.enrollGet = async(req, res) => {
+    try {
+        const id = req.params.id;
+        const course = await prisma.course.findUnique({
+            where: {
+                id: id,
+                deleted: false
+            },
+            include: {
+                enrollments: {
+                    where: {
+                        status: "APPROVED"
+                    },
+                    include: {
+                        user: {
+                            select: {
+                                id : true,
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        if(!course){
+            return res.status(404).json({ message: "course not found!" });
+        }
+        var users = course.enrollments.map(enrollment => enrollment.user);
+        res.send(users);
+    } catch(error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+}
