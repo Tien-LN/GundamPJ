@@ -3,10 +3,11 @@ const jwt = require("jsonwebtoken");
 const { prisma } = require("../config/db.js");
 const hashPassword = require("../utils/hashPassword.js");
 const { sendEmail, validateEmail } = require("../utils/emailService.js");
+const generateRandomPassword = require("../utils/generateRandomPassword.js");
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, role } = req.body;
 
     const emailCheck = await validateEmail(email);
     // console.log(emailCheck);
@@ -19,7 +20,8 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "email đã tồn tại" });
     }
 
-    const hashedPassword = await hashPassword(password);
+    const tempPassword = generateRandomPassword();
+    const hashedPassword = await hashPassword(tempPassword);
 
     const newUser = await prisma.user.create({
       data: {
@@ -27,16 +29,46 @@ const registerUser = async (req, res) => {
         email,
         password: hashedPassword,
         role,
+        mustChangePassword: true,
       },
     });
 
     await sendEmail(
       email,
       "Chào mừng bạn đến với PSTUDY!",
-      `Xin chào ${name}, cảm ơn bạn đã đăng ký khóa học của chúng tôi!`,
-      `<p><strong>Đây là thông tin đăng nhập của tài khoản học viên của bạn:</strong></p>
-        <br><strong>Email:</strong> ${email} 
-        <br><strong>Mật khẩu:</strong> ${password}`
+      `Xin chào ${name},
+    
+    Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:
+      - Email: ${email}
+      - Mật khẩu: ${tempPassword}
+    
+    📢 Khuyến cáo: Vui lòng đăng nhập và đổi mật khẩu ngay lần đầu tiên để bảo vệ tài khoản của bạn.
+    
+    Trân trọng,
+    Đội ngũ PSTUDY
+    `,
+      `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #2d89ef;">Chào mừng bạn đến với PSTUDY!</h2>
+        <p>Xin chào <strong>${name}</strong>,</p>
+        <p>Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:</p>
+        <ul>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Mật khẩu:</strong> ${tempPassword}</li>
+        </ul>
+        <p style="color: red; font-weight: bold;">
+          📢 Lưu ý: Để bảo vệ tài khoản của bạn, hãy đăng nhập và đổi mật khẩu ngay lần đầu tiên.
+        </p>
+        <p>Bấm vào nút bên dưới để đổi mật khẩu ngay:</p>
+        <p>
+          <a href="https://yourwebsite.com/reset-password" 
+             style="display: inline-block; padding: 10px 20px; color: white; background: #2d89ef; text-decoration: none; border-radius: 5px;">
+             Đổi mật khẩu ngay
+          </a>
+        </p>
+        <p>Trân trọng,<br><strong>Đội ngũ PSTUDY</strong></p>
+      </div>
+      `
     );
 
     res
@@ -64,29 +96,89 @@ const registerMultipleUsers = async (req, res) => {
     });
 
     const existingEmails = await existingUsers.map((user) => {
-      user.email;
+      existingUsers.email;
     });
 
+    const invalidEmails = [];
+    const validUsers = [];
+
     // lọc các user mới
-    const newUsers = users.filter(
+    for (const user of users) {
+      const emailCheck = await validateEmail(user.email);
+      if (!emailCheck.valid) {
+        invalidEmails.push(user.email);
+      } else {
+        validUsers.push(user);
+      }
+    }
+    const newUsers = validUsers.filter(
       (user) => !existingEmails.includes(user.email)
     );
+
     if (newUsers.length === 0)
-      return res.status(400).json({ message: "Tất cả Email đều đã tồn tại" });
+      return res.status(400).json({
+        message: "Tất cả Email đều đã tồn tại",
+        existingEmails,
+        invalidEmails,
+      });
 
     // hashing passwords
     const hashedUsers = await Promise.all(
-      newUsers.map(async (user) => ({
-        ...user, // sao chep tat ca thuoc tinh cua object sau do chi thay doi 1 tt
-        password: await hashPassword(user.password),
-      }))
+      newUsers.map(async (user) => {
+        const tempPassword = generateRandomPassword();
+        return {
+          ...user, // sao chep tat ca thuoc tinh cua object sau do chi thay doi 1 tt
+          password: await hashPassword(tempPassword),
+          tempPassword,
+        };
+      })
     );
 
     // them users vao db
     await prisma.user.createMany({
-      data: hashedUsers,
+      data: hashedUsers.map(({ tempPassword, ...user }) => user),
       skipDuplicates: true,
     });
+
+    for (const user of hashedUsers) {
+      await sendEmail(
+        user.email,
+        "Chào mừng bạn đến với PSTUDY!",
+        `Xin chào ${user.name},
+      
+      Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:
+        - Email: ${user.email}
+        - Mật khẩu: ${user.tempPassword}
+      
+      📢 Khuyến cáo: Vui lòng đăng nhập và đổi mật khẩu ngay lần đầu tiên để bảo vệ tài khoản của bạn.
+      
+      Trân trọng,
+      Đội ngũ PSTUDY
+      `,
+        `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color: #2d89ef;">Chào mừng bạn đến với PSTUDY!</h2>
+          <p>Xin chào <strong>${user.name}</strong>,</p>
+          <p>Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:</p>
+          <ul>
+            <li><strong>Email:</strong> ${user.email}</li>
+            <li><strong>Mật khẩu:</strong> ${user.tempPassword}</li>
+          </ul>
+          <p style="color: red; font-weight: bold;">
+            📢 Lưu ý: Để bảo vệ tài khoản của bạn, hãy đăng nhập và đổi mật khẩu ngay lần đầu tiên.
+          </p>
+          <p>Bấm vào nút bên dưới để đổi mật khẩu ngay:</p>
+          <p>
+            <a href="https://yourwebsite.com/reset-password" 
+               style="display: inline-block; padding: 10px 20px; color: white; background: #2d89ef; text-decoration: none; border-radius: 5px;">
+               Đổi mật khẩu ngay
+            </a>
+          </p>
+          <p>Trân trọng,<br><strong>Đội ngũ PSTUDY</strong></p>
+        </div>
+        `
+      );
+    }
 
     res
       .status(201)
@@ -121,8 +213,16 @@ const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    console.log(token);
+
+    res.cookie("jwt", token, {
+      httpOnly: true, // bảo vệ cookie khỏi javascript trên trình duyệt
+      secure: process.env.NODE_ENV === "production", //chỉ gửi cookie qua HTTPS trong môi trường production
+      maxAge: 3600000,
+    });
+
     res.json({
-      token,
+      message: "Đăng nhập thành công",
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (error) {
@@ -131,4 +231,44 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, registerMultipleUsers, login };
+const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const userId = req.body.id;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "Vui lòng nhập mật khẩu mới" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user.mustChangePassword) {
+      if (!oldPassword) {
+        return res.status(400).json({ message: "Vui lòng nhập mật khẩu cũ" });
+      }
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Mật khẩu không chính xác" });
+      }
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: false,
+      },
+    });
+
+    res.status(200).json({ message: "Đổi mật khẩu thành công" });
+  } catch (error) {
+    console.error("Lỗi đổi mật khẩu: ", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+module.exports = { registerUser, registerMultipleUsers, login, changePassword };
