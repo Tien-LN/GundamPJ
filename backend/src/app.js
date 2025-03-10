@@ -3,17 +3,18 @@ const express = require("express");
 const cors = require("cors");
 const { connectDB } = require("./config/db.js");
 const app = express();
+const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
 const routeClient = require("./routes/api/index.route.js");
 
 //parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
 
-// Routes 
+// Routes
 routeClient(app);
 
 const startServer = async () => {
@@ -24,6 +25,7 @@ const startServer = async () => {
     // Middleware
     app.use(cors());
     app.use(express.json());
+    app.use(cookieParser());
 
     // Home route
     app.get("/", (req, res) => res.send("API is running"));
