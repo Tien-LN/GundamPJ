@@ -13,19 +13,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  TEACHER
-  STUDENT
-}
-
 model User {
   id                 String         @id @default(uuid())
   email              String         @unique
   name               String
   password           String
-  status             String
-  role               Role           @default(STUDENT)
+  status             String         @default("active")
+  role_id            String
+  token              String
+  role               Roles          @relation(fields: [role_id], references: [id])
   enrollments        Enrollment[] // Add relation to Enrollment
   userAnswers        UserAnswer[] // Relation to UserAnswer
   userExams          UserExam[] // Relation to UserExam
@@ -43,6 +39,7 @@ model Course {
   enrollments Enrollment[] // Add relation to Enrollment
   exams       Exam[] // Relation to Exam
   deleted     Boolean      @default(false)
+  docs        doc[]
 }
 
 enum EnrollmentStatus {
@@ -60,7 +57,6 @@ model Enrollment {
   status   EnrollmentStatus @default(PENDING)
   deleted  Boolean          @default(false)
 
-
   @@unique([userId, courseId]) // Prevent duplicate enrollments
 }
 
@@ -73,7 +69,6 @@ model Exam {
   questions Question[]
   UserExam  UserExam[]
   deleted   Boolean    @default(false)
-
 }
 
 enum QuestionType {
@@ -158,4 +153,13 @@ model Roles {
   description String
   permissions String[] // Mảng chứa danh sách quyền
   deleted     Boolean  @default(false)
+  User        User[]
+}
+
+model doc {
+  id         String @id @default(uuid())
+  title      String
+  courseId   String
+  content    String
+  linkCourse Course @relation(fields: [courseId], references: [id])
 }

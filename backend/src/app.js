@@ -17,6 +17,18 @@ const routes = {
 };
 
 const app = express();
+const bodyParser = require("body-parser");
+
+const routeClient = require("./routes/api/index.route.js");
+
+//parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}));
+
+// parse application/json
+app.use(bodyParser.json());
+
+// Routes 
+routeClient(app);
 
 const startServer = async () => {
   try {
