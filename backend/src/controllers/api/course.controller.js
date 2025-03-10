@@ -123,7 +123,7 @@ module.exports.docCreatePost = async(req,res) => {
 
         const courseExist = await prisma.course.findUnique({
             where: {id: courseId}
-        });
+        }); 
 
         if(!courseExist){
             res.send("khóa học không tồn tại");

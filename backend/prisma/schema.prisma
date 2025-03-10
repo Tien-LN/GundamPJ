@@ -61,14 +61,16 @@ model Enrollment {
 }
 
 model Exam {
-  id        String     @id @default(uuid())
-  course    Course     @relation(fields: [courseId], references: [id])
-  courseId  String
-  startDate DateTime
-  endDate   DateTime
-  questions Question[]
-  UserExam  UserExam[]
-  deleted   Boolean    @default(false)
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  course      Course     @relation(fields: [courseId], references: [id])
+  courseId    String
+  startDate   DateTime
+  endDate     DateTime
+  questions   Question[]
+  UserExam    UserExam[]
+  deleted     Boolean    @default(false)
 }
 
 enum QuestionType {
