@@ -13,6 +13,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RoleType {
+  ADMIN
+  TEACHER
+  ASSISTANT
+  STUDENT
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  title       String @unique
+  roleType RoleType?
+  description String
+  permissions String[] // Mảng chứa danh sách quyền
+  deleted     Boolean  @default(false)
+  User        User[]
+}
+
 model User {
   id                 String         @id @default(uuid())
   email              String         @unique
@@ -21,13 +38,15 @@ model User {
   status             String         @default("active")
   role_id            String
   token              String
-  role               Roles          @relation(fields: [role_id], references: [id])
+  role               RoleType
   enrollments        Enrollment[] // Add relation to Enrollment
   userAnswers        UserAnswer[] // Relation to UserAnswer
   userExams          UserExam[] // Relation to UserExam
   Announcement       Announcement[]
   deleted            Boolean        @default(false)
   mustChangePassword Boolean        @default(true)
+  Roles              Roles?         @relation(fields: [rolesId], references: [id])
+  rolesId            String?
 }
 
 model Course {
@@ -145,15 +164,6 @@ model Announcement {
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
   deleted        Boolean                @default(false)
-}
-
-model Roles {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  permissions String[] // Mảng chứa danh sách quyền
-  deleted     Boolean  @default(false)
-  User        User[]
 }
 
 model doc {

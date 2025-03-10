@@ -2,32 +2,19 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { connectDB } = require("./config/db.js");
-const cookieParser = require("cookie-parser");
-
-// Import routes
-const routes = {
-  auth: require("./routes/authRoutes.js"),
-  users: require("./routes/userRoutes.js"),
-  courses: require("./routes/courseRoutes.js"),
-  enrollments: require("./routes/enrollmentRoutes.js"),
-  exams: require("./routes/examRoutes.js"),
-  docs: require("./routes/docRoutes.js"),
-  announcements: require("./routes/announRoutes.js"),
-  statistics: require("./routes/statisticsRoutes.js"),
-};
-
 const app = express();
+const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
 const routeClient = require("./routes/api/index.route.js");
 
 //parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
 
-// Routes 
+// Routes
 routeClient(app);
 
 const startServer = async () => {
@@ -40,20 +27,10 @@ const startServer = async () => {
     app.use(express.json());
     app.use(cookieParser());
 
-    // Routes
-    app.use("/api/auth", routes.auth);
-    app.use("/api/users", routes.users);
-    // app.use("/api/courses", routes.courses);
-    // app.use("/api/enrollments", routes.enrollments);
-    // app.use("/api/exams", routes.exams);
-    // app.use("/api/docs", routes.docs);
-    // app.use("/api/announcements", routes.announcements);
-    // app.use("/api/statistics", routes.statistics);
-
     // Home route
     app.get("/", (req, res) => res.send("API is running"));
 
-    // Middleware xử lý lỗi
+    // Middleware xử lý lỗi (thêm nếu chưa có)
     app.use((err, req, res, next) => {
       console.error(err.stack);
       res.status(500).json({ error: "Internal Server Error" });
