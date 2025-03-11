@@ -43,7 +43,7 @@ model User {
   Announcement       Announcement[]
   deleted            Boolean        @default(false)
   mustChangePassword Boolean        @default(true)
-  role               Roles?         @relation(fields: [rolesId], references: [id])
+  Roles              Roles?         @relation(fields: [rolesId], references: [id])
   rolesId            String?
 }
 

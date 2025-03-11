@@ -2,7 +2,7 @@ const { prisma } = require("../../config/db.js");
 // [GET] /api/courses
 module.exports.index = async (req, res) => {
     const courses = await prisma.course.findMany({
-        where: {deleted: false},
+        where: { deleted: false },
         select: {
             id: false,
             name: true,
@@ -17,9 +17,9 @@ module.exports.index = async (req, res) => {
 }
 
 // [POST] /api/courses/create 
-module.exports.createPost = async(req, res) => {
-    if(req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
-    if(req.body.exams && req.body.exams.length == 0) delete req.body.exams;
+module.exports.createPost = async (req, res) => {
+    if (req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
+    if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
 
     await prisma.course.create({
         data: req.body
@@ -28,36 +28,36 @@ module.exports.createPost = async(req, res) => {
 }
 
 // [DELETE] /api/courses/:id 
-module.exports.deleteCourse = async(req, res) => {
-    try{
+module.exports.deleteCourse = async (req, res) => {
+    try {
         const id = req.params.id;
 
         await prisma.course.update({
-            where: {id: id},
+            where: { id: id },
             data: {
                 deleted: true
             },
         });
         // Gửi lên FrontEnd Tình trạng 
         res.send("Đã xóa thành công");
-    } catch(error) {
+    } catch (error) {
         //Gửi lỗi lên Frontend 
 
         if (error.code === "P2025") {
             return res.status(404).json({ success: false, message: "Course not found!" });
         }
-      
+
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
 
 // [PATCH] /api/courses/:id 
 module.exports.coursePatch = async (req, res) => {
-    try{
+    try {
         const id = req.params.id;
 
-        if(req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
-        if(req.body.exams && req.body.exams.length == 0) delete req.body.exams;
+        if (req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
+        if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
 
         await prisma.course.update({
             where: {
@@ -68,19 +68,19 @@ module.exports.coursePatch = async (req, res) => {
         });
         // Gửi lên FrontEnd Tình trạng 
         res.send("Đã sửa thành công!");
-    } catch(error) {
+    } catch (error) {
         //Gửi lỗi lên Frontend 
 
         if (error.code === "P2025") {
             return res.status(404).json({ success: false, message: "Course not found!" });
         }
-      
+
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
 
 // [GET] /api/courses/:id/enrollments 
-module.exports.enrollGet = async(req, res) => {
+module.exports.enrollGet = async (req, res) => {
     try {
         const id = req.params.id;
         const course = await prisma.course.findUnique({
@@ -96,7 +96,7 @@ module.exports.enrollGet = async(req, res) => {
                     include: {
                         user: {
                             select: {
-                                id : true,
+                                id: true,
                                 name: true,
                                 email: true
                             }
@@ -105,27 +105,27 @@ module.exports.enrollGet = async(req, res) => {
                 }
             }
         });
-        
-        if(!course){
+
+        if (!course) {
             return res.status(404).json({ message: "course not found!" });
         }
         var users = course.enrollments.map(enrollment => enrollment.user);
         res.send(users);
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 }
 
 // [POST] /api/courses/:id/doc/create 
-module.exports.docCreatePost = async(req,res) => {
-    try{
+module.exports.docCreatePost = async (req, res) => {
+    try {
         const courseId = req.params.id;
 
         const courseExist = await prisma.course.findUnique({
-            where: {id: courseId}
-        }); 
+            where: { id: courseId }
+        });
 
-        if(!courseExist){
+        if (!courseExist) {
             res.send("khóa học không tồn tại");
         } else {
             req.body.courseId = courseId;
@@ -134,7 +134,7 @@ module.exports.docCreatePost = async(req,res) => {
             });
             res.send("Đã thêm bài giảng");
         }
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 
