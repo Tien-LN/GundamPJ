@@ -7,6 +7,7 @@ const examRoutes = require("./exam.route");
 const userRoutes = require("./user.route");
 const statisticRoutes = require("./statistics.route");
 const adminRoutes = require("./admin.route");
+const roleRoutes = require("./role.route");
 const systemConfig = require("../../config/dotenv");
 
 module.exports = (app) => {

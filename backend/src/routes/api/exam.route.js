@@ -9,4 +9,6 @@ router.post("/create", controller.createPost);
 router.post("/:id/createQuestion", controller.createQuestion);
 
 router.get("/:id", controller.getQuestions);
+
+router.patch("/:id", controller.changeQuestionPatch);
 module.exports = router;

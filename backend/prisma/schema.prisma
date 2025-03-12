@@ -113,6 +113,7 @@ model QuestionOption {
   questionId String
   content    String
   isCorrect  Boolean
+  num        Int          @default(-1)
   UserAnswer UserAnswer[]
 }
 
