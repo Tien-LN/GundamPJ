@@ -8,10 +8,11 @@ const bodyParser = require("body-parser");
 
 const routeClient = require("./routes/api/index.route.js");
 
-//parse application/x-www-form-urlencoded
+// Middleware
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+app.use(cookieParser()); // Đảm bảo cookie-parser được sử dụng trước các route
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
 app.use(bodyParser.json());
 
 // Routes
@@ -21,11 +22,6 @@ const startServer = async () => {
   try {
     await connectDB(); // Đợi DB kết nối xong mới chạy tiếp
     console.log("✅ Database connected");
-
-    // Middleware
-    app.use(cors());
-    app.use(express.json());
-    app.use(cookieParser());
 
     // Home route
     app.get("/", (req, res) => res.send("API is running"));

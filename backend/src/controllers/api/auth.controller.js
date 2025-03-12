@@ -7,7 +7,10 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { role: true },
+    });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -21,17 +24,18 @@ const login = async (req, res) => {
     const token = await jwt.sign(
       {
         id: user.id,
-        role: user.role,
+        role: user.role?.roleType,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
     );
 
-    console.log(token);
+    // console.log(token);
 
     res.cookie("jwt", token, {
       httpOnly: true, // bảo vệ cookie khỏi javascript trên trình duyệt
-      secure: process.env.NODE_ENV === "production", //chỉ gửi cookie qua HTTPS trong môi trường production
+      secure: process.env.NODE_ENV === "production" ? true : false, // Chỉ bật trên môi trường production
+      sameSite: "Lax",
       maxAge: 3600000,
     });
 

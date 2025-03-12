@@ -28,5 +28,5 @@ module.exports = (app) => {
 
   app.use(systemConfig.API_route + "/statistics", statisticRoutes);
 
-  app.use(systemConfig.API_route + "/roles", roleRoutes);
+  // app.use(systemConfig.API_route + "/roles", roleRoutes);
 };

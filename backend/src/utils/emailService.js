@@ -30,7 +30,7 @@ const validateEmail = async (email) => {
     const response = await axios.get(
       `https://apilayer.net/api/check?access_key=${API_KEY}&email=${email}`
     );
-    console.log(response);
+    // console.log(response);
     const { format_valid, mx_found, smtp_check, score } = response.data;
 
     if (!format_valid || !mx_found || !smtp_check) {

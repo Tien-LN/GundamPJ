@@ -1,12 +1,13 @@
 const { sendEmail, validateEmail } = require("../../utils/emailService.js");
 const generateRandomPassword = require("../../utils/generateRandomPassword.js");
+const { prisma } = require("../../config/db.js");
+const hashPassword = require("../../utils/hashPassword.js");
 
 const registerUser = async (req, res) => {
   try {
     const { name, email, role } = req.body;
 
     const emailCheck = await validateEmail(email);
-    // console.log(emailCheck);
     if (!emailCheck.valid) {
       return res.status(400).json({ message: emailCheck.message });
     }
@@ -14,6 +15,13 @@ const registerUser = async (req, res) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "email đã tồn tại" });
+    }
+
+    const roleRecord = await prisma.roles.findUnique({
+      where: { roleType: role || "STUDENT" },
+    });
+    if (!roleRecord) {
+      return res.status(400).json({ message: "Role không hợp lệ" });
     }
 
     const tempPassword = generateRandomPassword();
@@ -24,7 +32,7 @@ const registerUser = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role,
+        roleId: roleRecord.id,
         mustChangePassword: true,
       },
     });
@@ -71,6 +79,7 @@ const registerUser = async (req, res) => {
       .status(201)
       .json({ message: "tạo người dùng thành công", user: newUser });
   } catch (error) {
+    console.error("Lỗi khi tạo người dùng:", error);
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
@@ -78,6 +87,7 @@ const registerUser = async (req, res) => {
 const registerMultipleUsers = async (req, res) => {
   try {
     const users = req.body.users;
+    console.log(users);
     if (!users || !Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ message: "Dữ liệu không hợp lệ" });
     }
@@ -122,10 +132,20 @@ const registerMultipleUsers = async (req, res) => {
     const hashedUsers = await Promise.all(
       newUsers.map(async (user) => {
         const tempPassword = generateRandomPassword();
+        const roleRecord = await prisma.roles.findUnique({
+          where: { roleType: user.role || "STUDENT" },
+        });
+        if (!roleRecord) {
+          res.status(400).json({
+            message: `user với email: ${user.email} có role không hợp lệ`,
+          });
+        }
         return {
-          ...user, // sao chep tat ca thuoc tinh cua object sau do chi thay doi 1 tt
+          name: user.name,
+          email: user.email,
           password: await hashPassword(tempPassword),
-          tempPassword,
+          roleId: roleRecord.id,
+          mustChangePassword: true,
         };
       })
     );

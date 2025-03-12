@@ -1,17 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../../controllers/api/user.controller");
+const controller = require("../../controllers/api/user.controller.js");
+const {
+  verifyAdmin,
+  verifyUser,
+} = require("../../middleware/authMiddleware.js");
 
-router.get("/", controller.getUsers);
+// lấy danh sách user - chỉ Admin
+router.get("/", verifyAdmin);
 
-router.post("/create", controller.createPost);
+// xem thông tin tài khoản
+router.get("/me", verifyUser);
 
-router.delete("/:id", controller.userDelete);
+// cập nhật thông tin tài khoản
+router.put("/me/update", verifyUser);
 
-router.patch("/lock/:id", controller.userLock);
-
-router.patch("/unlock/:id", controller.userUnLock);
-
-router.patch("/:id", controller.userUpdate);
+// xóa user theo id - chỉ admin
+router.delete("/:id/delete", verifyAdmin);
 
 module.exports = router;
