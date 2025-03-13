@@ -5,10 +5,18 @@ const { prisma } = require("../../config/db.js");
 module.exports.getAllAnnouncements = async (req, res) => {
     try {
         const announcements = await prisma.announcement.findMany({
+            where: {
+                deleted: false
+            },
             select: {
-                id: false,
                 title: true,
                 content: true,
+                createdAt: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         })
         res.json(announcements);
@@ -43,8 +51,17 @@ module.exports.getOneAnnouncement = async (req, res) => {
 
 // [POST] /api/announcements/create
 module.exports.createAnnouncement = async (req, res) => {
+    const { title, content, authorId } = req.body;
     await prisma.announcement.create({
-        data: req.body
+        data: {
+            title,
+            content,
+            author: {
+                connect: {
+                    id: authorId
+                }
+            }
+        }
     });
 
     res.send("Create Announcement Successfully");
