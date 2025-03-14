@@ -1,0 +1,79 @@
+$color-bg-section: linear-gradient(90deg, #00208E 0%, #00114B 100%);
+$color-bg-link-hover: #00AEFE8C;
+$color-text-unit-title: #FF4028;
+
+.section{
+    &__header{
+        background: $color-bg-section;
+        list-style-type: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        li{
+            
+            a{
+                color: #fff;
+                display: block;
+                width: 100%;
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                transition: all 0.3s;
+                &:hover{
+                    background-color: $color-bg-link-hover;
+
+                }
+            }
+        }
+        
+    }
+    &__containnerImg{
+        width: 100%;
+        aspect-ratio: 3.2;
+        overflow: hidden;
+        position: relative;
+    }
+    &__description{
+        bottom: 20px;
+        left: 10px;
+        position: absolute;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+    }
+    &__image{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    &__units{
+        padding: 0 20px;
+        list-style: none;
+        &-hr{
+            width: 100%;
+            height: 5px;
+            background-color: #000;
+            margin: 10px 0;
+        }
+    }
+    &__unit{
+        &-title{
+            color: $color-text-unit-title;
+        }
+    }
+    &__lessons{
+        list-style: none;
+        &-item{
+            padding: 10px 0;
+            border-bottom: 1px solid rgb(0,0,0,0.3);
+        }
+        &-link{
+            text-decoration: none;
+            color: #000;
+        }
+    }
+}

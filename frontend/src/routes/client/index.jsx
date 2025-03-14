@@ -12,6 +12,9 @@ import Category from "../../pages/client/Category/index.jsx";
 import Faq from "../../pages/client/Faq/index.jsx";
 import Error404 from "../../pages/client/Error404/index.jsx";
 import CoursesDefault from "../../layouts/client/CoursesDefault.jsx";
+import Section from "../../pages/client/Courses/Section.jsx";
+import Lesson from "../../pages/client/Courses/Lesson.jsx";
+import SectionDescription from "../../pages/client/Courses/SectionDescription.jsx";
 export const routes = [
     {
         path: "/auth/login",
@@ -35,15 +38,23 @@ export const routes = [
             },
             {
                 path: "courses",
+                element: <Courses/>
+            },
+            {
+                path: "courses/:sectionId",
                 element: <CoursesDefault/>,
                 children: [
                     {
                         index: true,
-                        element: <Courses/>
+                        element: <Section/>
                     },
                     {
-                        path: ":subject",
-                        element: <Subject/>
+                        path: "description",
+                        element: <SectionDescription/>
+                    },
+                    {
+                        path: ":lessonId",
+                        element: <Lesson/>
                     }
                 ]
             },
