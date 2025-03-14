@@ -1,4 +1,8 @@
-const { sendEmail, validateEmail } = require("../../utils/emailService.js");
+const {
+  sendEmail,
+  validateEmail,
+  validateEmailBatch,
+} = require("../../utils/emailService.js");
 const generateRandomPassword = require("../../utils/generateRandomPassword.js");
 const { prisma } = require("../../config/db.js");
 const hashPassword = require("../../utils/hashPassword.js");
@@ -92,41 +96,61 @@ const registerMultipleUsers = async (req, res) => {
       return res.status(400).json({ message: "Dữ liệu không hợp lệ" });
     }
 
-    // lấy email list
-    const emailList = await users.map((user) => user.email);
+    // lấy danh sách email
+    const emailList = users.map((user) => user.email);
+    console.log("Email list:", emailList);
 
-    // lấy ra các email đã tồn tại
-    const existingUsers = await prisma.user.findMany({
+    // lấy ra các email đã tồn tại trong DB
+    const existingEmailsList = await prisma.user.findMany({
       where: { email: { in: emailList } },
       select: { email: true },
     });
 
-    const existingEmails = await existingUsers.map((user) => {
-      existingUsers.email;
+    console.log("Existing emails:", existingEmailsList);
+
+    const existingEmails = existingEmailsList.map((user) => user.email);
+    console.log("Existing emails array:", existingEmails);
+
+    const emailvalidationResults = await validateEmailBatch(emailList);
+    const validEmails = [];
+    const invalidEmails = [];
+
+    // lọc email
+    emailList.forEach((email, index) => {
+      if (!emailvalidationResults[index].valid) {
+        invalidEmails.push({
+          email: email,
+          reason: emailvalidationResults[index].message,
+        });
+      } else {
+        validEmails.push(email);
+      }
     });
 
-    const invalidEmails = [];
-    const validUsers = [];
+    console.log("Valid emails:", validEmails);
+    console.log("Invalid emails:", invalidEmails);
 
-    // lọc các user mới
-    for (const user of users) {
-      const emailCheck = await validateEmail(user.email);
-      if (!emailCheck.valid) {
-        invalidEmails.push(user.email);
-      } else {
-        validUsers.push(user);
-      }
-    }
-    const newUsers = validUsers.filter(
-      (user) => !existingEmails.includes(user.email)
+    // Lọc các user mới (hợp lệ và chưa tồn tại)
+    const newUsers = users.filter(
+      (user) =>
+        validEmails.includes(user.email) && !existingEmails.includes(user.email)
     );
 
-    if (newUsers.length === 0)
+    console.log("New users:", newUsers);
+
+    if (newUsers.length === 0) {
       return res.status(400).json({
-        message: "Tất cả Email đều đã tồn tại",
+        message: "không thể tạo tài khoản",
+        reason:
+          invalidEmails.length > 0 && existingEmails.length > 0
+            ? "Một số email không hợp lệ, còn lại đã tồn tại"
+            : invalidEmails.length > 0
+            ? "Tất cả email không hợp lệ"
+            : "Tất cả email đã tồn tại",
         existingEmails,
         invalidEmails,
       });
+    }
 
     // hashing passwords
     const hashedUsers = await Promise.all(
@@ -135,72 +159,58 @@ const registerMultipleUsers = async (req, res) => {
         const roleRecord = await prisma.roles.findUnique({
           where: { roleType: user.role || "STUDENT" },
         });
+
         if (!roleRecord) {
-          res.status(400).json({
+          return res.status(400).json({
             message: `user với email: ${user.email} có role không hợp lệ`,
           });
         }
+
         return {
           name: user.name,
           email: user.email,
           password: await hashPassword(tempPassword),
           roleId: roleRecord.id,
           mustChangePassword: true,
+          tempPassword: tempPassword,
         };
       })
     );
 
-    // them users vao db
+    // Thêm user vào DB
     await prisma.user.createMany({
-      data: hashedUsers.map(({ tempPassword, ...user }) => user),
+      data: hashedUsers,
       skipDuplicates: true,
     });
 
+    // Gửi email cho từng user
     for (const user of hashedUsers) {
       await sendEmail(
         user.email,
         "Chào mừng bạn đến với PSTUDY!",
-        `Xin chào ${user.name},
-      
-      Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:
-        - Email: ${user.email}
-        - Mật khẩu: ${user.tempPassword}
-      
-      📢 Khuyến cáo: Vui lòng đăng nhập và đổi mật khẩu ngay lần đầu tiên để bảo vệ tài khoản của bạn.
-      
-      Trân trọng,
-      Đội ngũ PSTUDY
-      `,
-        `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #2d89ef;">Chào mừng bạn đến với PSTUDY!</h2>
+        `Xin chào ${user.name},\n\nCảm ơn bạn đã đăng ký! Dưới đây là thông tin đăng nhập:\n- Email: ${user.email}\n- Mật khẩu: ${user.tempPassword}\n\n📢 Vui lòng đổi mật khẩu ngay lần đầu tiên.\n\nTrân trọng,\nĐội ngũ PSTUDY`,
+        `<div style="font-family: Arial, sans-serif;">
+          <h2>Chào mừng bạn đến với PSTUDY!</h2>
           <p>Xin chào <strong>${user.name}</strong>,</p>
-          <p>Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:</p>
+          <p>Cảm ơn bạn đã đăng ký! Dưới đây là thông tin đăng nhập của bạn:</p>
           <ul>
             <li><strong>Email:</strong> ${user.email}</li>
             <li><strong>Mật khẩu:</strong> ${user.tempPassword}</li>
           </ul>
-          <p style="color: red; font-weight: bold;">
-            📢 Lưu ý: Để bảo vệ tài khoản của bạn, hãy đăng nhập và đổi mật khẩu ngay lần đầu tiên.
-          </p>
-          <p>Bấm vào nút bên dưới để đổi mật khẩu ngay:</p>
-          <p>
-            <a href="https://yourwebsite.com/reset-password" 
-               style="display: inline-block; padding: 10px 20px; color: white; background: #2d89ef; text-decoration: none; border-radius: 5px;">
-               Đổi mật khẩu ngay
-            </a>
-          </p>
+          <p><a href="https://yourwebsite.com/reset-password">Đổi mật khẩu ngay</a></p>
           <p>Trân trọng,<br><strong>Đội ngũ PSTUDY</strong></p>
-        </div>
-        `
+        </div>`
       );
     }
 
-    res
-      .status(201)
-      .json({ message: `đã tạo thành công ${newUsers.length} tài khoản` });
+    res.status(201).json({
+      message: `Đã tạo thành công ${newUsers.length} tài khoản`,
+      createdUsers: newUsers.map((user) => user.email),
+      existingEmails,
+      invalidEmails,
+    });
   } catch (error) {
-    console.error("lỗi khi tạo nhiều tài khoản", error);
+    console.error("Lỗi khi tạo nhiều tài khoản:", error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };

@@ -35,6 +35,7 @@ model User {
   email              String         @unique
   name               String
   password           String
+  tempPassword       String?
   status             String         @default("active")
   enrollments        Enrollment[]
   userAnswers        UserAnswer[]
