@@ -11,6 +11,7 @@ import Subject from "../../pages/client/Courses/Subject.jsx";
 import Category from "../../pages/client/Category/index.jsx";
 import Faq from "../../pages/client/Faq/index.jsx";
 import Error404 from "../../pages/client/Error404/index.jsx";
+import CoursesDefault from "../../layouts/client/CoursesDefault.jsx";
 export const routes = [
     {
         path: "/auth/login",
@@ -21,43 +22,49 @@ export const routes = [
         element: <Default/>,
         children: [
             {
-                path: "/",
+                index: true,
                 element: <Home/>
             },
             {
-                path: "/statistics",
+                path: "statistics",
                 element: <Statistic/>
             },
             {
-                path: "/all-courses",
+                path: "all-courses",
                 element: <AllCourses/>
             },
             {
-                path: "/courses",
-                element: <Courses/>
+                path: "courses",
+                element: <CoursesDefault/>,
+                children: [
+                    {
+                        index: true,
+                        element: <Courses/>
+                    },
+                    {
+                        path: ":subject",
+                        element: <Subject/>
+                    }
+                ]
             },
             {
-                path: "/courses/:subject",
-                element: <Subject/>
-            },
-            {
-                path: "/my-account",
+                path: "my-account",
                 element: <MyAccount/>
             },
             {
-                path: "/enrollments",
+                path: "enrollments",
                 element: <Enrollments/>
             },
             {
-                path: "/about",
+                path: "about",
                 element: <About/>
             },
             {
-                path: "/category",
+                path: "category",
                 element: <Category/>
             },
             {
-                path: "/faq",
+                path: "faq",
                 element: <Faq/>
             }
         ]
