@@ -5,7 +5,7 @@ const xlsx = require("xlsx");
 const upload = multer({ storage: multer.memoryStorage() });
 
 const exactUsersFromExcel = (req, res, next) => {
-  console.log("🟢 File nhận được:", req.file);
+  // console.log("🟢 File nhận được:", req.file);
   try {
     if (!req.file) {
       return res
