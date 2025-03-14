@@ -1,0 +1,118 @@
+$color-title: #EC4000;
+$color-description: #BBB5B5;
+$color-footer: #9A9ADE;
+
+@keyframes meteor{
+    0% {
+        transform: translate(0,0) rotate(150deg);
+        height: 0;
+        opacity: 1;
+    }
+    25%{
+        transform: translate(75px, 100px) rotate(150deg);
+        height: 20px;
+        opacity: 0.7;
+    }
+    50%{
+        transform: translate(120px, 160px) rotate(150deg);
+        height: 40px;
+        opacity: 0.5;
+    }
+    75%{
+        transform: translate(150px, 200px) rotate(150deg);
+        height: 60px;
+        opacity: 0.3;
+        
+    }
+    90%{
+        transform: translate(165px, 220px) rotate(150deg);
+        height: 80px;
+        opacity: 0;
+        height: 80px;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+.error404{
+    background: url("/bg-404.jpg");
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    &__meteor{
+        position: absolute;
+        top: calc(var(--y)*1px);
+        left: calc(var(--x)*1px);
+        width: 3px;
+        height: 100px;
+        background: linear-gradient(#fff, transparent);
+        filter: blur(1px);
+        opacity: 0;
+        transform: rotate(150deg);
+        animation: meteor 5s linear infinite;
+        // animation-fill-mode: forwards;
+        animation-delay:  calc(var(--s)*1ms);
+        &::after{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 8px;   
+            height: 8px;
+            border-radius: 50%;
+            background-color: #fff;
+            transform: translate(-50%, -50%);
+            filter: blur(1px);
+
+        }
+    }
+    &__containner{
+        background-color: rgb(0,0,0,0.2);
+        border: 1px solid rgb(255,255,255, 0.2);
+        border-radius: 4px;
+        max-width: 400px;
+        max-height: 400px;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        padding: 48px 24px;
+        box-shadow: 0px 4px 12px 0px rgba(255, 255, 255, .1);
+        position: relative;
+        z-index: 5;
+    }
+    &__subtitle{
+        color: $color-title;
+        font-size: 35px;
+        font-weight: 600;
+        
+    }
+    &__title{
+        color: #fff;
+        font-size: 100px;
+        font-weight: 600;
+        margin: 20px 0;
+    }
+    &__description{
+        color: $color-description;
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    &__footer{
+        color: $color-footer;
+        font-size: 16px;
+        a{
+            color: #fff;
+        }
+        a:hover{
+            text-decoration: none;
+        }
+        
+    }
+}   
