@@ -1,0 +1,42 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 1240px;
+    height: 147px;
+    margin: 0 auto;
+}
+
+.nav-link {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    font-size: 20px;
+}
+
+.nav-link-c {
+    color: black;
+    position: relative;
+}
+
+.nav-link-c::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -25px;
+    width: 0;
+    height: 4px;
+    border-radius: 20px;
+    background-color: #c0392b;
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%);
+}
+
+.nav-link-c.active::after {
+    width: 50%;
+}
+
+.nav-bar {
+    display: flex;
+    gap: 40px;
+}
