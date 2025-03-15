@@ -4,8 +4,10 @@ function Home() {
     return (
         <>
             <div className="home-container">
-                <div className='linear'></div>
-                <img src="../../public/img/Frame 12.png" className='banner' />
+                <div>
+                    <div className='linear'></div>
+                    <img src="../../public/img/Frame 12.png" className='banner' />
+                </div>
                 <div className='home-container__background'>
                     <div className='home-container__box'>
                         <div className='home-container__box--reason'>

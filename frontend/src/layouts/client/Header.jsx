@@ -12,7 +12,7 @@ function Header() {
                         <NavLink to="/courses" className="nav-link-c">Khoá học của tôi</NavLink>
                         <NavLink to="/statistics" className="nav-link-c">Thống kê</NavLink>
                     </div>
-                    <NavLink to="/my-account"><img className="logo-account" src="../public/img/Account.png" /></NavLink>
+                    <NavLink to="/my-account"><img className="avatar-account" src="../public/img/Account.png" /></NavLink>
                 </nav>
             </div>
         </>

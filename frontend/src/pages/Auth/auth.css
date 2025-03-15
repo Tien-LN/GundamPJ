@@ -1,0 +1,62 @@
+.auth-container {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-image: url('https://s3-alpha-sig.figma.com/img/d496/f0b7/0d766a62141cbda16515b6d96e11ebcb?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=AJ4YAMiRK6VKemQjKwylsPwUx3dQrrld0g-r5hCghtsoRb7Lej7yjAwjbERcP92to8izV-r~oItR2FJxiLwMont2thQ-m5hq2CcxtyrTVPNMqthVaIqmjiou63jwjONdC6zewy0sJgmJdTD5lMZxbDuFEGLsY8GPgbitW6BtvtUe4lCCOIUsjobhAdYbKHVCkGetM3o73mHoZ59kf7rGE6cNaCtGaF4xdB5jA3Q9z6WlI37JSZKKLdErI2VNvwzQQ5aQEudxZPY3E6aeaZykblc7dH1VfTYgxlTEW5ZTO1bMUUbf2IX9RXDC9WJFh91BxSeCq2x2RVBuEFqJCHXQjQ__');
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-form {
+    padding: 96px 152px;
+    background-color: #CB4155;
+    border: 1px solid #fff;
+    border-radius: 32px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    width: 50%;
+}
+
+.auth-form__title {
+    text-align: center;
+}
+
+form label {
+    display: inline-block;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+form input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 7px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    font-size: 16px;
+}
+
+form button {
+    display: block;
+    margin: 15px auto 0;
+    width: 70%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: white;
+    color: #d32f2f;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form button:hover {
+    background-color: #ff6659;
+    color: white;
+}
