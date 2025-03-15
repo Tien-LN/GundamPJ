@@ -6,14 +6,14 @@ function Home() {
             <div className="home-container">
                 <div>
                     <div className='linear'></div>
-                    <img src="../../public/img/Frame 12.png" className='banner' />
+                    <img src="/img/Frame_12.png" className='banner' />
                 </div>
                 <div className='home-container__background'>
                     <div className='home-container__box'>
                         <div className='home-container__box--reason'>
                             <h1 className='home-container__box-header'>LÝ DO CHỌN iSMART</h1>
                             <div className='home-container__box--reason-descrip'>
-                                <img src='../../public/img/Ảnh 1.png'></img>
+                                <img src='/img/Anh_1.png'/>
                                 <ul className='home-container__box--reason-descrip__list'>
                                     <li className='home-container-box-reason-desctip__list--detail'>Không gian học tập mở và năng động. Thỏa sức làm việc nhóm, thỏa sức vận động</li>
                                     <li className='home-container-box-reason-desctip__list--detail'>Trang trí sáng tạo, kích thích cảm hứng học tập</li>

@@ -57,7 +57,7 @@
     top: 2%;
     width: 25px;
     height: 25px;
-    background-image: url('../../../../public/img/Group\ 1.png');
+    background-image: url('/img/Group_1.png');
 }
 
 .home-container__box--content {
@@ -106,7 +106,7 @@
 .home-container__box--content-courses__detail1::before {
     content: "";
     position: absolute;
-    background-image: url('../../../../public/img/LOGO\ 1.png');
+    background-image: url('/img/LOGO_1.png');
     left: 10%;
     top: -16%;
     width: 38px;
@@ -116,7 +116,7 @@
 .home-container__box--content-courses__detail2::before {
     content: "";
     position: absolute;
-    background-image: url('../../../../public/img/logo\ hóa.png');
+    background-image: url('/img/logo_hoa.png');
     left: 10%;
     top: -16%;
     width: 38px;
@@ -126,7 +126,7 @@
 .home-container__box--content-courses__detail3::before {
     content: "";
     position: absolute;
-    background-image: url('../../../../public/img/LOGO\ 3.png');
+    background-image: url('/img/LOGO_3.png');
     left: 10%;
     top: -16%;
     width: 38px;
