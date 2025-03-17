@@ -41,7 +41,12 @@ const login = async (req, res) => {
 
     res.json({
       message: "Đăng nhập thành công",
-      user: { id: user.id, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
+      },
     });
   } catch (error) {
     console.error("Login error: ", error);
