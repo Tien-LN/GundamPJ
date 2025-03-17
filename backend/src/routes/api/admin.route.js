@@ -1,27 +1,31 @@
 const express = require("express");
 const {
-  verifyAdmin,
-  verifyUser,
-} = require("../../middleware/authMiddleware.js");
-const {
   upload,
   exactUsersFromExcel,
 } = require("../../middleware/exactUsersFromExcel.js");
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware.js");
 const router = express.Router();
 const controller = require("../../controllers/api/admin.controller");
 
 // Register
-router.post("/register", verifyAdmin, controller.registerUser);
+router.post(
+  "/register",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.registerUser
+);
 
 router.post(
   "/register-multiple",
-  verifyAdmin,
+  verifyUser,
+  checkRole(["ADMIN"]),
   controller.registerMultipleUsers
 );
 
 router.post(
   "/excel-register",
-  verifyAdmin,
+  verifyUser,
+  checkRole(["ADMIN"]),
   upload.single("file"),
   exactUsersFromExcel,
   controller.registerMultipleUsers

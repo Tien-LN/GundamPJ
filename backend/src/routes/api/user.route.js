@@ -1,21 +1,39 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../../controllers/api/user.controller.js");
-const {
-  verifyAdmin,
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware.js");
+
+// Lấy danh sách user - chỉ Admin
+router.get("/", verifyUser, checkRole(["ADMIN"]), controller.getUsers);
+
+// Xem thông tin tài khoản
+router.get("/me", verifyUser, controller.getMe);
+
+// Cập nhật thông tin tài khoản
+router.put("/me/update", verifyUser, controller.updateMe);
+
+// Xóa tạm thời user (soft delete) - chỉ Admin
+router.patch(
+  "/soft-delete",
   verifyUser,
-} = require("../../middleware/authMiddleware.js");
+  checkRole(["ADMIN"]),
+  controller.softDeleteUser
+);
 
-// lấy danh sách user - chỉ Admin
-router.get("/", verifyAdmin);
+// Khôi phục user - chỉ Admin
+router.patch(
+  "/restore",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.restoreUser
+);
 
-// xem thông tin tài khoản
-router.get("/me", verifyUser);
-
-// cập nhật thông tin tài khoản
-router.put("/me/update", verifyUser);
-
-// xóa user theo id - chỉ admin
-router.delete("/:id/delete", verifyAdmin);
+// Xóa vĩnh viễn user (hard delete) - chỉ Admin
+router.delete(
+  "/hard-delete",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.hardDeleteUser
+);
 
 module.exports = router;

@@ -1,0 +1,106 @@
+const { prisma } = require("../../config/db.js");
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        gender: true,
+        dateOfBirth: true,
+        phone: true,
+        address: true,
+        role: { select: { title: true } },
+        status: true,
+      },
+    });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+const getMe = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        name: true,
+        phone: true,
+        gender: true,
+        dateOfBirth: true,
+        address: true,
+        role: { select: { title: true } },
+        status: true,
+      },
+    });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+const updateMe = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, phone, gender, dateOfBirth, address } = req.body;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { name, phone, gender, dateOfBirth, address },
+    });
+    res.status(200).json({ message: "user updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+const softDeleteUser = async (req, res) => {
+  try {
+    const userIds = req.body.userIds;
+    await prisma.user.updateMany({
+      where: { id: { in: userIds } },
+      data: { deletedAt: new Date() },
+    });
+    res.status(200).json({ message: "users soft deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+const restoreUser = async (req, res) => {
+  try {
+    const userIds = req.body.userIds;
+    await prisma.user.updateMany({
+      where: { id: { in: userIds } },
+      data: { deletedAt: null },
+    });
+    res.status(200).json({ message: "users restored successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+const hardDeleteUser = async (req, res) => {
+  try {
+    const userIds = req.body.userIds;
+    await prisma.user.deleteMany({
+      where: { id: { in: userIds } },
+    });
+    res.status(200).json({ message: "user hard deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+module.exports = {
+  getUsers,
+  getMe,
+  updateMe,
+  softDeleteUser,
+  restoreUser,
+  hardDeleteUser,
+};

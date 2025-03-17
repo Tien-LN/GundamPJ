@@ -65,7 +65,7 @@ module.exports.enrollDelete = async (req, res) => {
 };
 
 // [GET] /api/enrollments/list/:id
-module.exports.list = async (req, res) => {
+const list = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -73,17 +73,11 @@ module.exports.list = async (req, res) => {
       where: {
         courseId: id,
         status: "PENDING",
-        deleted: false,
+        deleted: false, // Kiểm tra trạng thái deleted
       },
     });
     res.send(enrolls);
   } catch (error) {
-    if (error.code === "P2025") {
-      return res
-        .status(404)
-        .json({ success: false, message: "Enrollment Id not found!" });
-    }
-
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -163,3 +157,5 @@ module.exports.approve = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+module.exports.list = list;

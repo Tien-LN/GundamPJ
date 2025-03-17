@@ -4,7 +4,6 @@ const { prisma } = require("../config/db.js");
 const verifyUser = async (req, res, next) => {
   try {
     console.log("Middleware verifyUser được gọi");
-    // console.log("Token trong request:", req.cookies);
     const token = req.cookies.jwt;
     if (!token) {
       return res.status(401).json({ message: "Bạn chưa đăng nhập" });
@@ -23,24 +22,19 @@ const verifyUser = async (req, res, next) => {
     req.user = user; // Lưu thông tin user vào req
     next();
   } catch (error) {
-    res.status(401).json({ message: "Token không hợp lệ as", error });
+    res.status(401).json({ message: "Token không hợp lệ", error });
   }
 };
 
-const verifyAdmin = async (req, res, next) => {
-  try {
-    await verifyUser(req, res, async () => {
-      console.log("User role:", req.user.role?.roleType); // Debug log
-      if (req.user.role?.roleType !== "ADMIN") {
-        return res
-          .status(403)
-          .json({ message: "Bạn không có quyền thực hiện thao tác này" });
-      }
-      next();
-    });
-  } catch (error) {
-    res.status(403).json({ message: "Token không hợp lệ", error });
-  }
+const checkRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role?.roleType)) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền thực hiện thao tác này" });
+    }
+    next();
+  };
 };
 
-module.exports = { verifyUser, verifyAdmin };
+module.exports = { verifyUser, checkRole };

@@ -38,15 +38,6 @@ async function seedAdmin() {
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    const token = jwt.sign(
-      {
-        email: adminEmail,
-        role: "ADMIN",
-        userId: adminRole.id,
-      },
-      jwtSecret,
-      { expiresIn: "7d" }
-    );
 
     // 3. Tạo user với đầy đủ trường bắt buộc
     await prisma.user.create({
@@ -54,7 +45,6 @@ async function seedAdmin() {
         email: adminEmail,
         name: "Admin",
         password: hashedPassword,
-        token: token,
         status: "active",
         mustChangePassword: true,
         roleId: adminRole.id,
