@@ -1,0 +1,56 @@
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    height: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo {
+    width: 120px;
+    aspect-ratio: 4/3;
+    object-fit: contain;
+}
+
+.avatar-account {
+    width: 70px;
+    height: 70px;
+}
+
+.nav-link {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    font-size: 16px;
+}
+
+.nav-link-c {
+    color: black;
+    position: relative;
+}
+
+.nav-link-c::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -60%;
+    width: 0;
+    height: 4px;
+    border-radius: 20px;
+    background-color: #c0392b;
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%);
+}
+
+.nav-link-c.active::after {
+    width: 50%;
+}
+
+.nav-bar {
+    display: flex;
+    gap: 40px;
+}
