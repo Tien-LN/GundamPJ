@@ -20,7 +20,7 @@ module.exports = (app) => {
 
   app.use(systemConfig.API_route + "/admin", adminRoutes);
 
-  app.use(systemConfig.API_route + "/users", userRoutes);
+  app.use(systemConfig.API_route + "/users", userRoutes); 
 
   app.use(systemConfig.API_route + "/courses", courseRoutes);
 

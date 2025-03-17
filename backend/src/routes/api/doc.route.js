@@ -5,11 +5,11 @@ const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 
 router.get("/", verifyUser, controller.index);
 
-router.post(
-  "/create",
-  verifyUser,
-  checkRole(["TEACHER", "ADMIN"]),
-  controller.createPost
-);
+// router.post(
+//   "/create",
+//   verifyUser,
+//   checkRole(["TEACHER", "ADMIN"]),
+//   controller.createPost
+// );
 
 module.exports = router;

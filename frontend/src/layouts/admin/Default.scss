@@ -1,0 +1,79 @@
+$color-bg-header: #212529;
+$color-bg-siders: #212529;
+$color-bg-button: #C7C8C9;
+$color-text-siders: #C7C8C9;
+$color-bg-siders-hover: #373a3d;
+.admin{
+    &__header{
+        width: 100%;
+        background-color: $color-bg-header;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        position: relative;
+        z-index: 3;
+        &-containner{
+            width: 20%;
+            display: flex;
+            justify-content: space-between;
+        }
+        &-title{
+            color: #fff;
+            font-size: 23px;
+        }
+        &-closeSide{
+            background: transparent;
+            border: 0;
+            color: $color-bg-button;
+        }
+        a i{
+            color: $color-bg-button;
+        }
+    }
+    &__main{
+        display: flex;
+        position: relative;
+        &-containner{
+            flex: 1;
+        }
+
+    }
+    &__siders{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 20%;
+        height: 100vh;
+        padding-top: 80px;
+        z-index: 2;
+        background-color: $color-bg-siders;
+        list-style: none;
+        &.d-none{
+            display: none;
+        }
+        &-item{
+            padding: 10px 5px;
+            transition: all 0.2s;
+            a{
+                color: $color-text-siders;
+                transition: all 0.2s;
+            }
+            &:hover{
+                background-color: $color-bg-siders-hover;
+                a{
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}
+.offset-2{
+    width: 20%;
+    height: calc(100vh - 48.8px);
+    transition: all 0.3s;
+    background: $color-bg-siders;
+    &.d-none{
+        width: 0;
+    }
+}
