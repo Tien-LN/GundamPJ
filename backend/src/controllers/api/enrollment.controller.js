@@ -2,12 +2,12 @@ const { prisma } = require("../../config/db.js");
 const { body, validationResult } = require("express-validator");
 
 // [GET] /api/enrollments
-module.exports.index = (req, res) => {
+const index = (req, res) => {
   res.send("Đây là api tham gia khóa học");
 };
 
 // [POST] /api/enrollments
-module.exports.createPost = [
+const createPost = [
   // Kiểm tra đầu vào
   body("userId").isUUID().withMessage("Invalid userId"),
   body("courseId").isUUID().withMessage("Invalid courseId"),
@@ -39,7 +39,7 @@ module.exports.createPost = [
 ];
 
 // [DELETE] /api/enrollments/:id
-module.exports.enrollDelete = async (req, res) => {
+const enrollDelete = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -83,7 +83,7 @@ const list = async (req, res) => {
 };
 
 // [GET] /api/enrollments/listApproved
-module.exports.listApproved = async (req, res) => {
+const listApproved = async (req, res) => {
   try {
     const courseId = req.params.id;
     const userId = req.user.id;
@@ -119,7 +119,7 @@ module.exports.listApproved = async (req, res) => {
 };
 
 // [PATCH] /api/enrollments/reject/:id
-module.exports.reject = async (req, res) => {
+const reject = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -145,7 +145,7 @@ module.exports.reject = async (req, res) => {
 };
 
 // [PATCH] /api/enrollments/approve/:id
-module.exports.approve = async (req, res) => {
+const approve = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -170,4 +170,12 @@ module.exports.approve = async (req, res) => {
   }
 };
 
-module.exports.list = list;
+module.exports = {
+  index,
+  createPost,
+  enrollDelete,
+  list,
+  listApproved,
+  reject,
+  approve,
+};

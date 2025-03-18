@@ -1,7 +1,6 @@
 const { prisma } = require("../../config/db");
 
-// [GET] /api/exams/?courseId=:id
-module.exports.index = async (req, res) => {
+const index = async (req, res) => {
   try {
     const courseId = req.query.courseId;
     const userId = req.user.id;
@@ -36,8 +35,7 @@ module.exports.index = async (req, res) => {
   }
 };
 
-// [POST] /api/exams/create
-module.exports.createPost = async (req, res) => {
+const createPost = async (req, res) => {
   if (req.body.questions && req.body.questions.length == 0)
     delete req.body.questions;
   if (req.body.UserExam && req.body.UserExam.length == 0)
@@ -54,8 +52,7 @@ module.exports.createPost = async (req, res) => {
   res.send("Đã tạo bài thi thành công");
 };
 
-// [POST] /api/exams/:id/createQuestion
-module.exports.createQuestion = async (req, res) => {
+const createQuestion = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -145,7 +142,6 @@ module.exports.createQuestion = async (req, res) => {
   }
 };
 
-// [GET] /api/exams/:id
 const getQuestions = async (req, res) => {
   try {
     const examId = req.params.examId;
@@ -160,10 +156,7 @@ const getQuestions = async (req, res) => {
   }
 };
 
-module.exports = { getQuestions };
-
-// [PATCH] /api/exams/:id?QuestionId=...
-module.exports.changeQuestionPatch = async (req, res) => {
+const changeQuestionPatch = async (req, res) => {
   try {
     const id = req.params.id;
     const exam = await prisma.exam.findUnique({
@@ -278,4 +271,12 @@ module.exports.changeQuestionPatch = async (req, res) => {
   } catch (error) {
     return res.status(400).json({ message: "Lỗi j rồi", error });
   }
+};
+
+module.exports = {
+  index,
+  createPost,
+  createQuestion,
+  getQuestions,
+  changeQuestionPatch,
 };

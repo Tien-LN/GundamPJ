@@ -29,11 +29,9 @@ const getAllAnnouncements = async (req, res) => {
   }
 };
 
-module.exports.getAllAnnouncements = getAllAnnouncements;
-
 // [GET] /api/announements/:id
 
-module.exports.getOneAnnouncement = async (req, res) => {
+const getOneAnnouncement = async (req, res) => {
   try {
     const id = req.params.id;
     const announcement = await prisma.announcement.findUnique({
@@ -53,7 +51,7 @@ module.exports.getOneAnnouncement = async (req, res) => {
 };
 
 // [POST] /api/announcements/create
-module.exports.createAnnouncement = async (req, res) => {
+const createAnnouncement = async (req, res) => {
   const { title, content, authorId } = req.body;
   await prisma.announcement.create({
     data: {
@@ -71,7 +69,7 @@ module.exports.createAnnouncement = async (req, res) => {
 };
 
 // [DELETE] /api/announcements/:id
-module.exports.deleteAnnouncement = async (req, res) => {
+const deleteAnnouncement = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -94,7 +92,7 @@ module.exports.deleteAnnouncement = async (req, res) => {
 };
 
 // [PATCH] /api/announcements/:id
-module.exports.updateAnnouncement = async (req, res) => {
+const updateAnnouncement = async (req, res) => {
   try {
     const id = req.params.id;
     await prisma.announcement.update({
@@ -112,4 +110,12 @@ module.exports.updateAnnouncement = async (req, res) => {
     }
     res.status(500).json({ message: "Internal Server Error" });
   }
+};
+
+module.exports = {
+  getAllAnnouncements,
+  getOneAnnouncement,
+  createAnnouncement,
+  deleteAnnouncement,
+  updateAnnouncement,
 };
