@@ -1,24 +1,17 @@
 const { prisma } = require("../../config/db.js");
 
 // [GET] /api/announcements
-module.exports.getAllAnnouncements = async (req, res) => {
+const getAllAnnouncements = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const courseId = req.params.courseId;
 
     const announcements = await prisma.announcement.findMany({
       where: {
         deleted: false,
-        course: {
-          enrollments: {
-            some: {
-              userId: userId,
-              status: "APPROVED",
-              deleted: false,
-            },
-          },
-        },
+        courseId: courseId,
       },
       select: {
+        id: true,
         title: true,
         content: true,
         createdAt: true,
@@ -29,11 +22,14 @@ module.exports.getAllAnnouncements = async (req, res) => {
         },
       },
     });
+
     res.json(announcements);
   } catch (error) {
     res.status(500).json({ error: "SERVER ERROR!!!" });
   }
 };
+
+module.exports.getAllAnnouncements = getAllAnnouncements;
 
 // [GET] /api/announements/:id
 

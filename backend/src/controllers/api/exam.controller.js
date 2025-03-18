@@ -148,29 +148,19 @@ module.exports.createQuestion = async (req, res) => {
 // [GET] /api/exams/:id
 const getQuestions = async (req, res) => {
   try {
-    const id = req.params.id;
-    const exam = await prisma.exam.findUnique({
-      where: {
-        id: id,
-        deleted: false, // Kiểm tra trạng thái deleted
-      },
-      include: {
-        questions: {
-          include: {
-            options: true,
-          },
-        },
-      },
+    const examId = req.params.examId;
+
+    const questions = await prisma.question.findMany({
+      where: { examId: examId },
     });
-    if (!exam) {
-      return res.status(404).json({ message: "Không tìm thấy bài thi" });
-    }
-    res.send(exam);
+
+    res.status(200).json(questions);
   } catch (error) {
-    return res.status(400).json({ message: "Lỗi server", error });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
-module.exports.getQuestions = getQuestions;
+
+module.exports = { getQuestions };
 
 // [PATCH] /api/exams/:id?QuestionId=...
 module.exports.changeQuestionPatch = async (req, res) => {

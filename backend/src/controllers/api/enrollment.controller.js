@@ -33,9 +33,6 @@ module.exports.createPost = [
       await prisma.enrollment.create({ data: req.body });
       res.status(201).json({ message: "Enrollment request sent" });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientInitializationError) {
-        return res.status(500).json({ message: "Database connection error" });
-      }
       res.status(500).json({ message: "Server error", error: error.message });
     }
   },

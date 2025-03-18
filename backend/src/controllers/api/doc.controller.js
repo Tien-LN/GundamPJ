@@ -7,6 +7,7 @@ const getDocs = async (req, res) => {
 
     const docs = await prisma.doc.findMany({
       where: {
+        deleted: false,
         course: {
           enrollments: {
             some: {
@@ -16,7 +17,11 @@ const getDocs = async (req, res) => {
             },
           },
         },
-        deleted: false,
+      },
+      select: {
+        id: true,
+        title: true,
+        fileUrl: true,
       },
     });
 
@@ -29,13 +34,30 @@ const getDocs = async (req, res) => {
 const readDoc = async (req, res) => {
   try {
     const docId = req.body.docId;
-    const selectedDoc = await prisma.findUnique({
-      where: { id: docId },
+    const userId = req.user.id;
+
+    // Kiểm tra quyền truy cập
+    const hasAccess = await prisma.doc.findFirst({
+      where: {
+        id: docId,
+        deleted: false,
+        course: {
+          enrollments: {
+            some: {
+              userId: userId,
+              status: "APPROVED",
+              deleted: false,
+            },
+          },
+        },
+      },
     });
-    if (!selectedDoc) {
-      return res.status(400).json({ message: "document not found" });
+
+    if (!hasAccess) {
+      return res.status(403).json({ message: "Access denied" });
     }
-    res.status(200).json(selectedDoc);
+
+    res.status(200).json(hasAccess);
   } catch (error) {
     res.status(500).json({ error: "Lỗi server" });
   }
@@ -70,10 +92,10 @@ const uploadDoc = async (req, res) => {
       .status(201)
       .json({ message: "Document uploaded successfully", doc: newDoc });
   } catch (error) {
-    console.error("Error uploading document:", error);
-    res.status(500).json({ message: "Server error", error });
+    console.error("Error uploading document:", error); // Log lỗi chi tiết
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 // [GET] /api/docs
-module.exports = { getDocs };
+module.exports = { getDocs, readDoc, uploadDoc };
