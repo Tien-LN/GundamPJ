@@ -171,6 +171,7 @@ model Announcement {
   author         User                   @relation(fields: [authorId], references: [id])
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
+  courseIds      String[]               // Array of course IDs
   deleted        Boolean                @default(false)
 }
 

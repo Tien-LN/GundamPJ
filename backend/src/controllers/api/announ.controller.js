@@ -3,12 +3,14 @@ const { prisma } = require("../../config/db.js");
 // [GET] /api/announcements
 const getAllAnnouncements = async (req, res) => {
   try {
-    const courseId = req.params.courseId;
+    const { courseIds } = req.body;
 
     const announcements = await prisma.announcement.findMany({
       where: {
         deleted: false,
-        courseId: courseId,
+        courseIds: {
+          hasSome: courseIds,
+        },
       },
       select: {
         id: true,
@@ -52,20 +54,26 @@ const getOneAnnouncement = async (req, res) => {
 
 // [POST] /api/announcements/create
 const createAnnouncement = async (req, res) => {
-  const { title, content, authorId } = req.body;
-  await prisma.announcement.create({
-    data: {
-      title,
-      content,
-      author: {
-        connect: {
-          id: authorId,
+  try {
+    const { title, content, authorId, courseIds } = req.body;
+
+    await prisma.announcement.create({
+      data: {
+        title,
+        content,
+        courseIds, // Save the array of course IDs
+        author: {
+          connect: {
+            id: authorId,
+          },
         },
       },
-    },
-  });
+    });
 
-  res.send("Create Announcement Successfully");
+    res.send("Create Announcement Successfully");
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 // [DELETE] /api/announcements/:id
@@ -95,18 +103,24 @@ const deleteAnnouncement = async (req, res) => {
 const updateAnnouncement = async (req, res) => {
   try {
     const id = req.params.id;
+    const { title, content, courseIds } = req.body;
+
     await prisma.announcement.update({
       where: {
         id: id,
         deleted: false,
       },
-      data: req.body,
+      data: {
+        title,
+        content,
+        courseIds, // Update the courseIds array
+      },
     });
 
     res.send("Update Announcement Successfully");
   } catch (error) {
     if (error.code === "P2025") {
-      return res.status(404).json({ message: "Annoucement not found!" });
+      return res.status(404).json({ message: "Announcement not found!" });
     }
     res.status(500).json({ message: "Internal Server Error" });
   }
