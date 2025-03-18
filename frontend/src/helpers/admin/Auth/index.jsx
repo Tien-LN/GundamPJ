@@ -6,6 +6,7 @@ import axios from "axios";
 export const AuthLogin = () => {
     const [hasPermissions, setHasPermissions] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,8 +15,10 @@ export const AuthLogin = () => {
                 const res = await axios.get("http://localhost:3000/api/users/getPermission", {
                     withCredentials: true
                 });
-                if(res.data == "ADMIN"){
+                if(res.data.role == "ADMIN"){
                     setHasPermissions(true);
+                    setUser(res.data);
+
                 } else if(isLoading == false){
                     navigate("/auth/login");
                 }
@@ -31,6 +34,6 @@ export const AuthLogin = () => {
         
     }, [navigate]);
 
-    return {hasPermissions, isLoading};
+    return {user, hasPermissions, isLoading};
 }
 

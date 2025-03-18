@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import CloseSider from "../../components/CloseSider";
+import Logout from "../../components/Logout";
 
 function Header(){
     return (
@@ -9,9 +10,13 @@ function Header(){
                 <CloseSider/>
                 
             </div>
-            <Link to="/admin/my-account">
-                    <i className="fa-solid fa-user"></i>
-            </Link>
+            <div className="my-account__containner">
+                <Link to="/admin/my-account">
+                        <i className="fa-solid fa-user"></i>
+                </Link>
+                <Logout/>
+            </div>
+            
             
         </>
     )

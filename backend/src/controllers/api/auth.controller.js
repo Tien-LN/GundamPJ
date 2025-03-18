@@ -96,6 +96,7 @@ const changePassword = async (req, res) => {
   }
 };
 
+// [POST] /api/auth/logout 
 const logout = async (req, res) => {
   try {
     res.cookie("jwt", "", {

@@ -77,3 +77,13 @@ $color-bg-siders-hover: #373a3d;
         width: 0;
     }
 }
+.my-account{
+    &__logout{
+        color: #fff;
+        padding: 5px 10px;
+        background-color: #e00c0c;
+        border:1px solid #b9586b;
+        border-radius: 5px;
+        margin-left: 14px;
+    }
+}
