@@ -11,29 +11,29 @@ export const AuthLogin = () => {
 
     useEffect(() => {
         const fetchAuth = async () => {
-            try{
+            try {
                 const res = await axios.get("http://localhost:3000/api/users/getPermission", {
                     withCredentials: true
                 });
-                if(res.data.role == "ADMIN"){
+                if (res.data.role == "ADMIN") {
                     setHasPermissions(true);
                     setUser(res.data);
 
-                } else if(isLoading == false){
-                    navigate("/auth/login");
+                } else if (isLoading == false) {
+                    navigate("/login");
                 }
-            } catch(error){
+            } catch (error) {
                 console.error("Lỗi khi lấy quyền ", error);
-                navigate("/auth/login");
-            } finally{
+                navigate("/login");
+            } finally {
                 setIsLoading(false);
             }
-            
+
         }
         fetchAuth();
-        
+
     }, [navigate]);
 
-    return {user, hasPermissions, isLoading};
+    return { user, hasPermissions, isLoading };
 }
 

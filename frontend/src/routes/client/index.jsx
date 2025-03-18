@@ -17,71 +17,71 @@ import Lesson from "../../pages/client/Courses/Lesson.jsx";
 import SectionDescription from "../../pages/client/Courses/SectionDescription.jsx";
 export const routes = [
     {
-        path: "/auth/login",
-        element: <Auth/>
+        path: "/login",
+        element: <Auth />
     },
     {
         path: "/",
-        element: <Default/>,
+        element: <Default />,
         children: [
             {
                 index: true,
-                element: <Home/>
+                element: <Home />
             },
             {
                 path: "statistics",
-                element: <Statistic/>
+                element: <Statistic />
             },
             {
                 path: "all-courses",
-                element: <AllCourses/>
+                element: <AllCourses />
             },
             {
                 path: "courses",
-                element: <Courses/>
+                element: <Courses />
             },
             {
                 path: "courses/:sectionId",
-                element: <CoursesDefault/>,
+                element: <CoursesDefault />,
                 children: [
                     {
                         index: true,
-                        element: <Section/>
+                        element: <Section />
                     },
                     {
                         path: "description",
-                        element: <SectionDescription/>
+                        element: <SectionDescription />
                     },
                     {
                         path: ":lessonId",
-                        element: <Lesson/>
+                        element: <Lesson />
                     }
                 ]
             },
             {
                 path: "my-account",
-                element: <MyAccount/>
+                element: <MyAccount />
             },
             {
                 path: "enrollments",
-                element: <Enrollments/>
+                element: <Enrollments />
             },
             {
                 path: "about",
-                element: <About/>
+                element: <About />
             },
             {
                 path: "category",
-                element: <Category/>
+                element: <Category />
             },
             {
                 path: "faq",
-                element: <Faq/>
+                element: <Faq />
             }
         ]
     },
     {
         path: "*",
-        element: <Error404/>
+        element: <Error404 />
     }
 ]
