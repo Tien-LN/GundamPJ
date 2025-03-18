@@ -1,11 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const docController = require("../../controllers/api/doc.controller");
-const {
-  verifyUser,
-  checkAccessToCourse,
-} = require("../../middleware/authMiddleware");
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 const upload = require("../../middleware/upload");
+const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 
 router.get(
   "/:courseId/docs",
@@ -30,16 +28,16 @@ router.post(
 
 router.get("/:id", verifyUser, docController.readDoc);
 
-router.patch(
-  "/soft-delete/:id",
-  checkRole(["TEACHER", "ADMIN"]),
-  docController.softDeleteDoc
-);
+// router.patch(
+//   "/soft-delete/:id",
+//   checkRole(["TEACHER", "ADMIN"]),
+//   docController.softDeleteDoc
+// );
 
-router.delete(
-  "/hard-delete/:id",
-  checkRole(["ADMIN"]),
-  docController.hardDeleteDoc
-);
+// router.delete(
+//   "/hard-delete/:id",
+//   checkRole(["ADMIN"]),
+//   docController.hardDeleteDoc
+// );
 
 module.exports = router;

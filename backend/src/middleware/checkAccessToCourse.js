@@ -28,4 +28,4 @@ const checkAccessToCourse = async (req, res, next) => {
   }
 };
 
-module.exports = { checkAccessToCourse };
+module.exports = checkAccessToCourse;

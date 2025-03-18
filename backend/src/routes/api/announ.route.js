@@ -2,11 +2,9 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../../controllers/api/announ.controller");
 const validateContent = require("../../middleware/validateContent");
-const {
-  verifyUser,
-  checkRole,
-  checkAccessToCourse,
-} = require("../../middleware/authMiddleware");
+const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
+
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 
 // Lấy tất cả thông báo của một khóa học (chỉ cho phép người đã đăng ký khóa học)
 router.get(

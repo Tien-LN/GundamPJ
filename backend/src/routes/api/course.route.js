@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../../controllers/api/course.controller");
-const {
-  verifyUser,
-  checkRole,
-  checkAccessToCourse,
-} = require("../../middleware/authMiddleware");
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
+const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 
 router.get("/", verifyUser, controller.index);
 

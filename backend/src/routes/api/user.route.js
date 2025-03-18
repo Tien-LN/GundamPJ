@@ -36,10 +36,6 @@ router.delete(
   controller.hardDeleteUser
 );
 
-// Lấy role của user đang đăng nhập 
-router.get(
-  "/getPermission",
-  verifyUser,
-  controller.getPermissonUser
-);
+// Lấy role của user đang đăng nhập
+router.get("/getPermission", verifyUser, controller.getPermissonUser);
 module.exports = router;
