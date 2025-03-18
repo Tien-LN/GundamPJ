@@ -1,118 +1,135 @@
 const { prisma } = require("../../config/db.js");
 
-
 // [GET] /api/announcements
-module.exports.getAllAnnouncements = async (req, res) => {
-    try {
-        const announcements = await prisma.announcement.findMany({
-            where: {
-                deleted: false
-            },
-            select: {
-                title: true,
-                content: true,
-                createdAt: true,
-                author: {
-                    select: {
-                        name: true
-                    }
-                }
-            }
-        })
-        res.json(announcements);
-    } catch (error) {
-        res.status(500).json({ error: "SERVER ERROR!!!" });
-    }
-}
+const getAllAnnouncements = async (req, res) => {
+  try {
+    const { courseIds } = req.body;
+
+    const announcements = await prisma.announcement.findMany({
+      where: {
+        deleted: false,
+        courseIds: {
+          hasSome: courseIds,
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    res.json(announcements);
+  } catch (error) {
+    res.status(500).json({ error: "SERVER ERROR!!!" });
+  }
+};
 
 // [GET] /api/announements/:id
 
-module.exports.getOneAnnouncement = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const announcement = await prisma.announcement.findUnique({
-            where: {
-                id: id,
-                deleted: false
-            }
-        })
+const getOneAnnouncement = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const announcement = await prisma.announcement.findUnique({
+      where: {
+        id: id,
+        deleted: false,
+      },
+    });
 
-        res.json(announcement);
-
-    } catch (error) {
-
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Announcement not found!" });
-        }
-        res.status(500).json({ message: "Internal Server Error" });
-
+    res.json(announcement);
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Announcement not found!" });
     }
-}
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 // [POST] /api/announcements/create
-module.exports.createAnnouncement = async (req, res) => {
-    const { title, content, authorId } = req.body;
+const createAnnouncement = async (req, res) => {
+  try {
+    const { title, content, authorId, courseIds } = req.body;
+
     await prisma.announcement.create({
-        data: {
-            title,
-            content,
-            author: {
-                connect: {
-                    id: authorId
-                }
-            }
-        }
+      data: {
+        title,
+        content,
+        courseIds, // Save the array of course IDs
+        author: {
+          connect: {
+            id: authorId,
+          },
+        },
+      },
     });
 
     res.send("Create Announcement Successfully");
-}
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 // [DELETE] /api/announcements/:id
-module.exports.deleteAnnouncement = async (req, res) => {
-    try {
-        const id = req.params.id;
+const deleteAnnouncement = async (req, res) => {
+  try {
+    const id = req.params.id;
 
-        await prisma.announcement.update({
-            where: {
-                id: id
-            },
-            data: {
-                deleted: true
-            },
-        });
+    await prisma.announcement.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deleted: true,
+      },
+    });
 
-        res.send("Delete Announcement Successfully");
-
-    } catch (error) {
-
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Announcement not found!" });
-        }
-        res.status(500).json({ message: "Internal Server Error" });
-
+    res.send("Delete Announcement Successfully");
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Announcement not found!" });
     }
-}
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 // [PATCH] /api/announcements/:id
-module.exports.updateAnnouncement = async (req, res) => {
-    try {
-        const id = req.params.id;
-        await prisma.announcement.update({
-            where: {
-                id: id,
-                deleted: false
-            },
-            data: req.body
-        });
+const updateAnnouncement = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { title, content, courseIds } = req.body;
 
-        res.send("Update Announcement Successfully");
+    await prisma.announcement.update({
+      where: {
+        id: id,
+        deleted: false,
+      },
+      data: {
+        title,
+        content,
+        courseIds, // Update the courseIds array
+      },
+    });
 
-    } catch (error) {
-
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Annoucement not found!" });
-        }
-        res.status(500).json({ message: "Internal Server Error" });
-
+    res.send("Update Announcement Successfully");
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Announcement not found!" });
     }
-}
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  getAllAnnouncements,
+  getOneAnnouncement,
+  createAnnouncement,
+  deleteAnnouncement,
+  updateAnnouncement,
+};

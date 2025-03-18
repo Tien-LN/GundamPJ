@@ -1,45 +1,45 @@
 const { prisma } = require("../../config/db.js");
+const { body, validationResult } = require("express-validator");
+
 // [GET] /api/enrollments
-module.exports.index = (req, res) => {
+const index = (req, res) => {
   res.send("Đây là api tham gia khóa học");
 };
 
 // [POST] /api/enrollments
-module.exports.createPost = async (req, res) => {
-  try {
-    const { userId, courseId } = req.body;
+const createPost = [
+  // Kiểm tra đầu vào
+  body("userId").isUUID().withMessage("Invalid userId"),
+  body("courseId").isUUID().withMessage("Invalid courseId"),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-    });
-    if (!user) {
-      res.send("Không tìm thấy user!");
-      return;
+    try {
+      const { userId, courseId } = req.body;
+
+      const user = await prisma.user.findFirst({ where: { id: userId } });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const course = await prisma.course.findFirst({ where: { id: courseId } });
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+
+      await prisma.enrollment.create({ data: req.body });
+      res.status(201).json({ message: "Enrollment request sent" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
     }
-    const course = await prisma.course.findFirst({
-      where: {
-        id: courseId,
-      },
-    });
-    if (!course) {
-      res.send("Không tìm thấy khóa học!");
-    }
-    await prisma.enrollment.create({
-      data: req.body,
-    });
-    res.send("Đã gửi yêu cầu tham gia");
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientInitializationError) {
-      return res.status(500).json({ message: "database connect error!" });
-    }
-    res.status(500).json({ message: "server error!", error: error.message });
-  }
-};
+  },
+];
 
 // [DELETE] /api/enrollments/:id
-module.exports.enrollDelete = async (req, res) => {
+const enrollDelete = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -83,31 +83,43 @@ const list = async (req, res) => {
 };
 
 // [GET] /api/enrollments/listApproved
-module.exports.listApproved = async (req, res) => {
+const listApproved = async (req, res) => {
   try {
-    const id = req.params.id;
+    const courseId = req.params.id;
+    const userId = req.user.id;
+    const userRole = req.user.role.roleType;
+
+    // Kiểm tra quyền truy cập
+    if (userRole !== "ADMIN") {
+      const isEnrolled = await prisma.enrollment.findFirst({
+        where: {
+          courseId: courseId,
+          userId: userId,
+          status: "APPROVED",
+          deleted: false,
+        },
+      });
+
+      if (!isEnrolled) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
 
     const enrolls = await prisma.enrollment.findMany({
       where: {
-        courseId: id,
+        courseId: courseId,
         status: "APPROVED",
         deleted: false,
       },
     });
-    res.send(enrolls);
+    res.json(enrolls);
   } catch (error) {
-    if (error.code === "P2025") {
-      return res
-        .status(404)
-        .json({ success: false, message: "Enrollment Id not found!" });
-    }
-
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
 // [PATCH] /api/enrollments/reject/:id
-module.exports.reject = async (req, res) => {
+const reject = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -133,7 +145,7 @@ module.exports.reject = async (req, res) => {
 };
 
 // [PATCH] /api/enrollments/approve/:id
-module.exports.approve = async (req, res) => {
+const approve = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -158,4 +170,12 @@ module.exports.approve = async (req, res) => {
   }
 };
 
-module.exports.list = list;
+module.exports = {
+  index,
+  createPost,
+  enrollDelete,
+  list,
+  listApproved,
+  reject,
+  approve,
+};

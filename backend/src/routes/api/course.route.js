@@ -1,16 +1,35 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const controller = require('../../controllers/api/course.controller');
+const controller = require("../../controllers/api/course.controller");
+const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
+const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 
-router.get("/", controller.index);
+router.get("/", verifyUser, controller.index);
 
-router.post("/create", controller.createPost);
+router.post("/create", verifyUser, checkRole(["ADMIN"]), controller.createPost);
 
-router.delete("/:id", controller.deleteCourse);
+router.delete(
+  "/:id",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.deleteCourse
+);
 
-router.patch("/:id", controller.coursePatch);
+router.patch("/:id", verifyUser, checkRole(["ADMIN"]), controller.coursePatch);
 
-router.get("/:id/enrollments", controller.enrollGet);
+router.get(
+  "/:id/enrollments",
+  verifyUser,
+  checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
+  controller.enrollGet
+);
 
-router.post("/:id/doc/create", controller.docCreatePost);
+router.post(
+  "/:id/doc/create",
+  verifyUser,
+  checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
+  checkRole(["TEACHER", "ADMIN"]),
+  controller.docCreatePost
+);
+
 module.exports = router;
