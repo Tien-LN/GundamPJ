@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
 const routeClient = require("./routes/api/index.route.js");
+const adminRoute = require("./routes/admin/index.route.js");
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 
 // Routes
 routeClient(app);
+adminRoute(app);
 
 const startServer = async () => {
   try {
