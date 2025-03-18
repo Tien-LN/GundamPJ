@@ -32,7 +32,7 @@ router.post("/", verifyUser, upload.single("file"), async (req, res) => {
         .end(req.file.buffer);
     });
 
-    // Nếu là avatar, ai cũng có thể đổi
+    // Nếu là avatar, ai cũng có thể đổi  
     if (type === "avatar") {
       await prisma.user.update({
         where: { id: req.user.id },

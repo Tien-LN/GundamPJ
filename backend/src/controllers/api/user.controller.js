@@ -96,6 +96,18 @@ const hardDeleteUser = async (req, res) => {
   }
 };
 
+// [GET] /api/users/getPermission 
+const getPermissonUser = async (req, res) => {
+  if(!req.user) return res.status(404).json({message: "Không tìm thấy user"});
+  console.log(req.user);
+  res.send({
+    name: req.user.name,
+    description: req.user.role?.description,
+    role: req.user.role?.roleType,
+    avatar: req.user.avatarUrl
+  });
+};
+
 module.exports = {
   getUsers,
   getMe,
@@ -103,4 +115,5 @@ module.exports = {
   softDeleteUser,
   restoreUser,
   hardDeleteUser,
+  getPermissonUser
 };

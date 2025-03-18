@@ -20,6 +20,7 @@ router.post(
   docController.readDoc
 );
 
+<<<<<<< HEAD
 router.post(
   "/create",
   verifyUser,
@@ -41,5 +42,13 @@ router.delete(
   checkRole(["ADMIN"]),
   docController.hardDeleteDoc
 );
+=======
+// router.post(
+//   "/create",
+//   verifyUser,
+//   checkRole(["TEACHER", "ADMIN"]),
+//   controller.createPost
+// );
+>>>>>>> 1e6b54dc1383ca39d185ae5afdcb678e65b35f75
 
 module.exports = router;

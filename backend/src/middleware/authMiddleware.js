@@ -18,7 +18,7 @@ const verifyUser = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Người dùng không tồn tại" });
     }
-
+    
     req.user = user; // Lưu thông tin user vào req
     next();
   } catch (error) {

@@ -1,0 +1,15 @@
+.dashboard{
+    &__user{
+        &-avatarContain{
+            padding: 5px;
+            border: 2px solid #ddd;
+            width: auto;
+            display: inline-block;
+            img{
+                width: 100%;
+                max-width: 320px;
+                object-fit: cover;
+            }
+        }
+    }
+}
