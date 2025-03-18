@@ -12,6 +12,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter });
+// Giới hạn kích thước file
+const limits = {
+  fileSize: 15 * 1024 * 1024, // 15MB
+};
+
+const upload = multer({ storage, fileFilter, limits });
 
 module.exports = upload;
