@@ -41,7 +41,7 @@ function Auth() {
         <>
             <div className='auth'>
                 <div className='auth__header'>
-                    <img src='../../public/img/logo.png' className='logo' />
+                    <img src='/img/logo.png' className='logo' />
                 </div>
                 <div className='linear'></div>
                 <div className="auth-container">
