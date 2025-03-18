@@ -1,6 +1,9 @@
 import AccountsView from "../../../components/AccountsView";
+import { AuthLogin } from "../../../helpers/admin/Auth";
 
-function Accounts(){
+function Accounts() {
+
+    const checkPermission = AuthLogin();
     const role = "Học sinh";
     const accounts = [
         {
@@ -29,7 +32,7 @@ function Accounts(){
         <>
             <div className="accounts">
                 <h1 className="accounts__title">Trang danh sách tài khoản</h1>
-                <AccountsView role={role} accounts={accounts}/>
+                <AccountsView role={role} accounts={accounts} />
             </div>
         </>
     )
