@@ -137,7 +137,6 @@ model UserExam {
   examId      String
   startTime   DateTime
   endTime     DateTime?
-  duration    Int?
   status      ExamStatus   @default(IN_PROGRESS)
   userAnswers UserAnswer[]
 }
@@ -152,6 +151,8 @@ model UserAnswer {
   questionOptionId String?
   User             User?           @relation(fields: [userId], references: [id])
   userId           String?
+  score            Float
+  timeTaken        Int?
   deleted          Boolean         @default(false)
 }
 
@@ -177,6 +178,6 @@ model doc {
   id         String @id @default(uuid())
   title      String
   courseId   String
-  content    String
+  fileUrl    String
   linkCourse Course @relation(fields: [courseId], references: [id])
 }
