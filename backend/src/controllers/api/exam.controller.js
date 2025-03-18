@@ -4,18 +4,32 @@ const { prisma } = require("../../config/db");
 module.exports.index = async (req, res) => {
   try {
     const courseId = req.query.courseId;
-    if (!courseId) {
-      return res.status(400).json({ message: "courseId is required!" });
+    const userId = req.user.id;
+
+    const isEnrolled = await prisma.enrollment.findFirst({
+      where: {
+        courseId: courseId,
+        userId: userId,
+        status: "APPROVED",
+        deleted: false,
+      },
+    });
+
+    if (!isEnrolled) {
+      return res.status(403).json({ message: "Access denied" });
     }
+
     const course = await prisma.course.findFirst({
       where: { id: courseId },
       include: {
         exams: true,
       },
     });
+
     if (!course) {
-      return res.status(400);
+      return res.status(404).json({ message: "Course not found" });
     }
+
     return res.status(200).json(course);
   } catch (error) {
     return res.status(500).json({ message: "Server error!", error });
