@@ -10,7 +10,7 @@ function Auth() {
     });
 
     const handleChange = (e) => {
-        console.log(loginData);
+        // console.log(loginData);
         setLoginData({
             ...loginData,
             [e.target.name]: e.target.value
@@ -29,7 +29,7 @@ function Auth() {
             });
 
             // Thông báo làm sau 
-            console.log("Đăng nhập thành công ");
+            console.log("Đăng nhập thành công ", res);
             if(res.data){
                 navigate("/admin");
             }
