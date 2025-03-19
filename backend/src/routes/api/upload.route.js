@@ -42,6 +42,8 @@ router.post("/", verifyUser, upload.single("file"), async (req, res) => {
 
     // Nếu là ảnh khóa học, kiểm tra quyền giáo viên
     if (type === "course") {
+      // console.log(req.file);
+      // console.log(req.body);
       if (!courseId) {
         return res.status(400).json({ message: "Course ID is required" });
       }

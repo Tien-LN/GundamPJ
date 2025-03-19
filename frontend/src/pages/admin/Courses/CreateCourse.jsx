@@ -45,12 +45,22 @@ function CreateCourse(){
     }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(!data.startDate || !data.endDate){
+            alert("Vui lòng chọn ngày bắt đầu và ngày kết thúc!");
+            return;
+        }
+
+        if(data.endDate < data.startDate){
+            alert("Ngày kết thúc không thể sớm hơn ngày bắt đầu!");
+            return;
+        }
+
         const course = {
-            name: e.target.elements.name.value,
-            description: e.target.elements.description.value,
-            startDate: e.target.elements.startDate.value,
-            endDate: e.target.elements.endDate.value,
-            teacherId: e.target.elements.teacherId.value 
+            name: data.name,
+            description: data.description,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            teacherId: data.teacherId 
         };
         
         try{
@@ -61,6 +71,21 @@ function CreateCourse(){
                 withCredentials: true
             });
             console.log(res.data);
+            if(image){
+                const formData = new FormData();
+                formData.append("file", image);
+                formData.append("type", "course");
+                formData.append("courseId", res.data.id);
+                
+                const upload = await axios.post("http://localhost:3000/api/upload", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    },
+                    withCredentials: true
+
+                });
+                console.log("Tạo khóa học thành công !!");
+            }
         } catch(error){
             console.error("Lỗi", error);
         }

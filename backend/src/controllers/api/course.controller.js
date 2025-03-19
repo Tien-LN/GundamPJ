@@ -23,8 +23,8 @@ module.exports.createPost = async (req, res) => {
     if (!req.body.teacherId || !req.body.startDate || !req.body.endDate){
         return res.status(400).json({message: "Bad request"});
     }
-    req.body.startDate = parseDate(req.body.startDate);
-    req.body.endDate = parseDate(req.body.endDate);
+    // req.body.startDate = parseDate(req.body.startDate);
+    // req.body.endDate = parseDate(req.body.endDate);
     if (req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
     if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
 
