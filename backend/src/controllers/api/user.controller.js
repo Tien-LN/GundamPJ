@@ -1,24 +1,26 @@
 const { prisma } = require("../../config/db.js");
 
 const getUsers = async (req, res) => {
+  
   try {
+
     const users = await prisma.user.findMany({
       select: {
-        id: true,
         email: true,
         name: true,
         gender: true,
         dateOfBirth: true,
         phone: true,
         address: true,
-        role: { select: { title: true } },
+        role: { select: { roleType: true } },
         status: true,
+        avatarUrl: true
       },
     });
 
-    res.json(users);
+    res.send(users);
   } catch (error) {
-    res.status(500).json({ error: "server error" });
+    return res.status(500).json({ message: "server error" });
   }
 };
 
@@ -99,7 +101,7 @@ const hardDeleteUser = async (req, res) => {
 // [GET] /api/users/getPermission 
 const getPermissonUser = async (req, res) => {
   if(!req.user) return res.status(404).json({message: "Không tìm thấy user"});
-  console.log(req.user);
+  // console.log(req.user);
   res.send({
     name: req.user.name,
     description: req.user.role?.description,

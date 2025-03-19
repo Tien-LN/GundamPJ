@@ -1,9 +1,10 @@
+require("dotenv").config();
 const axios = require("axios");
 const sgMail = require("@sendgrid/mail");
 const redis = require("redis");
 
 const client = redis.createClient();
-client.on("error", (err) => console.error("❌ Redis connection error:"));
+client.on("error", (err) => console.error("❌ Redis connection error:", err));
 client.connect();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
