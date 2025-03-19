@@ -1,4 +1,5 @@
 const { prisma } = require("../../config/db.js");
+const { parseDate } = require("../../utils/dateFormat.js");
 // [GET] /api/courses
 module.exports.index = async (req, res) => {
     const courses = await prisma.course.findMany({
@@ -18,13 +19,19 @@ module.exports.index = async (req, res) => {
 
 // [POST] /api/courses/create 
 module.exports.createPost = async (req, res) => {
+    // res.send(req.body);
+    if (!req.body.teacherId || !req.body.startDate || !req.body.endDate){
+        return res.status(400).json({message: "Bad request"});
+    }
+    req.body.startDate = parseDate(req.body.startDate);
+    req.body.endDate = parseDate(req.body.endDate);
     if (req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;
     if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
 
-    await prisma.course.create({
+    const result = await prisma.course.create({
         data: req.body
-    });
-    res.send("OK");
+    }); 
+    res.send(result);
 }
 
 // [DELETE] /api/courses/:id 

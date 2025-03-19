@@ -50,6 +50,7 @@ model User {
   phone              String?
   dateOfBirth        DateTime?
   avatarUrl          String?
+  Course             Course[]
 }
 
 model Course {
@@ -58,6 +59,8 @@ model Course {
   description String
   startDate   DateTime
   endDate     DateTime
+  teacherId   String
+  teacher     User         @relation(fields: [teacherId], references: [id])
   enrollments Enrollment[] // Add relation to Enrollment
   exams       Exam[] // Relation to Exam
   deleted     Boolean      @default(false)
@@ -171,7 +174,7 @@ model Announcement {
   author         User                   @relation(fields: [authorId], references: [id])
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
-  courseIds      String[]               // Array of course IDs
+  courseIds      String[] // Array of course IDs
   deleted        Boolean                @default(false)
 }
 
