@@ -5,8 +5,11 @@ function AccountsView(props) {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemPage, setItemPage] = useState(5);
+    const [searchUser, setSearchUser] = useState("");
 
-    const filteredAccounts = accounts.filter(item => item.role.roleType === role);
+    const filteredAccounts = accounts
+        .filter(item => item.role.roleType === role)
+        .filter(item => searchUser.trim() === "" || item.name.toLowerCase().includes(searchUser.toLowerCase()));
 
     const totalPage = Math.ceil(filteredAccounts.length / itemPage);
 
@@ -19,6 +22,9 @@ function AccountsView(props) {
         setItemPage(Number(event.target.value));
         setCurrentPage(1);
     };
+    const handleSearch = (event) => {
+        setSearchUser(event.target.value);
+    }
 
     return (
         <div className="accountsView">
@@ -36,6 +42,10 @@ function AccountsView(props) {
                     <option value="25">25</option>
                 </select>
                 <label htmlFor="choosePagination">Hiển thị trên page</label>
+                <form>
+                    <label htmlFor="search">Tìm kiếm theo tên</label><br />
+                    <input type="text" value={searchUser} onChange={handleSearch} />
+                </form>
             </div>
 
             {/* Danh sách tài khoản */}
