@@ -34,7 +34,8 @@ function Auth() {
       // Thông báo làm sau
       console.log("Đăng nhập thành công ", res);
       if (res.data) {
-        navigate("/admin");
+        if (res.data.user.role.roleType === "STUDENT") navigate("/");
+        else navigate("/admin");
       }
     } catch (error) {
       console.log("Lỗi đăng nhập", error);
