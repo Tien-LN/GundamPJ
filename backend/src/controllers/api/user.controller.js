@@ -5,6 +5,9 @@ const getUsers = async (req, res) => {
   try {
 
     const users = await prisma.user.findMany({
+      where: {
+        deletedAt: null
+      },
       select: {
         id: true,
         email: true,
