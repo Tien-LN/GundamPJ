@@ -3,20 +3,19 @@ const { prisma } = require("../../config/db.js");
 // [GET] /api/announcements
 const getAllAnnouncements = async (req, res) => {
   try {
-    const { courseIds } = req.body;
+    const { courseId } = req.query; // Lấy courseId từ query string
 
     const announcements = await prisma.announcement.findMany({
       where: {
-        deleted: false,
-        courseIds: {
-          hasSome: courseIds,
-        },
+        deleted: false, // Chỉ lấy các thông báo chưa bị xóa
+        ...(courseId && { courseIds: { has: courseId } }), // Lọc theo courseId nếu có
       },
       select: {
         id: true,
         title: true,
         content: true,
         createdAt: true,
+        courseIds: true,
         author: {
           select: {
             name: true,
