@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-
+import * as XLSX from "xlsx";
 function MultiRegister(){
     const [rows, setRows] = useState(4);
     const [data, setData] = useState([]);
@@ -51,6 +51,7 @@ function MultiRegister(){
         const users = data.filter(user => user.email && user.name && user.role);
         if(users.length == 0){
             console.error("Không có để tạo");
+            return;
         }
         
         const DataSend = {
@@ -71,13 +72,36 @@ function MultiRegister(){
             console.error("Lỗi", error.response);
         }
     }
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+
+        reader.onload = (e) => {
+            const bufferArray = e.target.result;
+            const wb = XLSX.read(bufferArray, {type: "buffer"});
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+
+            const excelData = XLSX.utils.sheet_to_json(ws);
+            
+            const roleType = roles.map(role => role.roleType);
+            // console.log(roleType);
+            const valueChecked = excelData.filter(record => roleType.includes(record.role));
+
+            setData(valueChecked);
+            setRows(valueChecked.length);
+        }
+    }
+    
     return (
         <>
             <div className="MultiRegister">
-                <button className="MultiRegister__addRows" onClick={handleAddRows}>+</button>
-                <button className="MultiRegister__minusRows" onClick={handleMinusRows}>-</button>
+                
                 <h1 className="MultiRegister__title">Tạo nhiều tài khoản</h1>
-                <table>
+                <table className="MultiRegister__table">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -92,13 +116,13 @@ function MultiRegister(){
                             Array.from({length: rows}).map((_, index) => (
                                 <tr key={index}>
                                     <td>{index+1}</td>
-                                    <td>
+                                    <td className="MultiRegister__table-td">
                                         <input type="email" name="email" value={data[index]?.email || ""} onChange={(e) => {handleChange(index, e)}}/>
                                     </td>
-                                    <td>
+                                    <td className="MultiRegister__table-td">
                                         <input type="text" name="name" value={data[index]?.name || ""} onChange={(e) => {handleChange(index, e)}}/>
                                     </td>
-                                    <td>
+                                    <td className="MultiRegister__table-td">
                                         <select name="role" value={data[index]?.role || ""} onChange={(e) => {handleChange(index, e)}}>
                                             <option value="" disabled>---Chọn---</option>
                                             {
@@ -113,7 +137,16 @@ function MultiRegister(){
                         }
                     </tbody>
                 </table>
-                <button className="MultiRegister__submit" onClick={handleSubmit}>Gửi</button>
+                <div className="MultiRegister__submit-Contain">
+                    <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+                    <button className="MultiRegister__submit" onClick={handleSubmit}>Gửi</button>
+                </div>
+                
+                <div className="MultiRegister__changeRows">
+                    <button className="MultiRegister__addRows" onClick={handleAddRows}>+</button>
+                    <button className="MultiRegister__minusRows" onClick={handleMinusRows}>-</button>
+                </div>
+                
             </div>
         </>
     )
