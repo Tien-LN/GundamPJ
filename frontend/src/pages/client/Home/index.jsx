@@ -1,6 +1,8 @@
 import './home.css'
 
 function Home() {
+
+
     return (
         <>
             <div className="home-container">
@@ -13,7 +15,7 @@ function Home() {
                         <div className='home-container__box--reason'>
                             <h1 className='home-container__box-header'>LÝ DO CHỌN iSMART</h1>
                             <div className='home-container__box--reason-descrip'>
-                                <img src='/img/Anh_1.png'/>
+                                <img src='/img/Anh_1.png' />
                                 <ul className='home-container__box--reason-descrip__list'>
                                     <li className='home-container-box-reason-desctip__list--detail'>Không gian học tập mở và năng động. Thỏa sức làm việc nhóm, thỏa sức vận động</li>
                                     <li className='home-container-box-reason-desctip__list--detail'>Trang trí sáng tạo, kích thích cảm hứng học tập</li>
