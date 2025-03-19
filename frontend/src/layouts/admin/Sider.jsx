@@ -23,9 +23,13 @@ function Sider(){
                 <li className="admin__siders-item">
                     <NavLink to="/admin/statistics">Thống kê</NavLink>
                 </li>
-                <li className="admin__siders-item">
+                <li className="admin__siders-item" data-type-register>
                     <NavLink to="/admin/registers">Đăng ký tài khoản</NavLink>
                 </li>
+                <li className="admin__siders-itemChild">
+                    <NavLink to="/admin/registers/multi">Đăng ký Nhiều tài khoản</NavLink>
+                </li>
+                
             </ul>
         </>
     )

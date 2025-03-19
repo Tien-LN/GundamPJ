@@ -7,9 +7,9 @@ const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 router.get("/", verifyUser, controller.index);
 
 router.get(
-  "/getDeleted", 
+  "/getDeleted",
   verifyUser,
-  checkRole(["ADMIN"]), 
+  checkRole(["ADMIN"]),
   controller.getCourseDelete
 );
 
@@ -51,6 +51,6 @@ router.patch(
   verifyUser,
   checkRole(["ADMIN"]),
   controller.restoreCourse
-)
+);
 
 module.exports = router;

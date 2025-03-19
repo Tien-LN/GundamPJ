@@ -1,0 +1,55 @@
+.register{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.singleRegister{
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    &__title{
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+    &__box{
+        display: flex;
+        flex-wrap: wrap;
+        margin: 10px 0;
+        label{
+            font-weight: bold;
+            width: 100px;
+        }
+        input{
+            margin-right: 20px;
+            margin-left: 20px;
+            flex: 1;
+            border: 0;
+            border-bottom: 1px solid #ddd;
+            outline: none;
+        }
+        select{
+            margin-right: 20px;
+            margin-left: 20px;
+            flex: 1;
+            border: 0;
+            border-bottom: 1px solid #ddd;
+            outline: none;
+        }
+
+    }
+    &__submit{
+        padding: 10px 20px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-left: auto;
+        margin-top: 20px;
+    }
+}
+
+.MultiRegister{
+    &__title{
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+}

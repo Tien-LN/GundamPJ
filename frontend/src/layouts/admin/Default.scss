@@ -2,6 +2,7 @@ $color-bg-header: #212529;
 $color-bg-siders: #212529;
 $color-bg-button: #C7C8C9;
 $color-text-siders: #C7C8C9;
+$color-text-siders-child: #63a1de;
 $color-bg-siders-hover: #373a3d;
 .admin{
     &__header{
@@ -57,14 +58,41 @@ $color-bg-siders-hover: #373a3d;
         &-item{
             padding: 10px 5px;
             transition: all 0.2s;
+            overflow: hidden;
+            &[data-type-register]:hover{
+                + .admin__siders-itemChild{
+                    display: block;
+                }
+            }
             a{
                 color: $color-text-siders;
                 transition: all 0.2s;
+                text-wrap: wrap;
             }
             &:hover{
                 background-color: $color-bg-siders-hover;
                 a{
                     color: #ffffff;
+                }
+                
+            }
+            &Child{
+                padding: 10px 5px;
+                transition: all 0.2s;
+                margin-left: 15px;
+                overflow: hidden;
+                display: none;
+                a{
+                    color: $color-text-siders-child;
+                    transition: all 0.2s;
+                    text-wrap: wrap;
+                }
+                &:hover{
+                    display: block;
+                    background-color: $color-bg-siders-hover;
+                    a{
+                        color: #ffffff;
+                    }
                 }
             }
         }

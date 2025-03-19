@@ -13,7 +13,7 @@ function MyAccount() {
         gender: ""
     });
     const refB = useRef();
-    console.log(refB)
+    // console.log(refB)
     const handleChange = (e) => {
         setInfo({
             ...info,

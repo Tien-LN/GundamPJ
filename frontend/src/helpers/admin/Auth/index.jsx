@@ -32,7 +32,7 @@ export const AuthLogin = () => {
         }
         fetchAuth();
 
-    }, [navigate]);
+    }, [navigate, isLoading]);
 
     return { user, hasPermissions, isLoading };
 }
