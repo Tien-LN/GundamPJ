@@ -2,45 +2,26 @@ import { Link } from "react-router-dom";
 import AdminCourses from "../../../components/AdminCourses";
 import { AuthLogin } from "../../../helpers/admin/Auth";
 import "./Courses.scss";
+import { useEffect, useState } from "react";
+import axios from "axios";
 function Courses(){
     const checkPermission = AuthLogin();
-    const courses = [
-        {
-            name: "Lập trình 1",
-            description: "Khóa học lập trình 1",
-            startDate: "2025-07-05T00:00:00Z",
-            endDate: "2025-09-10T00:00:00Z",
-            imageUrl: "https://vtiacademy.edu.vn/upload/images/lap-trinh-1(1).jfif"
-        },
-        {
-            name: "Lập trình 1",
-            description: "Khóa học lập trình 1",
-            startDate: "2025-07-05T00:00:00Z",
-            endDate: "2025-09-10T00:00:00Z",
-            imageUrl: "https://vtiacademy.edu.vn/upload/images/lap-trinh-1(1).jfif"
-        },
-        {
-            name: "Lập trình 1",
-            description: "Khóa học lập trình 1",
-            startDate: "2025-07-05T00:00:00Z",
-            endDate: "2025-09-10T00:00:00Z",
-            imageUrl: "https://vtiacademy.edu.vn/upload/images/lap-trinh-1(1).jfif"
-        },
-        {
-            name: "Lập trình 1",
-            description: "Khóa học lập trình 1",
-            startDate: "2025-07-05T00:00:00Z",
-            endDate: "2025-09-10T00:00:00Z",
-            imageUrl: "https://vtiacademy.edu.vn/upload/images/lap-trinh-1(1).jfif"
-        },
-        {
-            name: "Lập trình 1",
-            description: "Khóa học lập trình 1",
-            startDate: "2025-07-05T00:00:00Z",
-            endDate: "2025-09-10T00:00:00Z",
-            imageUrl: "https://vtiacademy.edu.vn/upload/images/lap-trinh-1(1).jfif"
-        },
-    ]
+    const [courses, setCourses] = useState([]);
+    useEffect(() => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.get("http://localhost:3000/api/courses", {
+                    withCredentials: true
+                });
+                // console.log(res.data);
+                setCourses(res.data);
+            } catch(error){
+                console.log("Lỗi", error);
+            }
+        }
+        fetchApi();
+    }, []);
+
     return (
         <>
             <div className="adminCourses">

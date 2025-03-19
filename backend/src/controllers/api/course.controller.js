@@ -5,12 +5,13 @@ module.exports.index = async (req, res) => {
     const courses = await prisma.course.findMany({
         where: { deleted: false },
         select: {
-            id: false,
+            id: true,
             name: true,
             description: true,
             startDate: true,
             endDate: true,
-            deleted: false
+            deleted: false,
+            imageUrl: true,
         }
     });
     // Đợi gửi dữ liệu lên frontend  
