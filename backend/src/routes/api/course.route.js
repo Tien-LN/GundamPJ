@@ -6,6 +6,13 @@ const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 
 router.get("/", verifyUser, controller.index);
 
+router.get(
+  "/getDeleted", 
+  verifyUser,
+  checkRole(["ADMIN"]), 
+  controller.getCourseDelete
+);
+
 router.post("/create", verifyUser, checkRole(["ADMIN"]), controller.createPost);
 
 router.delete(
@@ -13,6 +20,13 @@ router.delete(
   verifyUser,
   checkRole(["ADMIN"]),
   controller.deleteCourse
+);
+
+router.delete(
+  "/delete/permanent/:id",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.deletePerm
 );
 
 router.patch("/:id", verifyUser, checkRole(["ADMIN"]), controller.coursePatch);
@@ -31,5 +45,12 @@ router.post(
   checkRole(["TEACHER", "ADMIN"]),
   controller.docCreatePost
 );
+
+router.patch(
+  "/restore/:id",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.restoreCourse
+)
 
 module.exports = router;

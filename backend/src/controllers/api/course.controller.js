@@ -10,14 +10,33 @@ module.exports.index = async (req, res) => {
             description: true,
             startDate: true,
             endDate: true,
-            deleted: false,
+            deleted: true,
             imageUrl: true,
-        }
+            teacher: {select: {name: true}}
+        },
     });
     // Đợi gửi dữ liệu lên frontend  
     res.send(courses);
 }
 
+// [GET] /api/courses/getDeleted
+module.exports.getCourseDelete = async (req, res) => {
+    const courses = await prisma.course.findMany({
+        where: { deleted: true },
+        select: {
+            id: true,
+            name: true,
+            description: true,
+            startDate: true,
+            endDate: true,
+            deleted: false,
+            imageUrl: true,
+            teacher: {select: {name: true}}
+        },
+    });
+    // Đợi gửi dữ liệu lên frontend  
+    res.send(courses);
+}
 // [POST] /api/courses/create 
 module.exports.createPost = async (req, res) => {
     // res.send(req.body);
@@ -55,7 +74,31 @@ module.exports.deleteCourse = async (req, res) => {
             return res.status(404).json({ success: false, message: "Course not found!" });
         }
 
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
+// [DELETE] /api/courses/delete/permanent/:id 
+module.exports.deletePerm = async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        await prisma.course.delete({
+            where: { 
+                id: id,
+                deleted: true
+             }
+        });
+        // Gửi lên FrontEnd Tình trạng 
+        res.send("Đã xóa vĩnh viễn thành công");
+    } catch (error) {
+        //Gửi lỗi lên Frontend 
+
+        if (error.code === "P2025") {
+            return res.status(404).json({ success: false, message: "Course not found!" });
+        }
+
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
 
@@ -146,4 +189,31 @@ module.exports.docCreatePost = async (req, res) => {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 
+}
+
+// [PATCH] /api/courses/restore/:id 
+module.exports.restoreCourse = async (req, res) => {
+    try {
+        const id = req.params.id;
+        // console.log(id);
+        await prisma.course.update({
+            where: { 
+                id: id,
+                deleted: true
+            },
+            data: {
+                deleted: false
+            },
+        });
+        // Gửi lên FrontEnd Tình trạng 
+        res.send("Đã khôi phục thành công");
+    } catch (error) {
+        //Gửi lỗi lên Frontend 
+
+        if (error.code === "P2025") {
+            return res.status(404).json({ success: false, message: "Course not found!" });
+        }
+
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
 }

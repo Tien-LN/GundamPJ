@@ -7,24 +7,36 @@ import axios from "axios";
 function Courses(){
     const checkPermission = AuthLogin();
     const [courses, setCourses] = useState([]);
+    const [deletedCourses, setDeletedCourses] = useState([]);
     useEffect(() => {
         const fetchApi = async() => {
             try{
                 const res = await axios.get("http://localhost:3000/api/courses", {
                     withCredentials: true
                 });
-                // console.log(res.data);
+                const deletedRecords = await axios.get("http://localhost:3000/api/courses/getDeleted", {
+                    withCredentials: true
+                });
+                // console.log(res.data);  
                 setCourses(res.data);
+                setDeletedCourses(deletedRecords.data);
             } catch(error){
                 console.log("Lỗi", error);
             }
         }
         fetchApi();
     }, []);
-
+    // console.log(courses);
+    // console.log(deletedCourses.data);
     return (
         <>
             <div className="adminCourses">
+                {deletedCourses?.length > 0  && 
+                    <Link className="adminCourses__bin" to="/admin/courses/restore">
+                        <i className="fa-solid fa-trash"></i>
+                    </Link>
+                }
+                
                 <Link className="adminCourses__create" to="/admin/courses/create">+</Link>
                 <div className="adminCourses__charts">
                     Chart - Dũng
