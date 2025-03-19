@@ -3,17 +3,16 @@ const jwt = require("jsonwebtoken");
 const { prisma } = require("../../config/db.js");
 const hashPassword = require("../../utils/hashPassword.js");
 
-
 // [POST] /api/auth/login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+    console.log(req.body);
     const user = await prisma.user.findUnique({
       where: { email },
       include: { role: true },
     });
-    
+
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
@@ -22,7 +21,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-    
+
     const token = await jwt.sign(
       {
         id: user.id,
@@ -96,7 +95,7 @@ const changePassword = async (req, res) => {
   }
 };
 
-// [POST] /api/auth/logout 
+// [POST] /api/auth/logout
 const logout = async (req, res) => {
   try {
     res.cookie("jwt", "", {
