@@ -1,6 +1,7 @@
 const { prisma } = require("../../config/db.js");
 // [GET] /api/roles
 module.exports.index = async(req, res) => {
+    // console.log("OK");
     const roles = await prisma.roles.findMany({
         where: {
             deleted : false
@@ -10,10 +11,12 @@ module.exports.index = async(req, res) => {
             title: true,
             description: true,
             permissions: true,
-            deleted: false
+            deleted: false,
+            roleType: true
         }
     })
-    res.send(roles);
+    const newRoles = roles.filter(role => role.roleType != "ADMIN");
+    res.send(newRoles);
 }
 
 // [POST] /api/roles/create 

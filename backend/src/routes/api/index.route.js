@@ -32,5 +32,5 @@ module.exports = (app) => {
 
   app.use(systemConfig.API_route + "/upload", uploadRoutes);
 
-  // app.use(systemConfig.API_route + "/roles", roleRoutes);
+  app.use(systemConfig.API_route + "/roles", roleRoutes);
 };

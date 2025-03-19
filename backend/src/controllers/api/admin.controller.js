@@ -32,7 +32,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await hashPassword(tempPassword);
 
     const newUser = await prisma.user.create({
-      data: {
+      data: { 
         name,
         email,
         password: hashedPassword,
@@ -91,6 +91,7 @@ const registerUser = async (req, res) => {
 const registerMultipleUsers = async (req, res) => {
   try {
     const users = req.body.users;
+    // console.log(req.body);
     console.log(users);
     if (!users || !Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ message: "Dữ liệu không hợp lệ" });
