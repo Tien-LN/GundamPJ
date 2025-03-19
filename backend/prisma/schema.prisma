@@ -27,7 +27,7 @@ model Roles {
   description String
   permissions String[] // Mảng chứa danh sách quyền
   deleted     Boolean   @default(false)
-  users       User[] // Quan hệ với User (sửa User -> users để rõ ràng hơn)
+  users       User[] // Quan hệ với User
 }
 
 model User {
@@ -51,6 +51,7 @@ model User {
   dateOfBirth        DateTime?
   avatarUrl          String?
   Course             Course[]
+  attendances        Attendance[] // Thêm quan hệ ngược lại với Attendance
 }
 
 model Course {
@@ -61,11 +62,34 @@ model Course {
   endDate     DateTime
   teacherId   String
   teacher     User         @relation(fields: [teacherId], references: [id])
-  enrollments Enrollment[] // Add relation to Enrollment
-  exams       Exam[] // Relation to Exam
+  enrollments Enrollment[] // Quan hệ với Enrollment
+  exams       Exam[] // Quan hệ với Exam
+  lessons     Lesson[] // Quan hệ với Lesson
+  docs        doc[] // Quan hệ với tài liệu
   deleted     Boolean      @default(false)
-  docs        doc[]
   imageUrl    String?
+}
+
+model Lesson {
+  id          String       @id @default(uuid())
+  courseId    String
+  course      Course       @relation(fields: [courseId], references: [id])
+  date        DateTime // Ngày diễn ra buổi học
+  title       String // Tiêu đề buổi học
+  description String? // Mô tả buổi học
+  deleted     Boolean      @default(false) // Xóa mềm buổi học
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  attendances Attendance[] // Quan hệ với Attendance
+}
+
+model Attendance {
+  id       String  @id @default(uuid())
+  lessonId String
+  lesson   Lesson  @relation(fields: [lessonId], references: [id])
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+  attended Boolean // Học viên có điểm danh hay không
 }
 
 enum EnrollmentStatus {
