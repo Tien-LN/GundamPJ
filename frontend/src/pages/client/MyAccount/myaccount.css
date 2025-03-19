@@ -1,0 +1,72 @@
+.myaccount__container {
+    height: calc(100vh - 83px);
+    background: url(https://s3-alpha-sig.figma.com/img/181d/b508/981cd0ea5bd87c5c26338289ef0325bb?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=SQzLfj1KhzIt7MKDAnwoENQpyYbsZ6CSSy0Ids0cq1dQRDl8TouhDBhOiEqzzSUDHEAFJI7lfP66Rjn~RjFTfJqIiHe2rLBVegc74TUSSFFIhVMtJ2GCNlRaku5UXIdtqfMWDSHTwAZRF-hsS1gRp0LlTZbdoU-Ek7-5f5qHaXk4q-q7ZFn7nkkSZSn0S9ZIybF-I0f4PCb3BkAPolqHhdvypxlAtE-d1wtw2JW2Cg0KiOT3BugcezP2-is9l4G8dXUKteqdGqSwx-Wt4AWGYRNATgdfwDlygVXQG29Vmas73LVgE6gtvwp9T8Bb1hdXDRQbE5Ma2CQXQcPBNKJCIg__),
+        linear-gradient(to right, #575961, #7d3737);
+    background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.myaccount__box-heading {
+    color: #fff;
+    font-size: 25px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+
+.myaccount__box-avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #fff;
+}
+
+.myaccount__box {
+    padding: 96px 20px;
+    background-color: #CB4155;
+    border-radius: 20px;
+    width: 65%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.myaccount__box-info {
+    color: #fff;
+    letter-spacing: 1px;
+    font-size: 15px;
+}
+
+.myaccount__box-info--descript {
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.myaccount__box-info--name {
+    padding: 5px 5px;
+    background-color: rgb(43, 66, 66);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.myaccount__box-info--name:after {
+    top: 0;
+    right: 0;
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-image: url('/img/Pencil.png');
+    cursor: pointer;
+}
+
+.hide {
+    display: none;
+}
