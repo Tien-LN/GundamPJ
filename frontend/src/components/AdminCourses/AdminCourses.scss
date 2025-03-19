@@ -1,0 +1,161 @@
+$color-bg-buttonDelete-hover: #957d42;
+$color-bg-restore: #15d277;
+$color-bg-delete: #fc0b0b;
+
+@keyframes boom{
+    0%{
+        padding: 5px;
+        transform: (-50%, -50%);
+    }
+    25%{
+        padding: 4px;
+        transform: (-50%, -50%);
+
+    }
+    50%{
+        padding: 5px;
+        transform: (-50%, -50%);
+    }
+    100%{
+        padding: 4px;
+        transform: (-50%, -50%);
+    }
+}
+
+.adminCourses{
+    position: relative;
+    &__bin{
+        position: fixed;
+        right: 20px;
+        bottom: 100px;
+        width: 50px;
+        aspect-ratio: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #5ffe0f;
+        border-radius: 5px;
+        transition: all 0.6s;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        z-index: 99;
+        &:hover{
+            background-color: #19a809;
+        }
+        &::after{
+            content: "";
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            border-radius: 50%;
+            background-color: red;
+            padding: 5px;
+            animation: boom 5s ease infinite;
+        }
+    }
+    &__delete{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        padding: 7px;
+        transition: all 0.5s;
+        border-radius: 5px;
+        &:hover{
+            background-color: $color-bg-buttonDelete-hover;
+        }
+    }
+    &__deleted{
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        button{
+            background: transparent;
+            border-radius: 5px;
+            padding: 5px;
+            margin-left: 5px;
+            transition: all 0.6s;
+            cursor: pointer;
+        }
+        &-restore{
+            &:hover{
+                background: $color-bg-restore;
+            }
+        }
+        &-perm{
+            &:hover{
+                background: $color-bg-delete;
+            }
+        }
+    }
+    &__create{
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 50px;
+        aspect-ratio: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #291e6f;
+        border-radius: 5px;
+        transition: all 0.6s;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        z-index: 99;
+        &:hover{
+            background-color: #5947cf;
+        }
+    }
+    &__sort{
+        text-align: right;
+        margin: 20px;
+        &Options{
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 3px 5px;
+        }
+    }
+    &__lists{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    &__box{
+        width: 48%;
+        aspect-ratio: 4/3;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        margin-bottom: 30px;
+        position: relative;
+        &-head{
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            &Image{
+                width: 45%;
+                img{
+                    width: 100%;
+                    aspect-ratio: 1;
+                    object-fit: cover;
+                }
+            }
+            &Info{
+                width: 45%;
+                text-wrap: wrap;
+                &--name{
+                    margin-bottom: 15px;
+                    font-size: 20px;
+                }
+                &--startDate{
+                    margin-bottom: 10px;
+                }
+                &--endDate{
+                    margin-bottom: 10px;
+                }
+            }
+        }
+    }
+
+}

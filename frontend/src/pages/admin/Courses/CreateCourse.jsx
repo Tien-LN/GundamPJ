@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 function CreateCourse(){
+    const navigate = useNavigate();
     const [teachers, setTeachers] = useState([]);
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -70,7 +72,7 @@ function CreateCourse(){
                 },
                 withCredentials: true
             });
-            console.log(res.data);
+            // console.log(res.data);
             if(image){
                 const formData = new FormData();
                 formData.append("file", image);
@@ -85,6 +87,7 @@ function CreateCourse(){
 
                 });
                 console.log("Tạo khóa học thành công !!");
+                navigate("/admin/courses");
             }
         } catch(error){
             console.error("Lỗi", error);
