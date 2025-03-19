@@ -171,14 +171,14 @@ model Announcement {
   author         User                   @relation(fields: [authorId], references: [id])
   authorId       String
   roleVisibility AnnouncementVisibility @default(ALL)
-  courseIds      String[]               // Array of course IDs
+  courseIds      String[] // Array of course IDs
   deleted        Boolean                @default(false)
 }
 
 model doc {
-  id         String @id @default(uuid())
-  title      String
-  courseId   String
-  fileUrl    String
-  linkCourse Course @relation(fields: [courseId], references: [id])
+  id       String @id @default(uuid())
+  title    String
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
+  fileUrl  String
 }
