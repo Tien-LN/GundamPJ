@@ -47,6 +47,9 @@ const validateEmail = async (email) => {
     const response = await axios.get(
       `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${email}`
     );
+
+    console.log(response);
+
     if (!response.data) {
       return { valid: false, message: "❌ Không nhận được phản hồi từ API." };
     }

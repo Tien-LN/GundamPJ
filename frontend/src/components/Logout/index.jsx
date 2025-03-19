@@ -1,22 +1,22 @@
 import axios from "axios";
 
-function Logout(){
+function Logout() {
     const handleClick = async () => {
         const res = await axios.post(
-            "http://localhost:3000/api/auth/logout", 
+            "http://localhost:3000/api/auth/logout",
             {},
             {
                 withCredentials: true
             }
         );
-        if(res.status == 200){
+        if (res.status == 200) {
             console.log("Đăng xuất thành công!");
             window.location.reload();
         }
     }
     return (
         <>
-            <button className="my-account__logout" onClick={handleClick}>
+            <button className="my-account__logout" onClick={handleClick} style={{ cursor: "pointer" }}>
                 Logout
             </button>
         </>

@@ -3,20 +3,10 @@ const cloudinary = require("../../config/cloudinary.js");
 
 const getDocs = async (req, res) => {
   try {
-    const userId = req.user.id;
-
     const docs = await prisma.doc.findMany({
       where: {
         deleted: false,
-        course: {
-          enrollments: {
-            some: {
-              userId: userId,
-              status: "APPROVED",
-              deleted: false,
-            },
-          },
-        },
+        courseId: req.params.courseId,
       },
       select: {
         id: true,
@@ -34,32 +24,27 @@ const getDocs = async (req, res) => {
 const readDoc = async (req, res) => {
   try {
     const docId = req.body.docId;
-    const userId = req.user.id;
 
-    // Kiểm tra quyền truy cập
-    const hasAccess = await prisma.doc.findFirst({
+    // Lấy tài liệu từ cơ sở dữ liệu
+    const doc = await prisma.doc.findFirst({
       where: {
         id: docId,
         deleted: false,
-        course: {
-          enrollments: {
-            some: {
-              userId: userId,
-              status: "APPROVED",
-              deleted: false,
-            },
-          },
-        },
+      },
+      include: {
+        course: true, // Bao gồm thông tin khóa học nếu cần
       },
     });
 
-    if (!hasAccess) {
-      return res.status(403).json({ message: "Access denied" });
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found" });
     }
 
-    res.status(200).json(hasAccess);
+    // Nếu middleware đã đảm bảo quyền truy cập, không cần kiểm tra thêm
+    res.status(200).json(doc);
   } catch (error) {
-    res.status(500).json({ error: "Lỗi server" });
+    console.error("Error reading document:", error); // Log lỗi chi tiết
+    res.status(500).json({ error: "Server error" });
   }
 };
 

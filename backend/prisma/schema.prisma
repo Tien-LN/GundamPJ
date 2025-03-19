@@ -179,9 +179,9 @@ model Announcement {
 }
 
 model doc {
-  id         String @id @default(uuid())
-  title      String
-  courseId   String
-  fileUrl    String
-  linkCourse Course @relation(fields: [courseId], references: [id])
+  id       String @id @default(uuid())
+  title    String
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
+  fileUrl  String
 }

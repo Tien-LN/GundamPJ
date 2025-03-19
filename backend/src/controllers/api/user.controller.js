@@ -1,7 +1,7 @@
 const { prisma } = require("../../config/db.js");
 
 const getUsers = async (req, res) => {
-  
+
   try {
 
     const users = await prisma.user.findMany({
@@ -39,6 +39,7 @@ const getMe = async (req, res) => {
         address: true,
         role: { select: { title: true } },
         status: true,
+        avatarUrl: true
       },
     });
     res.json(user);
@@ -101,7 +102,7 @@ const hardDeleteUser = async (req, res) => {
 
 // [GET] /api/users/getPermission 
 const getPermissonUser = async (req, res) => {
-  if(!req.user) return res.status(404).json({message: "Không tìm thấy user"});
+  if (!req.user) return res.status(404).json({ message: "Không tìm thấy user" });
   // console.log(req.user);
   res.send({
     name: req.user.name,
