@@ -3,7 +3,13 @@ const { prisma } = require("../config/db.js");
 const checkAccessToCourse = async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const userRole = req.user.role; // Lấy vai trò của người dùng từ req.user
     const courseId = req.params.courseId || req.body.courseId;
+
+    // Nếu người dùng là admin, cho phép truy cập
+    if (userRole === "ADMIN") {
+      return next();
+    }
 
     // Kiểm tra xem người dùng có đăng ký khóa học với trạng thái APPROVED hay không
     const enrollment = await prisma.enrollment.findFirst({
