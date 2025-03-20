@@ -32,7 +32,7 @@ model Roles {
 
 model User {
   id                 String         @id @default(uuid())
-  slug               String?         @unique
+  slug               String?        @unique
   email              String         @unique
   name               String
   password           String
@@ -57,9 +57,10 @@ model User {
 
 model Course {
   id          String       @id @default(uuid())
-  slug        String?       @unique
+  slug        String?      @unique
   name        String
   description String
+  price       Int
   startDate   DateTime
   endDate     DateTime
   teacherId   String
