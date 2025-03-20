@@ -149,10 +149,19 @@ $color-bg-delete: #fc0b0b;
                     font-size: 20px;
                 }
                 &--startDate{
+                    font-size: 15px;
                     margin-bottom: 10px;
                 }
                 &--endDate{
+                    font-size: 15px;
                     margin-bottom: 10px;
+                }
+                &--teacher{
+                    font-size: 15px;
+                    margin-bottom: 10px;
+                }
+                &--price{
+                    font-size: 15px;
                 }
             }
         }

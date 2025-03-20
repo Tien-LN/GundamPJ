@@ -53,25 +53,19 @@ const getOneAnnouncement = async (req, res) => {
 
 // [POST] /api/announcements/create
 const createAnnouncement = async (req, res) => {
+  // console.log(req.body);
   try {
-    const { title, content, authorId, courseIds } = req.body;
+    // const { title, content, authorId, courseIds, roleVisibility } = req.body;
+
+    if(!req.body.roleVisibility) delete req.body.roleVisibility;
 
     await prisma.announcement.create({
-      data: {
-        title,
-        content,
-        courseIds, // Save the array of course IDs
-        author: {
-          connect: {
-            id: authorId,
-          },
-        },
-      },
+      data: req.body
     });
 
     res.send("Create Announcement Successfully");
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

@@ -1,15 +1,20 @@
 
+@keyframes showInput{
+    0%{
+        color: #000;
+        
+    }
+    100%{
+        color: #5945dd;
+        text-decoration: underline;
+    }
+}
 .createCourses{
     &__title{
         margin-left: 20px;
         margin-bottom: 20px;
     }
-    label{
-        font-weight: bold;
-        margin-right: 20px;
-        width: 100%;
-        max-width: 130px;    
-    }
+    
     &__form{
         display: flex;
         flex-direction: column;
@@ -19,6 +24,28 @@
         display: flex;
         margin: 10px 0;
         flex-wrap: wrap;
+        & > label{
+            font-weight: bold;
+            margin-right: 20px;
+            width: 100%;
+            max-width: 130px;    
+        }
+        &Price{
+            input[name="price"]{
+                width: 0;
+                padding: 0;
+                margin: 0;
+                border: 0;
+                display: inline;
+                &:focus{
+                    & + label{
+                        transition: all 0.3s;
+                        animation: showInput 1s linear infinite;
+                    }
+                }
+            }
+        }
+        
     }
     &__name{
         flex: 1;

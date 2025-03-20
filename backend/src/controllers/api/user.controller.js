@@ -108,6 +108,7 @@ const getPermissonUser = async (req, res) => {
   if (!req.user) return res.status(404).json({ message: "Không tìm thấy user" });
   // console.log(req.user);
   res.send({
+    id: req.user.id,
     name: req.user.name,
     description: req.user.role?.description,
     role: req.user.role?.roleType,

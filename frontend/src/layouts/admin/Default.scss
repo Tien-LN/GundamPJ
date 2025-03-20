@@ -15,7 +15,7 @@ $color-bg-siders-hover: #373a3d;
         position: sticky;
         top: 0;
         left: 0;
-        z-index: 3;
+        z-index: 99;
         &-containner{
             width: 20%;
             display: flex;
@@ -39,6 +39,7 @@ $color-bg-siders-hover: #373a3d;
         position: relative;
         &-containner{
             flex: 1;
+            position: relative;
         }
 
     }

@@ -1,7 +1,7 @@
 import axios from "axios";
 import {format} from "date-fns"
 import "./AdminCourses.scss";
-
+import { handlePriceFormat } from "../../helpers/admin/priceFormat";
 function AdminCourses(props){
     const {courses} = props;
     const handleDelete = (id) => {
@@ -87,6 +87,7 @@ function AdminCourses(props){
                                     <div className="adminCourses__box-headInfo--startDate"><b>Ngày bắt đầu: </b>{format(new Date(item.startDate), "dd/MM/yyyy")}</div>
                                     <div className="adminCourses__box-headInfo--endDate"><b>Ngày kết thúc: </b>{format(new Date(item.endDate), "dd/MM/yyyy")}</div>
                                     <div className="adminCourses__box-headInfo--teacher"><b>Giáo viên: </b>{item.teacher.name}</div>
+                                    <div className="adminCourses__box-headInfo--price"><b>Giá: </b>{handlePriceFormat(item.price)}</div>
                                 </div>
                             </div>
                             <div className="adminCourses__box-tail">

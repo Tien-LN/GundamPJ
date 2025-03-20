@@ -58,6 +58,7 @@ model Course {
   id          String       @id @default(uuid())
   name        String
   description String
+  price       Int
   startDate   DateTime
   endDate     DateTime
   teacherId   String
@@ -186,6 +187,8 @@ model UserAnswer {
 enum AnnouncementVisibility {
   ALL
   STUDENT
+  TEACHER
+  ASSISTANT
   ADMIN
 }
 

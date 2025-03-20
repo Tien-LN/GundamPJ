@@ -1,5 +1,6 @@
 import DefaultAdmin from "../../layouts/admin/DefaultAdmin";
 import Accounts from "../../pages/admin/Accounts";
+import Announcements from "../../pages/admin/Announcements";
 import Courses from "../../pages/admin/Courses";
 import CreateCourse from "../../pages/admin/Courses/CreateCourse";
 import Restore from "../../pages/admin/Courses/Restore";
@@ -45,6 +46,10 @@ export const routesAdmin = [
                         element: <MultiRegister/>
                     }
                 ]
+            },
+            {
+                path: "announcements",
+                element: <Announcements/>
             }
         ]
     }

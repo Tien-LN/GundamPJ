@@ -8,6 +8,7 @@ module.exports.index = async (req, res) => {
             id: true,
             name: true,
             description: true,
+            price: true,
             startDate: true,
             endDate: true,
             deleted: true,
@@ -27,6 +28,7 @@ module.exports.getCourseDelete = async (req, res) => {
             id: true,
             name: true,
             description: true,
+            price: true,
             startDate: true,
             endDate: true,
             deleted: false,
@@ -40,9 +42,11 @@ module.exports.getCourseDelete = async (req, res) => {
 // [POST] /api/courses/create 
 module.exports.createPost = async (req, res) => {
     // res.send(req.body);
-    if (!req.body.teacherId || !req.body.startDate || !req.body.endDate){
+    if (!req.body.teacherId || !req.body.startDate || !req.body.endDate || !req.body.price){
         return res.status(400).json({message: "Bad request"});
     }
+    req.body.price = parseInt(req.body.price);
+    
     // req.body.startDate = parseDate(req.body.startDate);
     // req.body.endDate = parseDate(req.body.endDate);
     if (req.body.enrollments && req.body.enrollments.length == 0) delete req.body.enrollments;

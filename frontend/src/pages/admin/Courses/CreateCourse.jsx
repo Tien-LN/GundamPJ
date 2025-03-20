@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { handlePriceFormat } from "../../../helpers/admin/priceFormat";
 function CreateCourse() {
     const navigate = useNavigate();
     const [teachers, setTeachers] = useState([]);
@@ -14,8 +15,10 @@ function CreateCourse() {
         description: "",
         startDate: null,
         endDate: null,
-        teacherId: ""
+        teacherId: "",
+        price: ""
     });
+    
     const handleChange = (e) => {
         // console.log(e);
         setData({
@@ -57,14 +60,20 @@ function CreateCourse() {
             return;
         }
 
+        if(!data.price){
+            alert("Vui lòng nhập giá !");
+            return;
+        }
+
         const course = {
             name: data.name,
             description: data.description,
+            price: data.price,
             startDate: data.startDate,
             endDate: data.endDate,
             teacherId: data.teacherId
         };
-
+    
         try {
             const res = await axios.post("http://localhost:3000/api/courses/create", course, {
                 headers: {
@@ -125,6 +134,14 @@ function CreateCourse() {
                                 ))}
                         </select>
                     </div>
+                    <div className="createCourses__box">
+                        <label htmlFor="createCourses__price">Giá: </label>
+                        <div className="createCourses__boxPrice">
+                            <input type="number" className="createCourses__price" id="createCourses__price" name="price" min="0" value={data.price} onChange={handleChange}/>
+                            <label htmlFor="createCourses__price">{handlePriceFormat(data.price) || "___"}</label>
+                        </div>
+                    </div>
+                        
                     <div className="createCourses__box">
                         <label htmlFor="createCourses__description">Mô tả khóa học</label>
                         <textarea className="createCourses__description" name="description" rows={5} id="createCourses__description" value={data.description} onChange={handleChange} />

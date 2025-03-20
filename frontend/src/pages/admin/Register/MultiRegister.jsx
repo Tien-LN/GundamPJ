@@ -87,7 +87,7 @@ function MultiRegister(){
 
             const excelData = XLSX.utils.sheet_to_json(ws);
             
-            console.log(excelData);
+            // console.log(excelData);
             const roleType = roles.map(role => role.roleType);
             // console.log(roleType);
             const valueChecked = excelData.filter(record => roleType.includes(record.role) || !record.role);

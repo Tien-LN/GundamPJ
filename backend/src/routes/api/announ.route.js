@@ -8,7 +8,7 @@ const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 
 // Lấy tất cả thông báo của một khóa học (chỉ cho phép người đã đăng ký khóa học)
 router.get(
-  "/:courseId",
+  "/",
   verifyUser,
   checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
   checkRole(["ADMIN", "TEACHER", "STUDENT"]),
@@ -26,7 +26,7 @@ router.get(
 
 // Tạo thông báo mới (chỉ giáo viên hoặc admin của khóa học được phép)
 router.post(
-  "/:courseId/create",
+  "/create",
   verifyUser,
   checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
   checkRole(["ADMIN", "TEACHER"]),
