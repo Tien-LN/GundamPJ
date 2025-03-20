@@ -28,16 +28,17 @@ router.post(
 
 router.get("/:id", verifyUser, docController.readDoc);
 
-// router.patch(
-//   "/soft-delete/:id",
-//   checkRole(["TEACHER", "ADMIN"]),
-//   docController.softDeleteDoc
-// );
+router.patch(
+  "/soft-delete/:id",
+  checkRole(["TEACHER", "ADMIN"]),
+  checkAccessToCourse,
+  docController.softDeleteDoc
+);
 
-// router.delete(
-//   "/hard-delete/:id",
-//   checkRole(["ADMIN"]),
-//   docController.hardDeleteDoc
-// );
+router.delete(
+  "/hard-delete/:id",
+  checkRole(["ADMIN"]),
+  docController.hardDeleteDoc
+);
 
 module.exports = router;

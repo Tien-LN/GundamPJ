@@ -32,6 +32,7 @@ model Roles {
 
 model User {
   id                 String         @id @default(uuid())
+  slug               String?         @unique
   email              String         @unique
   name               String
   password           String
@@ -56,6 +57,7 @@ model User {
 
 model Course {
   id          String       @id @default(uuid())
+  slug        String?       @unique
   name        String
   description String
   startDate   DateTime
@@ -95,7 +97,7 @@ model Attendance {
 enum EnrollmentStatus {
   PENDING
   APPROVED
-  REJECTED
+  CANCELED
 }
 
 model Enrollment {
@@ -104,7 +106,7 @@ model Enrollment {
   userId   String
   course   Course           @relation(fields: [courseId], references: [id])
   courseId String
-  status   EnrollmentStatus @default(PENDING)
+  status   EnrollmentStatus
   deleted  Boolean          @default(false)
 
   @@unique([userId, courseId]) // Prevent duplicate enrollments
