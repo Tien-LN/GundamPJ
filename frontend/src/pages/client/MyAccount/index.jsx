@@ -1,13 +1,16 @@
 import { use, useEffect, useRef, useState } from "react";
 import "./myaccount.css";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 function MyAccount() {
 
     const [user, setUser] = useState();
     const [info, setInfo] = useState({
         name: "",
-        dateOfBirth: "",
+        dateOfBirth: null,
         address: "",
         phone: "",
         gender: ""
@@ -39,8 +42,16 @@ function MyAccount() {
     const handleChangeGender = () => {
         setClickGender(!clickGender);
     }
+    const handleDateChange = (date, name) => {
+        setInfo({
+            ...info,
+            [name]: date
+        })
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(typeof info.dateOfBirth);
+        console.log(typeof user.dateOfBirth);
 
         const updatedInfo = {
             name: info.name || user.name,
@@ -69,7 +80,7 @@ function MyAccount() {
             }))
             setInfo({
                 name: "",
-                dateOfBirth: "",
+                dateOfBirth: null,
                 phone: "",
                 address: "",
                 gender: ""
@@ -121,12 +132,17 @@ function MyAccount() {
                         <div className="myaccount__box-info--date">
                             <div className="myaccount__box-info--date-box">
                                 <div>Date of birth</div>
-                                <div className="myaccount__box-info--descript">{user?.dateOfBirth || "Loading..."}</div>
+                                <div className="myaccount__box-info--descript">{user?.dateOfBirth ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") : "Loading..."}</div>
                                 {clickDate && (
-                                    <form className="hide" onSubmit={handleSubmit}>
-                                        <input name="dateOfBirth" value={info.date} onChange={handleChange} />
-                                        <button>Save</button>
-                                    </form>
+                                    <DatePicker
+                                        selected={info.dateOfBirth}
+                                        onChange={(date) => handleDateChange(date, "dateOfBirth")}
+                                        dateFormat="dd/MM/yyyy"
+                                        placeholderText="Chọn ngày"
+                                        id="date"
+                                        name="dateOfBirth"
+                                        className=""
+                                    />
                                 )}
                             </div>
                             <button onClick={handleChangeDate}><i class="fa-solid fa-pencil"></i></button>

@@ -8,7 +8,6 @@ const userRoutes = require("./user.route");
 const statisticRoutes = require("./statistics.route");
 const adminRoutes = require("./admin.route");
 const roleRoutes = require("./role.route");
-const uploadRoutes = require("./upload.route");
 const systemConfig = require("../../config/dotenv");
 const lessonRoutes = require("./lesson.route");
 const statisticsRoutes = require("./statistics.route");
@@ -32,10 +31,9 @@ module.exports = (app) => {
 
   app.use(systemConfig.API_route + "/statistics", statisticRoutes);
 
-  app.use(systemConfig.API_route + "/upload", uploadRoutes);
-
   app.use(systemConfig.API_route + "/roles", roleRoutes);
 
   app.use("/api/lessons", lessonRoutes);
+
   app.use("/api/statistics", statisticsRoutes);
 };

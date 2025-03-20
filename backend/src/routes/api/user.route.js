@@ -6,6 +6,10 @@ const { verifyUser, checkRole } = require("../../middleware/authMiddleware.js");
 // Lấy danh sách user - chỉ Admin
 router.get("/", verifyUser, checkRole(["ADMIN"]), controller.getUsers);
 
+router.get("/get-user-by-slug/:slug", controller.getUserBySlug);
+
+router.patch("/updateAvatar", verifyUser, controller.updateAvatar);
+
 // Xem thông tin tài khoản
 router.get("/me", verifyUser, controller.getMe);
 

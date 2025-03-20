@@ -82,5 +82,43 @@ const uploadDoc = async (req, res) => {
   }
 };
 
+const softDeleteDoc = async (req, res) => {
+  try {
+    const { docIds } = req.body;
+
+    if (!Array.isArray(docIds) || docIds.length === 0) {
+      return res.status(400).json({ message: "Invalid or empty document IDs" });
+    }
+
+    await prisma.doc.updateMany({
+      where: { id: { in: docIds } },
+      data: { deleted: true },
+    });
+
+    res.status(200).json({ message: "Documents soft-deleted successfully" });
+  } catch (error) {
+    console.error("Error soft-deleting document:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const hardDeleteDoc = async (req, res) => {
+  try {
+    const { docIds } = req.body;
+
+    if (!Array.isArray(docIds) || docIds.length === 0) {
+      return res.status(400).json({ message: "Invalid or empty document IDs" });
+    }
+
+    await prisma.doc.deleteMany({
+      where: { id: { in: docIds } },
+    });
+    res.status(200).json({ message: "Documents hard-deleted successfully" });
+  } catch (error) {
+    console.error("Error hard-deleting document:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // [GET] /api/docs
-module.exports = { getDocs, readDoc, uploadDoc };
+module.exports = { getDocs, readDoc, uploadDoc, softDeleteDoc, hardDeleteDoc };
