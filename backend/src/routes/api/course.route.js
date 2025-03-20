@@ -3,6 +3,7 @@ const router = express.Router();
 const controller = require("../../controllers/api/course.controller");
 const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
+const upload = require("../../middleware/upload");
 
 router.get("/", verifyUser, controller.index);
 
@@ -51,6 +52,23 @@ router.patch(
   verifyUser,
   checkRole(["ADMIN"]),
   controller.restoreCourse
+);
+
+router.post(
+  "/:courseId/image",
+  verifyUser,
+  checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
+  checkRole(["ADMIN", "TEACHER"]),
+  upload.single("file"),
+  controller.updateCourseImage
+);
+
+// Route tìm kiếm khóa học bằng slug
+router.get(
+  "/slug/:slug",
+  verifyUser,
+  checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
+  controller.getCourseBySlug
 );
 
 module.exports = router;
