@@ -6,6 +6,7 @@ const {
 const generateRandomPassword = require("../../utils/generateRandomPassword.js");
 const { prisma } = require("../../config/db.js");
 const hashPassword = require("../../utils/hashPassword.js");
+const slugify = require("slugify");
 
 const registerUser = async (req, res) => {
   try {
@@ -32,13 +33,23 @@ const registerUser = async (req, res) => {
     const hashedPassword = await hashPassword(tempPassword);
 
     const newUser = await prisma.user.create({
-      data: { 
+      data: {
         name,
         email,
         password: hashedPassword,
         roleId: roleRecord.id,
         mustChangePassword: true,
       },
+    });
+
+    const slug = slugify(`${name} - ${newUser.id.slice(0, 8)}`, {
+      lower: true,
+      strict: true,
+    });
+
+    await prisma.user.update({
+      where: { id: newUser.id },
+      data: { slug },
     });
 
     await sendEmail(
@@ -174,6 +185,10 @@ const registerMultipleUsers = async (req, res) => {
           roleId: roleRecord.id,
           mustChangePassword: true,
           tempPassword: tempPassword,
+          slug: slugify(`${user.name} - ${user.email.slice(0, 8)}`, {
+            lower: true,
+            strict: true,
+          }),
         };
       })
     );
