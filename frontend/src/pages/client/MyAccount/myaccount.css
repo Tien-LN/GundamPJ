@@ -14,14 +14,17 @@
     color: #fff;
     font-size: 25px;
     letter-spacing: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.myaccount__box-heading-container {
+    margin-bottom: 20px;
 }
 
 .myaccount__box-avatar {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     border-radius: 20px;
-    margin-bottom: 20px;
     border: 1px solid #fff;
 }
 
@@ -30,7 +33,7 @@
     background-color: #CB4155;
     border-radius: 20px;
     width: 65%;
-    height: 90%;
+    height: 98%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -53,20 +56,46 @@
     background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
-    position: relative;
+    display: flex;
+    justify-content: space-between;
 }
 
-.myaccount__box-info--name:after {
-    top: 0;
-    right: 0;
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-image: url('/img/Pencil.png');
-    cursor: pointer;
+.myaccount__box-info--date {
+    padding: 5px 5px;
+    background-color: rgb(43, 66, 66);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.myaccount__box-info--phone {
+    padding: 5px 5px;
+    background-color: rgb(43, 66, 66);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.myaccount__box-info--address {
+    padding: 5px 5px;
+    background-color: rgb(43, 66, 66);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.myaccount__box-info--gender {
+    padding: 5px 5px;
+    background-color: rgb(43, 66, 66);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .hide {
-    display: none;
+    /* display: none; */
 }

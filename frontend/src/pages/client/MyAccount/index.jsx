@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import "./myaccount.css";
 import axios from "axios";
 
@@ -12,13 +12,32 @@ function MyAccount() {
         phone: "",
         gender: ""
     });
-    const refB = useRef();
-    // console.log(refB)
+    const [clickName, setClickName] = useState(false);
+    const [clickDate, setClickDate] = useState(false);
+    const [clickAddress, setClickAddress] = useState(false);
+    const [clickPhone, setClickPhone] = useState(false);
+    const [clickGender, setClickGender] = useState(false);
+
     const handleChange = (e) => {
         setInfo({
             ...info,
             [e.target.name]: e.target.value
         })
+    }
+    const handleChangeName = () => {
+        setClickName(!clickName);
+    }
+    const handleChangeDate = () => {
+        setClickDate(!clickDate);
+    }
+    const handleChangeAddress = () => {
+        setClickAddress(!clickAddress);
+    }
+    const handleChangePhone = () => {
+        setClickPhone(!clickPhone);
+    }
+    const handleChangeGender = () => {
+        setClickGender(!clickGender);
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -55,6 +74,11 @@ function MyAccount() {
                 address: "",
                 gender: ""
             })
+            setClickAddress(false);
+            setClickName(false);
+            setClickGender(false);
+            setClickPhone(false);
+            setClickDate(false);
         } catch (error) {
             console.error("Error updating user:", error);
         }
@@ -70,55 +94,87 @@ function MyAccount() {
         fetchApi();
     }, [])
 
-    console.log(user);
 
     return (
         <>
             <div className="linear"></div>
             <div className="myaccount__container">
                 <div className="myaccount__box">
-                    <div className="myaccount__box-heading">ACCOUNT</div>
-                    <img className="myaccount__box-avatar" src={user?.avatarUrl || "./img/Account.png"} />
+                    <div className="myaccount__box-heading-container">
+                        <div className="myaccount__box-heading">ACCOUNT</div>
+                        <img className="myaccount__box-avatar" src={user?.avatarUrl || "./img/Account.png"} />
+                    </div>
                     <div className="myaccount__box-info">
                         <div className="myaccount__box-info--name">
-                            <div>Name</div>
-                            <div className="myaccount__box-info--descript">{user?.name || "Loading..."}</div>
-                            <form ref={refB} className="hide" onSubmit={handleSubmit}>
-                                <input name="name" value={info.name} onChange={handleChange} />
-                                <button type="submit">Save</button>
-                            </form>
+                            <div className="myaccount__box-info--name-box">
+                                <div>Name</div>
+                                <div className="myaccount__box-info--descript">{user?.name || "Loading..."}</div>
+                                {clickName &&
+                                    (<form className="hide" onSubmit={handleSubmit}>
+                                        <input name="name" value={info.name} onChange={handleChange} />
+                                        <button type="submit">Save</button>
+                                    </form>)
+                                }
+                            </div>
+                            <button onClick={handleChangeName}><i class="fa-solid fa-pencil"></i></button>
                         </div>
                         <div className="myaccount__box-info--date">
-                            <div>Date of birth</div>
-                            <div className="myaccount__box-info--descript">{user?.dateOfBirth || "Loading..."}</div>
-                            <form className="hide" onSubmit={handleSubmit}>
-                                <input name="dateOfBirth" value={info.date} onChange={handleChange} />
-                                <button>Save</button>
-                            </form>
+                            <div className="myaccount__box-info--date-box">
+                                <div>Date of birth</div>
+                                <div className="myaccount__box-info--descript">{user?.dateOfBirth || "Loading..."}</div>
+                                {clickDate && (
+                                    <form className="hide" onSubmit={handleSubmit}>
+                                        <input name="dateOfBirth" value={info.date} onChange={handleChange} />
+                                        <button>Save</button>
+                                    </form>
+                                )}
+                            </div>
+                            <button onClick={handleChangeDate}><i class="fa-solid fa-pencil"></i></button>
                         </div>
                         <div className="myaccount__box-info--phone">
-                            <div>Phone number (dad / mom)</div>
-                            <div className="myaccount__box-info--descript">{user?.phone || "Loading..."}</div>
-                            <form className="hide" onSubmit={handleSubmit}>
-                                <input name="phone" value={info.phone} onChange={handleChange} />
-                                <button>Save</button>
-                            </form>
+                            <div className="myaccount__box-info--phone-box">
+                                <div>Phone number (dad / mom)</div>
+                                <div className="myaccount__box-info--descript">{user?.phone || "Loading..."}</div>
+                                {
+                                    clickPhone && (
+                                        <form className="hide" onSubmit={handleSubmit}>
+                                            <input name="phone" value={info.phone} onChange={handleChange} />
+                                            <button>Save</button>
+                                        </form>
+                                    )
+                                }
+                            </div>
+                            <button onClick={handleChangePhone}><i class="fa-solid fa-pencil"></i></button>
                         </div>
                         <div className="myaccount__box-info--gender">
-                            <div>Gender</div>
-                            <div className="myaccount__box-info--descript">{user?.gender || "Loading..."}</div>
-                            <form className="hide" onSubmit={handleSubmit}>
-                                <input name="gender" value={info.gender} onChange={handleChange} />
-                                <button>Save</button>
-                            </form>
+                            <div>
+                                <div>Gender</div>
+                                <div className="myaccount__box-info--descript">{user?.gender || "Loading..."}</div>
+                                {clickGender && (
+                                    <form className="hide" onSubmit={handleSubmit}>
+                                        <select name="gender" value={info.gender} onChange={handleChange}>
+                                            <option value="" disabled>Chọn giới tính</option>
+                                            <option value="Nam">Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                        </select>
+                                        <button>Save</button>
+                                    </form>
+                                )}
+                            </div>
+                            <button onClick={handleChangeGender}><i class="fa-solid fa-pencil"></i></button>
                         </div>
                         <div className="myaccount__box-info--address">
-                            <div>Address</div>
-                            <div className="myaccount__box-info--descript">{user?.address || "Loading..."}</div>
-                            <form className="hide" onSubmit={handleSubmit}>
-                                <input name="address" value={info.address} onChange={handleChange} />
-                                <button>Save</button>
-                            </form>
+                            <div className="myaccount__box-info--address-box">
+                                <div>Address</div>
+                                <div className="myaccount__box-info--descript">{user?.address || "Loading..."}</div>
+                                {clickAddress && (
+                                    <form className="hide" onSubmit={handleSubmit}>
+                                        <input name="address" value={info.address} onChange={handleChange} />
+                                        <button>Save</button>
+                                    </form>
+                                )}
+                            </div>
+                            <button onClick={handleChangeAddress}><i class="fa-solid fa-pencil"></i></button>
                         </div>
                     </div>
                 </div>
