@@ -8,91 +8,48 @@ import { format } from "date-fns";
 function MyAccount() {
 
     const [user, setUser] = useState();
-    const [info, setInfo] = useState({
-        name: "",
-        dateOfBirth: null,
-        address: "",
-        phone: "",
-        gender: ""
-    });
-    const [clickName, setClickName] = useState(false);
-    const [clickDate, setClickDate] = useState(false);
-    const [clickAddress, setClickAddress] = useState(false);
-    const [clickPhone, setClickPhone] = useState(false);
-    const [clickGender, setClickGender] = useState(false);
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [gender, setGender] = useState("");
+    const [date, setDate] = useState(null);
 
-    const handleChange = (e) => {
-        setInfo({
-            ...info,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handleChangeName = () => {
-        setClickName(!clickName);
-    }
-    const handleChangeDate = () => {
-        setClickDate(!clickDate);
-    }
-    const handleChangeAddress = () => {
-        setClickAddress(!clickAddress);
-    }
-    const handleChangePhone = () => {
-        setClickPhone(!clickPhone);
-    }
-    const handleChangeGender = () => {
-        setClickGender(!clickGender);
-    }
-    const handleDateChange = (date, name) => {
-        setInfo({
-            ...info,
-            [name]: date
-        })
-    }
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log(typeof info.dateOfBirth);
-        console.log(typeof user.dateOfBirth);
+    const [changeName, setChangeName] = useState(false);
+    const [changeAddress, setChangeAddress] = useState(false);
+    const [changePhone, setChangePhone] = useState(false);
+    const [changeGender, setChangeGender] = useState(false);
+    const [changeDate, setChangeDate] = useState(false);
 
-        const updatedInfo = {
-            name: info.name || user.name,
-            dateOfBirth: info.dateOfBirth || user.dateOfBirth,
-            address: info.address || user.address,
-            phone: info.phone || user.phone,
-            gender: info.gender || user.gender
-        };
-        try {
-            const response = await axios.put('http://localhost:3000/api/users/me/update',
-                updatedInfo,
-                {
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    withCredentials: true
-                }
-            );
-            setUser((prev) => ({
-                ...prev,
-                name: updatedInfo.name,
-                dateOfBirth: updatedInfo.dateOfBirth,
-                address: updatedInfo.address,
-                phone: updatedInfo.phone,
-                gender: updatedInfo.gender
-            }))
-            setInfo({
-                name: "",
-                dateOfBirth: null,
-                phone: "",
-                address: "",
-                gender: ""
-            })
-            setClickAddress(false);
-            setClickName(false);
-            setClickGender(false);
-            setClickPhone(false);
-            setClickDate(false);
-        } catch (error) {
-            console.error("Error updating user:", error);
-        }
+    const handleChangeName = (e) => {
+        setName(e.target.value);
+    }
+    const onChangeName = () => {
+        setChangeName(!changeName);
+    }
+    const handleChangePhone = (e) => {
+        setPhone(e.target.value);
+    }
+    const onChangePhone = () => {
+        setChangePhone(!changePhone);
+    }
+    const handleChangeAddress = (e) => {
+        setAddress(e.target.value);
+    }
+    const onChangeAddress = () => {
+        setChangeAddress(!changeAddress);
+    }
+    const handleChangeDate = (date) => {
+        setDate(date);
+    }
+    const onChangeDate = () => {
+        setChangeDate(!changeDate);
+    }
+    const onChangeGender = () => {
+        setChangeGender(!changeGender);
+    }
+    const handleChangeGender = (e) => {
+        console.log(e);
+        // setGender(e.targer.value);
     }
 
     useEffect(() => {
@@ -119,78 +76,80 @@ function MyAccount() {
                         <div className="myaccount__box-info--name">
                             <div className="myaccount__box-info--name-box">
                                 <div>Name</div>
-                                <div className="myaccount__box-info--descript">{user?.name || "Loading..."}</div>
-                                {clickName &&
-                                    (<form className="hide" onSubmit={handleSubmit}>
-                                        <input name="name" value={info.name} onChange={handleChange} />
-                                        <button type="submit">Save</button>
-                                    </form>)
-                                }
+                                {changeName ? (
+                                    <div>
+                                        <input placeholder={user?.name ? user.name : ""} id="name" type="text" value={name} onChange={handleChangeName}></input>
+                                        <button>Save</button>
+                                    </div>
+
+                                ) : (<div>{user?.name ? user.name : "Loading"}</div>)}
                             </div>
-                            <button onClick={handleChangeName}><i class="fa-solid fa-pencil"></i></button>
+                            <div className="myaccount__box-info--name-change" onClick={onChangeName}><i class="fa-solid fa-pencil"></i></div>
                         </div>
                         <div className="myaccount__box-info--date">
                             <div className="myaccount__box-info--date-box">
                                 <div>Date of birth</div>
-                                <div className="myaccount__box-info--descript">{user?.dateOfBirth ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") : "Loading..."}</div>
-                                {clickDate && (
-                                    <DatePicker
-                                        selected={info.dateOfBirth}
-                                        onChange={(date) => handleDateChange(date, "dateOfBirth")}
-                                        dateFormat="dd/MM/yyyy"
-                                        placeholderText="Chọn ngày"
-                                        id="date"
-                                        name="dateOfBirth"
-                                        className=""
-                                    />
-                                )}
+                                {changeDate ? (
+                                    <div>
+                                        <DatePicker
+                                            selected={date}
+                                            onChange={(date) => handleChangeDate(date)}
+                                            dateFormat="dd/MM/yyyy"
+                                            placeholderText="Chọn ngày"
+                                            id="date"
+                                            name="dateOfBirth"
+                                            className=""
+                                        />
+                                        <button>Save</button>
+                                    </div>
+                                )
+                                    : (<div className="myaccount__box-info--descript">{user?.dateOfBirth ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") : "Loading..."}</div>)
+                                }
+
                             </div>
-                            <button onClick={handleChangeDate}><i class="fa-solid fa-pencil"></i></button>
+                            <div className="myaccount__box-info--name-change" onClick={onChangeDate}><i class="fa-solid fa-pencil"></i></div>
                         </div>
                         <div className="myaccount__box-info--phone">
                             <div className="myaccount__box-info--phone-box">
-                                <div>Phone number (dad / mom)</div>
-                                <div className="myaccount__box-info--descript">{user?.phone || "Loading..."}</div>
-                                {
-                                    clickPhone && (
-                                        <form className="hide" onSubmit={handleSubmit}>
-                                            <input name="phone" value={info.phone} onChange={handleChange} />
-                                            <button>Save</button>
-                                        </form>
-                                    )
-                                }
+                                <div>Phone number</div>
+                                {changePhone ? (
+                                    <div>
+                                        <input placeholder={user?.phone ? user.phone : ""} type="text" value={phone} onChange={handleChangePhone}></input>
+                                        <button>Save</button>
+                                    </div>
+
+                                ) : (<div>{user?.phone ? user.phone : "Loading"}</div>)}
                             </div>
-                            <button onClick={handleChangePhone}><i class="fa-solid fa-pencil"></i></button>
+                            <div className="myaccount__box-info--name-change" onClick={onChangePhone}><i class="fa-solid fa-pencil"></i></div>
                         </div>
                         <div className="myaccount__box-info--gender">
                             <div>
                                 <div>Gender</div>
-                                <div className="myaccount__box-info--descript">{user?.gender || "Loading..."}</div>
-                                {clickGender && (
-                                    <form className="hide" onSubmit={handleSubmit}>
-                                        <select name="gender" value={info.gender} onChange={handleChange}>
+                                {changeGender ? (
+                                    <div>
+                                        <select name="gender" value={gender} onChange={handleChangeGender}>
                                             <option value="" disabled>Chọn giới tính</option>
                                             <option value="Nam">Nam</option>
                                             <option value="Nữ">Nữ</option>
                                         </select>
                                         <button>Save</button>
-                                    </form>
-                                )}
+                                    </div>
+                                ) : (<div className="myaccount__box-info--descript">{user?.gender || "Loading..."}</div>)}
                             </div>
-                            <button onClick={handleChangeGender}><i class="fa-solid fa-pencil"></i></button>
+                            <div className="myaccount__box-info--name-change" onClick={onChangeGender}><i class="fa-solid fa-pencil"></i></div>
                         </div>
                         <div className="myaccount__box-info--address">
                             <div className="myaccount__box-info--address-box">
                                 <div>Address</div>
-                                <div className="myaccount__box-info--descript">{user?.address || "Loading..."}</div>
-                                {clickAddress && (
-                                    <form className="hide" onSubmit={handleSubmit}>
-                                        <input name="address" value={info.address} onChange={handleChange} />
+                                {changeAddress ? (
+                                    <div>
+                                        <input placeholder={user?.address ? user.address : ""} type="text" value={address} onChange={handleChangeAddress}></input>
                                         <button>Save</button>
-                                    </form>
-                                )}
+                                    </div>
+
+                                ) : (<div>{user?.address ? user.address : "Loading"}</div>)}
                             </div>
-                            <button onClick={handleChangeAddress}><i class="fa-solid fa-pencil"></i></button>
+                            <div className="myaccount__box-info--name-change" onClick={onChangeAddress}><i class="fa-solid fa-pencil"></i></div>
                         </div>
                     </div>
                 </div>

@@ -30,10 +30,10 @@
 
 .myaccount__box {
     padding: 96px 20px;
-    background-color: #CB4155;
+    background: linear-gradient(45deg, #000C33, #902D2D);
     border-radius: 20px;
     width: 65%;
-    height: 98%;
+    height: 90%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -47,13 +47,13 @@
 }
 
 .myaccount__box-info--descript {
-    font-size: 12px;
+    font-size: 15px;
     letter-spacing: 2px;
 }
 
 .myaccount__box-info--name {
+    width: 300px;
     padding: 5px 5px;
-    background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
@@ -62,7 +62,6 @@
 
 .myaccount__box-info--date {
     padding: 5px 5px;
-    background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
@@ -71,7 +70,6 @@
 
 .myaccount__box-info--phone {
     padding: 5px 5px;
-    background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
@@ -80,7 +78,6 @@
 
 .myaccount__box-info--address {
     padding: 5px 5px;
-    background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
@@ -89,9 +86,12 @@
 
 .myaccount__box-info--gender {
     padding: 5px 5px;
-    background-color: rgb(43, 66, 66);
     border-radius: 10px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+}
+
+.myaccount__box-info--name-change {
+    cursor: pointer;
 }
