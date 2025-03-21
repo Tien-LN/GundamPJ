@@ -2,12 +2,30 @@ import { Link, NavLink } from 'react-router-dom';
 import './header.css'
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getHeader } from '../../helpers/client/getHeader';
-import { logout } from '../../helpers/client/logout';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Header() {
 
-    const user = getHeader();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    console.log(user);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const data = await axios.get('http://localhost:3000/api/users/me', {
+                    withCredentials: true
+                })
+                console.log(data);
+                dispatch({ type: "SET_USER", payload: data.data });
+            } catch (error) {
+                console.log("ko lay đc user");
+            }
+        }
+        if (!user) fetchUser();
+    }, [dispatch, user]);
+
+
     const [dropDown, setDropDown] = useState(false);
     const handleDropDown = () => {
         setDropDown(!dropDown);
@@ -18,9 +36,14 @@ function Header() {
         }
     };
     const handleLogout = async () => {
-        logout();
-    }
-    useState(() => {
+        try {
+            await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+            dispatch({ type: "LOGOUT" });
+        } catch (error) {
+            console.error("Lỗi đăng xuất", error);
+        }
+    };
+    useEffect(() => {
         document.addEventListener("click", closeDropdown);
         return () => document.removeEventListener("click", closeDropdown);
     }, []);

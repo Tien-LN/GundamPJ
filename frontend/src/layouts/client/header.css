@@ -11,11 +11,6 @@
     background-color: #fff;
     display: flex;
     align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
     width: 100%;
     height: 70px;
     border-bottom: 1px solid black;
@@ -83,7 +78,11 @@
 
 .dropdown-container {
     position: relative;
-    transition: box-shadow 1s ease-in-out;
+}
+
+.dropdown-menu:hover {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s ease-in-out;
 }
 
 .dropdown-menu {

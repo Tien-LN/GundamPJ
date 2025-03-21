@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./auth.css";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 function Auth() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loginData, setLoginData] = useState({
     email: "",
@@ -10,7 +12,6 @@ function Auth() {
   });
 
   const handleChange = (e) => {
-    // console.log(loginData);
     setLoginData({
       ...loginData,
       [e.target.name]: e.target.value,
@@ -30,9 +31,9 @@ function Auth() {
           withCredentials: true,
         }
       );
-
-      // Thông báo làm sau
-      console.log("Đăng nhập thành công ", res);
+      console.log("OK", res.data.user);
+      dispatch({ type: "SET_USER", payload: res.data.user });
+      // console.log("Đăng nhập thành công ", res);
       if (res.data) {
         if (res.data.user.role.roleType === "STUDENT") navigate("/");
         else navigate("/admin");

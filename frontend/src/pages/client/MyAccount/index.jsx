@@ -4,10 +4,11 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import { useDispatch, useSelector } from "react-redux";
 
 function MyAccount() {
-
-    const [user, setUser] = useState();
+    const dispatch = useDispatch();
+    const user = useSelector(state => state.user);
     const [name, setName] = useState("");
     const [address, setAddress] = useState("");
     const [phone, setPhone] = useState("");
@@ -48,19 +49,50 @@ function MyAccount() {
         setChangeGender(!changeGender);
     }
     const handleChangeGender = (e) => {
-        console.log(e);
-        // setGender(e.targer.value);
+        setGender(e.target.value);
     }
+    const handleSave = async () => {
+        const updateData = {
+            name: name || user.name,
+            address: address || user.address,
+            gender: gender || user.gender,
+            phone: phone || user.phone,
+            dateOfBirth: date || user.dateOfBirth
+        }
+        try {
+            const res = await axios.put('http://localhost:3000/api/users/me/update', updateData, {
+                headers: {
+                    "Content-type": "application/json"
+                },
+                withCredentials: true
+            })
+            console.log(res);
+            setChangeName(false);
+            setChangeAddress(false);
+            setChangeDate(false);
+            setChangeGender(false);
+            setChangePhone(false);
+            dispatch({ type: "SET_USER", payload: updateData });
+        } catch (error) {
+            console.log("cap nhat user chua duoc");
+        }
+    }
+    console.log(user);
 
     useEffect(() => {
-        const fetchApi = async () => {
-            const response = await axios.get('http://localhost:3000/api/users/me', {
-                withCredentials: true
-            });
-            setUser(response.data);
+        const fetchUser = async () => {
+            try {
+                const data = await axios.get('http://localhost:3000/api/users/me', {
+                    withCredentials: true
+                })
+                // console.log(data);
+                dispatch({ type: "SET_USER", payload: data.data });
+            } catch (error) {
+                console.log("ko lay đc user");
+            }
         }
-        fetchApi();
-    }, [])
+        if (!user) fetchUser();
+    }, [dispatch, user]);
 
 
     return (
@@ -79,7 +111,7 @@ function MyAccount() {
                                 {changeName ? (
                                     <div>
                                         <input placeholder={user?.name ? user.name : ""} id="name" type="text" value={name} onChange={handleChangeName}></input>
-                                        <button>Save</button>
+                                        <button onClick={handleSave}>Save</button>
                                     </div>
 
                                 ) : (<div>{user?.name ? user.name : "Loading"}</div>)}
@@ -95,15 +127,15 @@ function MyAccount() {
                                             selected={date}
                                             onChange={(date) => handleChangeDate(date)}
                                             dateFormat="dd/MM/yyyy"
-                                            placeholderText="Chọn ngày"
+                                            placeholderText={user?.dateOfBirth ? format(user.dateOfBirth, "dd/MM/yyyy") : "Nhập ngày"}
                                             id="date"
                                             name="dateOfBirth"
                                             className=""
                                         />
-                                        <button>Save</button>
+                                        <button onClick={handleSave}>Save</button>
                                     </div>
                                 )
-                                    : (<div className="myaccount__box-info--descript">{user?.dateOfBirth ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") : "Loading..."}</div>)
+                                    : (<div className="myaccount__box-info--descript">{user.dateOfBirth ? format(new Date(user.dateOfBirth), "dd/MM/yyyy") : "Loading..."}</div>)
                                 }
 
                             </div>
@@ -115,7 +147,7 @@ function MyAccount() {
                                 {changePhone ? (
                                     <div>
                                         <input placeholder={user?.phone ? user.phone : ""} type="text" value={phone} onChange={handleChangePhone}></input>
-                                        <button>Save</button>
+                                        <button onClick={handleSave}>Save</button>
                                     </div>
 
                                 ) : (<div>{user?.phone ? user.phone : "Loading"}</div>)}
@@ -132,7 +164,7 @@ function MyAccount() {
                                             <option value="Nam">Nam</option>
                                             <option value="Nữ">Nữ</option>
                                         </select>
-                                        <button>Save</button>
+                                        <button onClick={handleSave}>Save</button>
                                     </div>
                                 ) : (<div className="myaccount__box-info--descript">{user?.gender || "Loading..."}</div>)}
                             </div>
@@ -144,7 +176,7 @@ function MyAccount() {
                                 {changeAddress ? (
                                     <div>
                                         <input placeholder={user?.address ? user.address : ""} type="text" value={address} onChange={handleChangeAddress}></input>
-                                        <button>Save</button>
+                                        <button onClick={handleSave}>Save</button>
                                     </div>
 
                                 ) : (<div>{user?.address ? user.address : "Loading"}</div>)}
