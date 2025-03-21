@@ -215,7 +215,8 @@ const restoreCourse = async (req, res) => {
 
 const updateCourseImage = async (req, res) => {
   try {
-    const { courseId } = req.params;
+    const courseId = req.params.courseId;
+    // console.log(courseId);
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });

@@ -16,12 +16,7 @@ router.get(
 
 router.post("/create", verifyUser, checkRole(["ADMIN"]), controller.createPost);
 
-router.delete(
-  "/:id",
-  verifyUser,
-  checkRole(["ADMIN"]),
-  controller.deleteCourse
-);
+router.patch("/:id", verifyUser, checkRole(["ADMIN"]), controller.deleteCourse);
 
 router.delete(
   "/delete/permanent/:id",
