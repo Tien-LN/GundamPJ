@@ -42,4 +42,10 @@ router.patch(
   controller.approve
 );
 
+router.get(
+  "/my-account",
+  verifyUser,
+  checkRole(["ADMIN", "TEACHER", "STUDENT"]),
+  controller.getRequestOfUserid
+)
 module.exports = router;

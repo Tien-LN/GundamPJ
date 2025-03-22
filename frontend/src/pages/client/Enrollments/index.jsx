@@ -1,16 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
 import "./Enrollments.scss";
+import ModalEnrollment from "../../../components/ModalEnrollment";
 function Enrollments(){
     const [data, setData] = useState({
         courseId: ""
     });
+    const [isOpen, setIsOpen] = useState(false);
     const handleChange = (event) => {
         setData({
             ...data,
             [event.target.name]: event.target.value
         });
     }
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         const fetchApi = async () => {
@@ -25,9 +28,29 @@ function Enrollments(){
         }
         fetchApi();
     }
+    const fnOpen = () => {
+        setIsOpen(true);
+    }
+    const fnClose = () => {
+        setIsOpen(false);
+    }
     return (
         <>
             <div className="enrollments">
+                {
+                    isOpen ? 
+                    <>
+                        <ModalEnrollment fnClose={fnClose}/>
+                    </> 
+                    : 
+                    <>
+                        <button className="enrollments__showItem" onClick={fnOpen}>
+                            <span className="enrollments__showItem-title">Yêu cầu đã gửi </span>
+                            <i className="fa-solid fa-eye"></i>
+                        </button>
+                    </>
+                    
+                }   
                 <div className="enrollments__box">
                     <h2 className="enrollments__box-title">Nhập mã lớp học</h2>
                     <p className="enrollments__box-example">Ví dụ : KEH-JSI-KML</p>

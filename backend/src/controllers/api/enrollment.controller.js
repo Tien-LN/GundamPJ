@@ -163,6 +163,57 @@ const approve = async (req, res) => {
   }
 };
 
+// [GET] /api/enrollments/my-account
+const getRequestOfUserid = async(req, res) => {
+  const userId = req.user.id;
+  if(!userId) res.status(403).json({message: "require login!!!!"});
+
+  try{
+      const user = await prisma.user.findUnique({
+        where: {id : userId}
+      });
+      if(!user) return res.status(404).json({message: "user not found!"});
+      const result = await prisma.enrollment.findMany({
+        where: {userId : userId}
+      });
+      const allCourses = await prisma.course.findMany({
+        where: {
+          deleted: false,
+          
+        },
+        select: {
+          id: true,
+          name: true,
+          teacher: {
+            select: {
+              name: true
+            }
+          }
+          
+        }
+      });
+      // res.send(allCourses);
+      let MapCourses = {};
+      allCourses.forEach((item) => {
+        MapCourses[item.id] = {
+          name: item.name,
+          teacher: item.teacher.name
+        }
+      });
+      let records = [];
+      result.forEach((item) => {
+        records.push({
+            status: item.status,
+            courseName: MapCourses[item.courseId].name,
+            courseTeacher: MapCourses[item.courseId].teacher
+        })
+      });
+      res.send(records);
+  } catch(error) {
+    return res.status(500).json({message: "Server Error!"});
+  }
+
+}
 module.exports = {
   index,
   createPost,
@@ -171,4 +222,5 @@ module.exports = {
   listApproved,
   reject,
   approve,
+  getRequestOfUserid,
 };
