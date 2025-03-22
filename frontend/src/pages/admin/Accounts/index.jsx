@@ -24,7 +24,7 @@ function Accounts() {
 
         fetchApi();
     }, []);
-    console.log(user);
+    // console.log(user);
     return (
         <>
             <div className="accounts">

@@ -79,7 +79,7 @@ function CreateCourse() {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                withCredentials: true
+                withCredentials: true 
             });
             // console.log(res.data);
             if (image) {
@@ -88,7 +88,7 @@ function CreateCourse() {
                 formData.append("type", "course");
                 formData.append("courseId", res.data.id);
 
-                const upload = await axios.post("http://localhost:3000/api/upload", formData, {
+                const upload = await axios.post(`http://localhost:3000/api/courses/${res.data.id}/image`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },

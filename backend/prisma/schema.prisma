@@ -107,7 +107,7 @@ model Enrollment {
   userId   String
   course   Course           @relation(fields: [courseId], references: [id])
   courseId String
-  status   EnrollmentStatus
+  status   EnrollmentStatus @default(PENDING)
   deleted  Boolean          @default(false)
 
   @@unique([userId, courseId]) // Prevent duplicate enrollments

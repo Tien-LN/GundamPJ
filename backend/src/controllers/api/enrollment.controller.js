@@ -7,36 +7,29 @@ const index = (req, res) => {
 };
 
 // [POST] /api/enrollments
-const createPost = [
-  // Kiểm tra đầu vào
-  body("userId").isUUID().withMessage("Invalid userId"),
-  body("courseId").isUUID().withMessage("Invalid courseId"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
+const createPost = async (req, res) => {
     try {
-      const { userId, courseId } = req.body;
+      const userId = req.user.id;
+      const { courseId } = req.body;
 
-      const user = await prisma.user.findFirst({ where: { id: userId } });
+
+      const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      const course = await prisma.course.findFirst({ where: { id: courseId } });
+      req.body.userId = userId;
+      const course = await prisma.course.findUnique({ where: { id: courseId } });
       if (!course) {
         return res.status(404).json({ message: "Course not found" });
       }
-
+      
       await prisma.enrollment.create({ data: req.body });
-      res.status(201).json({ message: "Enrollment request sent" });
+      res.send("Đã tạo yêu cầu tham gia thành công");
+      // res.status(201).json({ message: "Enrollment request sent" });
     } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
+      return res.status(500).json({ message: "Server error", error: error.message });
     }
-  },
-];
+  };
 
 // [DELETE] /api/enrollments/:id
 const enrollDelete = async (req, res) => {
