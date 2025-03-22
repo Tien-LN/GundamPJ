@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "./Announcements.scss";
 import { AuthLogin } from "../../../helpers/admin/Auth";
 import {format}  from "date-fns";
+import { useSearchParams } from "react-router-dom";
 function Announcements(){
     const checkPermission = AuthLogin();
     // console.log(checkPermission.user.id);
@@ -12,6 +13,7 @@ function Announcements(){
     const [courses, setCourses] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [announs, setAnnouns] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
     const [data, setData] = useState({
         title: "",
         content: "",
@@ -26,6 +28,19 @@ function Announcements(){
     const onOpen = () => {
         setIsOpen(true);
     }
+    useEffect(() => {
+        const ModalPick = document.querySelector("#modalChooseCourses");
+        const handleClickOutSide = (event) => {
+            // console.log(event);
+            if(event.target === ModalPick){
+                onClose();
+            }
+        }
+        if(ModalPick){
+            ModalPick.removeEventListener("click", handleClickOutSide);
+            ModalPick.addEventListener("click", handleClickOutSide);    
+        }
+    }, [isOpen]);
     useEffect(()=>{
         const fetchApi = async() => {
             try{
@@ -35,13 +50,9 @@ function Announcements(){
                 const res_courses = await axios.get("http://localhost:3000/api/courses", {
                     withCredentials: true
                 });
-                const res_announs = await axios.get("http://localhost:3000/api/announcements", {
-                    withCredentials: true
-                });
                 // console.log(res.data);
                 setRoles(res.data);
                 setCourses(res_courses.data);
-                setAnnouns(res_announs.data);
             } catch(error){
                 console.error("Lỗi", error);
             }
@@ -49,17 +60,27 @@ function Announcements(){
         }
         fetchApi();
 
-        const ModalPick = document.querySelector("#modalChooseCourses");
-        const handleClickOutSide = (event) => {
-            if(event.target === ModalPick){
-                onClose();
-            }
-        }
-        if(ModalPick){
-            ModalPick.removeEventListener("click", handleClickOutSide);
-            ModalPick.addEventListener("click", handleClickOutSide);    
-        }
+        
     }, []);
+
+    // Lấy thông báo 
+    useEffect(()=> {
+        const fetchApi = async() => {
+            try{
+                const queryString = searchParams.toString();
+                // console.log(queryString);
+                const res_announs = await axios.get(`http://localhost:3000/api/announcements?${queryString}`, {
+                    withCredentials: true
+                });
+                // console.log(res_announs.data);
+                setAnnouns(res_announs.data);
+            } catch(error){
+                console.error("Lỗi", error);
+            }
+            
+        }
+        fetchApi();
+    }, [searchParams]);
     useEffect(()=>{
         if(submit == true){
             const createAnnoun = async() => {
@@ -72,6 +93,7 @@ function Announcements(){
                     });
                     
                     console.log("Đã tạo thành công!");
+                    window.location.reload();
                 } catch(error) {
                     console.error("Lỗi khi tạo thông báo : ", error);
                 }
@@ -135,7 +157,41 @@ function Announcements(){
     
         return result;
     }
+    const addSearchParams = (e) => {
+        const selectedValue = e.target.value;
+        const selectedName = e.target.name;
+
+        if(selectedValue){
+            searchParams.set(selectedName, selectedValue);
+        } else {
+            searchParams.delete(selectedName);
+        }
+
+        setSearchParams(searchParams);
+    }
+    const handleDeleteAnnouncement = (id) => {
+        const fetchApi = async() => {
+            try {
+                const res = await axios.delete(`http://localhost:3000/api/announcements/${id}`, {
+                    withCredentials: true
+                });
     
+                console.log("Đã xóa thành công");
+                window.location.reload();
+            } catch(error){
+                console.error("Lỗi khi xóa thông báo", error);
+            }
+        };
+        fetchApi();
+    }
+    const handleDeleteData = () => {
+        setData({
+            title: "",
+            content: "",
+            roleVisibility: "",
+            courseIds: []
+        });
+    }
     // console.log(data);
     return (
         <>
@@ -182,13 +238,14 @@ function Announcements(){
                     <div className="announcements__views">
                         <span className="announcements__views-title">Tất cả thông báo</span>
                         <div className="announcements__views-options">
-                            <select className="announcements__views-sort">
+                            <select className="announcements__views-sort" name="createdAt" onChange={addSearchParams}>
                                 <option value="">Mặc định</option>
-                                <option value="createdAt-asc">Ngày tạo sớm nhất</option>
-                                <option value="createdAt-desc">Ngày tạo trễ</option>
+                                <option value="asc">Ngày tạo sớm nhất</option>
+                                <option value="desc">Ngày tạo trễ</option>
                             </select>
-                            <select className="announcements__views-filter">
+                            <select className="announcements__views-filter" name="roleVisibility" onChange={addSearchParams}>
                                 <option value="">Tất cả</option>
+                                <option value="ALL">ALL</option>
                                 {
                                     roles && 
                                         roles.map((item,index) => 
@@ -200,13 +257,13 @@ function Announcements(){
                         <ul className="announcements__list">
                             {announs && 
                                 announs.map((announ,index) => 
-                                    <li className="announcements__box">
+                                    <li className="announcements__box" key={index}>
                                     <div className="announcements__box-contain_content">
                                         <div className="announcements__box-title">
                                             <span className="announcements__createdAt"><b>date: </b>{format(new Date(announ.createdAt), "dd/MM/yyyy")}</span>
                                             <span className="announcements__courses"><b>Môn: </b>{getCoursesName(announ.courseIds)}</span>
                                         </div>
-                                        <div announcements__title>
+                                        <div className="announcements__title">
                                             <b>Tiêu đề: </b>{announ.title}
                                         </div>
                                         <div className="announcements__box-content">
@@ -214,8 +271,8 @@ function Announcements(){
                                         </div>
                                     </div>
                                     <div className="announcements__box-contain_actions">
-                                        <button className="announcements__config">Sửa</button>
-                                        <button className="announcements__delete">Xóa</button>
+                                        {/* <button className="announcements__config">Sửa</button> */}
+                                        <button className="announcements__delete" onClick={() => {handleDeleteAnnouncement(announ.id)}}>Xóa</button>
                                     </div>
                                 </li>
                                 )
@@ -235,7 +292,7 @@ function Announcements(){
                             <div className="announcements__create-formBox">
                                 <label htmlFor="announ__visibly">Tới</label>
                                 <div className="announcements__create-visiblyBox" id="announ__visibly">
-                                    <input type="radio" name="roleVisibility" className="announcements__create-visibly-chooseOption" id="role_ALL" value="" onChange={handleChange}/>
+                                    <input type="radio" name="roleVisibility" className="announcements__create-visibly-chooseOption" id="role_ALL" value={data.roleVisibility} onChange={handleChange}/>
                                     <label htmlFor="role_ALL">ALL</label>
                                     {roles && 
                                         roles.map((item, index) => (
@@ -254,7 +311,7 @@ function Announcements(){
                             </div>
                     
                             <div className="announcements__create-actions">
-                                    <button type="button" className="announcements__create-delete">Xóa</button>
+                                    <button type="button" className="announcements__create-delete" onClick={handleDeleteData}>Xóa</button>
                                     <button type="submit" className="announcements__create-submit">Gửi</button>
                             </div>
                         </form>

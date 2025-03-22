@@ -6,7 +6,7 @@ const index = async (req, res) => {
   const courses = await prisma.course.findMany({
     where: { deleted: false },
     select: {
-      id: true,
+      id: true, 
       name: true,
       description: true,
       price: true,
@@ -39,14 +39,16 @@ const getCourseDelete = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  if (!req.body.teacherId || !req.body.startDate || !req.body.endDate) {
+  
+  if (!req.body.teacherId || !req.body.startDate || !req.body.endDate || !req.body.price) {
     return res.status(400).json({ message: "Bad request" });
   }
-
+  req.body.price = parseInt(req.body.price);
+  // console.log(req.body);
   if (req.body.enrollments && req.body.enrollments.length == 0)
     delete req.body.enrollments;
   if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
-
+  
   const result = await prisma.course.create({
     data: req.body,
   });
@@ -108,6 +110,8 @@ const coursePatch = async (req, res) => {
     if (req.body.enrollments && req.body.enrollments.length == 0)
       delete req.body.enrollments;
     if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
+
+    if(req.body.price) req.body.price = parseInt(req.body.price);
 
     await prisma.course.update({
       where: {

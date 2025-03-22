@@ -36,7 +36,7 @@ router.post(
 
 // Xóa thông báo (chỉ admin được phép)
 router.delete(
-  "/:courseId/:id",
+  "/:id",
   verifyUser,
   checkAccessToCourse, // Kiểm tra quyền truy cập vào khóa học
   checkRole(["ADMIN"]),

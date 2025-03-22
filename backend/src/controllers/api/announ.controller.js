@@ -3,12 +3,19 @@ const { prisma } = require("../../config/db.js");
 // [GET] /api/announcements
 const getAllAnnouncements = async (req, res) => {
   try {
-    const { courseId } = req.query; // Lấy courseId từ query string
-
+    const find = {
+      deleted: false
+    };
+    const {courseId, roleVisibility, createdAt} = req.query; // Lấy courseId từ query string 
+    
     const announcements = await prisma.announcement.findMany({
       where: {
         deleted: false, // Chỉ lấy các thông báo chưa bị xóa
         ...(courseId && { courseIds: { has: courseId } }), // Lọc theo courseId nếu có
+        ...(roleVisibility && {roleVisibility: roleVisibility})
+      },
+      orderBy: {
+        ...(createdAt && {createdAt: createdAt})
       },
       select: {
         id: true,
@@ -71,6 +78,7 @@ const createAnnouncement = async (req, res) => {
 
 // [DELETE] /api/announcements/:id
 const deleteAnnouncement = async (req, res) => {
+  // console.log("Xóa tb");
   try {
     const id = req.params.id;
 
