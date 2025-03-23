@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./ShowDocs.scss";
 import TinyEditor from "../../../components/TinyEditor";
+import renderMathInElement from "katex/dist/contrib/auto-render";
 function ShowDocs(){
     const {courseId, docsId} = useParams();
     const [doc, setDoc] = useState({});
@@ -32,6 +33,20 @@ function ShowDocs(){
                
                 setDoc(res.data);
                 docContent.current = res.data.content;
+
+                setTimeout(() => {
+                    const contentElement = document.querySelector(".docs__content");
+                    
+                    if (contentElement) {
+                        renderMathInElement(contentElement, {
+                            delimiters: [
+                                { left: "$$", right: "$$", display: true },
+                                { left: "\\(", right: "\\)", display: false }
+                            ]
+                        });
+                    }
+                }, 100)
+
             } catch(error){
                 console.error("Lỗi khi lấy docs", error);
             }
