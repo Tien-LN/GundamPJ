@@ -3,7 +3,7 @@ import { Outlet, NavLink } from "react-router-dom";
 function CoursesDefault(){
     return (
         <>
-            <ul className="section__header">
+            <ul className="lessons__header">
                 <li>
                     <NavLink to="/courses">Chi tiết Khóa học</NavLink>
                 </li>

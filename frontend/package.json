@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.69.0",
+    "@tinymce/tinymce-react": "^6.0.0",
     "axios": "^1.8.3",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "js-cookie": "^3.0.5",
+    "katex": "^0.16.21",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
     "react-dom": "^19.0.0",

@@ -1,40 +1,68 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./Section.scss";
+import { useEffect, useState } from "react";
+import axios from "axios";
 function Section(){
+    const [course, setCourse] = useState({});
+    const {courseId} = useParams();
+    const [user, setUser] = useState({});
+    const [docs, setDocs] = useState([]);
+    useEffect(() => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.get(`http://localhost:3000/api/courses/${courseId}`, {
+                    withCredentials: true
+                });
+                const res_user = await axios.get(`http://localhost:3000/api/users/getPermission`, {
+                    withCredentials: true
+                });
+                const res_docs = await axios.get(`http://localhost:3000/api/docsCourse/${courseId}`, {
+                    withCredentials: true
+                });
+                setDocs(res_docs.data.docsCourse);
+                setCourse(res.data);
+                setUser(res_user.data);
+                
+            } catch(error) {
+                console.error("Lỗi khi lấy khóa học: ", error);
+            }
+        }
+        fetchApi();
+    }, []);
     return (
         <>
-            <div className="section">
-                <div className="section__containnerImg">
-                    <img className="section__image" src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="ảnh"/>
-                    <span className="section__description">UNIT 1 - UNIT 10</span>
+            <div className="lessons">
+                <Link to={`/courses/${course.id}/AddDocs`} className="lessons__add"><i className="fa-solid fa-plus"></i></Link>
+                <div className="lessons__containnerImg">
+
+                    {course.imageUrl ? 
+                        <img className="lessons__image" src={course.imageUrl} alt="ảnh"/>
+                        :
+                        <img className="lessons__image" src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="ảnh"/>
+                    }
+                    
                 </div>
                 
                 
-                <ul className="section__units">
-                    <div className="section__units-hr"></div>
-                    <li className="section__unit">
-                        <h2 className="section__unit-title">Unit 1 : SCIENCE  IN LIFE (khoa học trong cuộc sống)</h2>
-                        <ul className="section__lessons">
-                            <li className="section__lessons-item">
-                                <Link className="section__lessons-link">Lessons 1: My Body - Cơ thể của bé</Link>
-                            </li>
-                            <li className="section__lessons-item">
-                                <Link className="section__lessons-link">Lesson 2: My sense - Các giác quan của bé </Link>
-                            </li>
-                            <li className="section__lessons-item">
-                                <Link className="section__lessons-link">Lesson 3: Healthy Foods – Thức ăn tốt cho sức khỏe</Link>
-                            </li>
-                            <li className="section__lessons-item">
-                                <Link className="section__lessons-link">Lesson 4: Animals Around Me – Những con vật quanh bé</Link>
-                            </li>
-                            <li className="section__lessons-item">
-                                <Link className="section__lessons-link">Lesson 5: Big and Small Animals – Động vật to và nhỏ</Link>
-                            </li>
+                <ul className="lessons__units">
+                    <div className="lessons__units-hr"></div>
+                    <li className="lessons__unit">
+                        <h2 className="lessons__unit-title">Khóa học : {course.name}</h2>
+                        <ul className="lessons__lessons">
+                            {
+                                docs && 
+                                docs.map((item, index) => (
+                                    <li key={index} className="lessons__lessons-item">
+                                        <Link to={item.id} className="lessons__lessons-link">{`Lessons ${index+1}: ${item.title}`}</Link>
+                                    </li>
+                                ))
+                            }
+                            
+                            
                         </ul>
                     </li>
                 </ul>
             </div>
-
         </>
     )
 }

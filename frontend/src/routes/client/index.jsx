@@ -7,14 +7,14 @@ import Enrollments from "../../pages/client/Enrollments";
 import MyAccount from "../../pages/client/MyAccount";
 import Statistic from "../../pages/client/Statistic";
 import Default from "../../layouts/client/Default.jsx";
-import Subject from "../../pages/client/Courses/Subject.jsx";
+
 import Category from "../../pages/client/Category/index.jsx";
 import Faq from "../../pages/client/Faq/index.jsx";
 import Error404 from "../../pages/client/Error404/index.jsx";
 import CoursesDefault from "../../layouts/client/CoursesDefault.jsx";
 import Section from "../../pages/client/Courses/Section.jsx";
-import Lesson from "../../pages/client/Courses/Lesson.jsx";
-import SectionDescription from "../../pages/client/Courses/SectionDescription.jsx";
+import AddDocs from "../../pages/client/Courses/addDocs.jsx";
+import ShowDocs from "../../pages/client/Courses/ShowDocs.jsx";
 export const routes = [
     {
         path: "/login",
@@ -41,7 +41,7 @@ export const routes = [
                 element: <Courses />
             },
             {
-                path: "courses/:sectionId",
+                path: "courses/:courseId",
                 element: <CoursesDefault />,
                 children: [
                     {
@@ -49,12 +49,12 @@ export const routes = [
                         element: <Section />
                     },
                     {
-                        path: "description",
-                        element: <SectionDescription />
+                        path: "AddDocs",
+                        element: <AddDocs/>
                     },
                     {
-                        path: ":lessonId",
-                        element: <Lesson />
+                        path: ":docsId",
+                        element: <ShowDocs/>
                     }
                 ]
             },

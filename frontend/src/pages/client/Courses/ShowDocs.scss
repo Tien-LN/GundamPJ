@@ -1,0 +1,36 @@
+.docs{
+    width: 100%;
+    overflow: hidden;
+    &__title{
+        text-align: center;
+        margin: 20px 0;
+        &-edit{
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+        }
+    }
+    &__content{
+        width: 100%;
+        overflow: hidden;
+        &-edit{
+            height: 100%;
+            min-height: 600px;
+        }
+    }
+    &__actions{
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: flex-end;
+        button{
+            padding: 10px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+   
+}

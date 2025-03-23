@@ -26,4 +26,11 @@ router.get(
     checkAccessToCourse,
     controller.getDoc
 )
+
+router.patch(
+    "/:courseId/:docsId",
+    verifyUser,
+    checkAccessToCourse,
+    controller.editDocs
+)
 module.exports = router;

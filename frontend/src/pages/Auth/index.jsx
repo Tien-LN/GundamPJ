@@ -35,7 +35,7 @@ function Auth() {
       dispatch({ type: "SET_USER", payload: res.data.user });
       // console.log("Đăng nhập thành công ", res);
       if (res.data) {
-        if (res.data.user.role.roleType === "STUDENT") navigate("/");
+        if (res.data.user.role.roleType === "STUDENT" || res.data.user.role.roleType === "TEACHER") navigate("/");
         else navigate("/admin");
       }
     } catch (error) {

@@ -64,3 +64,22 @@ module.exports.createPost = async(req, res) => {
         return res.status(500).json({message: "Error server!!!"});
     }
 }
+
+// [PATCH] /api/docsCourse/:courseId/:docsId 
+module.exports.editDocs = async(req, res) => {
+    try{
+        const docsId = req.params.docsId;
+        const courseId = req.params.courseId;
+        
+        await prisma.docsOfCourse.update({
+            where: {
+                id: docsId,
+                courseId: courseId
+            },
+            data: req.body
+        });
+        res.send("Đã sửa thành công");
+    } catch(error){
+        return res.status(500).json({message : "server error"});
+    }
+}
