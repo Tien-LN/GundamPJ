@@ -12,7 +12,8 @@ const checkAccessToCourse = async (req, res, next) => {
       return next();
     }
 
-    // Tìm khóa học dựa trên id hoặc slug
+    if(userRole == "STUDENT"){
+      // Tìm khóa học dựa trên id hoặc slug
     const course = await prisma.course.findFirst({
       where: {
         OR: [{ id: courseId }, { slug: courseSlug }],
@@ -25,24 +26,42 @@ const checkAccessToCourse = async (req, res, next) => {
     if (!course) {
       return res.status(404).json({ message: "Khóa học không tồn tại" });
     }
-
-    // Kiểm tra xem người dùng có đăng ký khóa học với trạng thái APPROVED hay không
-    const enrollment = await prisma.enrollment.findFirst({
-      where: {
-        userId: userId,
-        courseId: course.id,
-        status: "APPROVED",
-        deleted: false,
-      },
-    });
-
-    if (!enrollment) {
-      return res.status(403).json({
-        message: "Access denied: You are not enrolled in this course.",
+      const enrollment = await prisma.enrollment.findFirst({
+        where: {
+          userId: userId,
+          courseId: courseId,
+          status: "APPROVED",
+          deleted: false,
+        },
       });
+      
+      if (!enrollment) {
+        return res.status(403).json({
+          message: "Access denied: You are not enrolled in this course.",
+        });
+      }
+  
+      req.course = course;
+      next();
+    } else {
+      // return res.send("OKK");
+      const course = await prisma.course.findFirst({
+        where: {
+          teacherId: userId,
+          id: courseId,
+          deleted: false,
+        },
+      });
+      if (!course) {
+        return res.status(403).json({
+          message: "Course not found!!!",
+        });
+      }
+  
+      req.course = course; 
+      next();
     }
-
-    next();
+    
   } catch (error) {
     console.error("Error checking course access:", error);
     res.status(500).json({ message: "Server error" });

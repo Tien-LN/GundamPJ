@@ -19,7 +19,15 @@ const index = async (req, res) => {
   });
   res.send(courses);
 };
-
+const getCourseWithId = async(req,res) => {
+  try{
+    const course = req.course;
+    if(!course) return res.status(404).json({message: "course does not found!"});
+    return res.send(course);
+  } catch(error) {
+    return res.status(500).json({message: "Server Error!"});
+  }
+}
 const getCourseDelete = async (req, res) => {
   const courses = await prisma.course.findMany({
     where: { deleted: true },
@@ -296,4 +304,5 @@ module.exports = {
   restoreCourse,
   updateCourseImage,
   getCourseBySlug,
+  getCourseWithId
 };

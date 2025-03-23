@@ -11,11 +11,11 @@ const roleRoutes = require("./role.route");
 const systemConfig = require("../../config/dotenv");
 const lessonRoutes = require("./lesson.route");
 const statisticsRoutes = require("./statistics.route");
-
+const docsCourseRoutes = require("./docsCourse.route");
 module.exports = (app) => {
   app.use(systemConfig.API_route + "/announcements", announRoutes);
 
-  app.use(systemConfig.API_route + "/docs", docRoutes);
+  // app.use(systemConfig.API_route + "/docs", docRoutes);
 
   app.use(systemConfig.API_route + "/auth", authRoutes);
 
@@ -32,6 +32,8 @@ module.exports = (app) => {
   app.use(systemConfig.API_route + "/statistics", statisticRoutes);
 
   app.use(systemConfig.API_route + "/roles", roleRoutes);
+
+  app.use(systemConfig.API_route + "/docsCourse", docsCourseRoutes);
 
   app.use("/api/lessons", lessonRoutes);
 

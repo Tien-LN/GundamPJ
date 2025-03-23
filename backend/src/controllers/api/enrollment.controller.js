@@ -78,36 +78,58 @@ const list = async (req, res) => {
 // [GET] /api/enrollments/listApproved
 const listApproved = async (req, res) => {
   try {
-    const courseId = req.params.id;
     const userId = req.user.id;
-    const userRole = req.user.role.roleType;
-
+    const userRole = req.user.role.roleType; 
+    const courseId = req.query.courseId;
+    
     // Kiểm tra quyền truy cập
-    if (userRole !== "ADMIN") {
-      const isEnrolled = await prisma.enrollment.findFirst({
+    if (userRole == "STUDENT") {
+      const Enrolled = await prisma.enrollment.findMany({
         where: {
-          courseId: courseId,
+          ...(courseId && {courseId : courseId}),
           userId: userId,
           status: "APPROVED",
           deleted: false,
         },
+        select: {
+          course: true,
+        }
       });
 
-      if (!isEnrolled) {
-        return res.status(403).json({ message: "Access denied" });
+      if (!Enrolled) {
+        return res.status(403).json({ message: "Do not have any course!!" });
       }
+      
+      return res.send(Enrolled);
+    }
+    if (userRole == "TEACHER") {
+      const Enrolled = await prisma.course.findMany({
+        where: {
+          teacherId: userId,
+          deleted: false,
+        }
+      });
+
+      if (!Enrolled) {
+        return res.status(403).json({ message: "Do not have any course!!" });
+      }
+      
+      return res.send(Enrolled);
     }
 
     const enrolls = await prisma.enrollment.findMany({
       where: {
-        courseId: courseId,
+        ...(courseId && {courseId : courseId}),
         status: "APPROVED",
         deleted: false,
       },
+      select: {
+        course: true,
+      }
     });
-    res.json(enrolls);
+    return res.send(enrolls);
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 

@@ -54,23 +54,24 @@ model User {
   Course             Course[]
   attendances        Attendance[] // Thêm quan hệ ngược lại với Attendance
 }
- 
+
 model Course {
-  id          String       @id @default(uuid())
-  slug        String?      @unique
+  id          String         @id @default(uuid())
+  slug        String?        @unique
   name        String
   description String
   price       Int
   startDate   DateTime
   endDate     DateTime
   teacherId   String
-  teacher     User         @relation(fields: [teacherId], references: [id])
+  teacher     User           @relation(fields: [teacherId], references: [id])
   enrollments Enrollment[] // Quan hệ với Enrollment
   exams       Exam[] // Quan hệ với Exam
   lessons     Lesson[] // Quan hệ với Lesson
   docs        doc[] // Quan hệ với tài liệu
-  deleted     Boolean      @default(false)
+  deleted     Boolean        @default(false)
   imageUrl    String?
+  docsCourse  docsOfCourse[]
 }
 
 model Lesson {
@@ -213,4 +214,12 @@ model doc {
   course   Course @relation(fields: [courseId], references: [id])
   courseId String
   fileUrl  String
+}
+
+model docsOfCourse {
+  id       String @id @default(uuid())
+  title    String
+  content  String
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
 }

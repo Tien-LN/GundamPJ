@@ -16,6 +16,13 @@ router.get(
 
 router.post("/create", verifyUser, checkRole(["ADMIN"]), controller.createPost);
 
+router.get(
+  "/:courseId",
+  verifyUser,
+  checkAccessToCourse,
+  controller.getCourseWithId
+
+)
 router.patch("/:id", verifyUser, checkRole(["ADMIN"]), controller.deleteCourse);
 
 router.delete(

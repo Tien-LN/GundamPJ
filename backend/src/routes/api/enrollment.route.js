@@ -22,9 +22,9 @@ router.get(
 );
 
 router.get(
-  "/listApproved/:id",
+  "/listApproved",
   verifyUser,
-  checkRole(["ADMIN", "TEACHER"]),
+  checkRole(["ADMIN", "TEACHER", "STUDENT"]),
   controller.listApproved
 );
 
