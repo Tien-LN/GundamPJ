@@ -15,6 +15,7 @@ import CoursesDefault from "../../layouts/client/CoursesDefault.jsx";
 import Section from "../../pages/client/Courses/Section.jsx";
 import AddDocs from "../../pages/client/Courses/addDocs.jsx";
 import ShowDocs from "../../pages/client/Courses/ShowDocs.jsx";
+import UpdateInfo from "../../pages/client/UpdateInfo/index.jsx";
 export const routes = [
     {
         path: "/login",
@@ -27,6 +28,10 @@ export const routes = [
             {
                 index: true,
                 element: <Home />
+            },
+            {
+                path: "update-info",
+                element: <UpdateInfo />
             },
             {
                 path: "statistics",
@@ -50,11 +55,11 @@ export const routes = [
                     },
                     {
                         path: "AddDocs",
-                        element: <AddDocs/>
+                        element: <AddDocs />
                     },
                     {
                         path: ":docsId",
-                        element: <ShowDocs/>
+                        element: <ShowDocs />
                     }
                 ]
             },
