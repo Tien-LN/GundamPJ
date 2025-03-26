@@ -1,0 +1,38 @@
+$color-bg-section: linear-gradient(90deg, #00208E 0%, #00114B 100%);
+$color-bg-link-hover: #00AEFE8C;
+$color-text-unit-title: #FF4028;
+
+.lessons{
+    
+    &__header{
+        background: $color-bg-section;
+        list-style-type: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        li{
+            
+            a{
+                color: #fff;
+                display: block;
+                width: 100%;
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                transition: all 0.3s;
+                &:hover{
+                    background-color: $color-bg-link-hover;
+                }
+            }
+        }
+        &-active{
+            background-color: #7056e2;
+        }
+        
+    }
+    
+}

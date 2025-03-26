@@ -37,4 +37,12 @@ router.patch(
   examController.changeQuestionPatch
 );
 
+router.delete(
+  "/:courseId/exams/:examId/:questionId",
+  verifyUser,
+  checkRole(["TEACHER", "ADMIN"]),
+  checkAccessToCourse,
+  examController.deleteQuestion
+);
+
 module.exports = router;
