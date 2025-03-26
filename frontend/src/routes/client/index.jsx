@@ -15,6 +15,7 @@ import CoursesDefault from "../../layouts/client/CoursesDefault.jsx";
 import Section from "../../pages/client/Courses/Section.jsx";
 import AddDocs from "../../pages/client/Courses/addDocs.jsx";
 import ShowDocs from "../../pages/client/Courses/ShowDocs.jsx";
+import UpdateInfo from "../../pages/client/UpdateInfo/index.jsx";
 import Exam from "../../pages/client/Courses/Exam.jsx";
 import ShowExam from "../../pages/client/Courses/ShowExam.jsx";
 import EditExam from "../../pages/client/Courses/EditExam.jsx";
@@ -30,6 +31,10 @@ export const routes = [
             {
                 index: true,
                 element: <Home />
+            },
+            {
+                path: "update-info",
+                element: <UpdateInfo />
             },
             {
                 path: "statistics",
@@ -73,8 +78,25 @@ export const routes = [
                         ]
                     },
                     {
+                        path: "exams",
+                        children: [
+                            {
+                                index: true,
+                                element: <Exam/>
+                            },
+                            {
+                                path: "edit/:examId",
+                                element: <EditExam/>
+                            },
+                            {
+                                path: ":examId",
+                                element: <ShowExam/>
+                            }
+                        ]
+                    },
+                    {
                         path: ":docsId",
-                        element: <ShowDocs/>
+                        element: <ShowDocs />
                     }
                 ]
             },
