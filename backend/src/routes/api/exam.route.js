@@ -45,4 +45,11 @@ router.delete(
   examController.deleteQuestion
 );
 
+router.delete(
+  "/:courseId/exams/:examId",
+  verifyUser,
+  checkRole(["TEACHER", "ADMIN"]),
+  checkAccessToCourse,
+  examController.deleteExam
+)
 module.exports = router;

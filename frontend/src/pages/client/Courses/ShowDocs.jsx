@@ -92,7 +92,7 @@ function ShowDocs(){
     return (
         <>
             <div className="docs">
-                {isEditing ? 
+                { (isEditing || user.role=="TEACHER") ? 
                     <>
                         <form className="docs__form" method="POST" onSubmit={handleSubmit}>
                             <input name="title" className="docs__title-edit" value={doc.title} onChange={handleChange}/>
@@ -111,13 +111,17 @@ function ShowDocs(){
                     <>
                         <h1 className="docs__title">{doc.title}</h1>
                         <div className="docs__content">
-                            <div dangerouslySetInnerHTML={{__html: doc.content}} />
+                            <div dangerouslySetInnerHTML={{__html: doc.content}} /> 
                         </div>
-                        <div className="docs__actions">
-                            <button className="docs__edit" onClick={onOpenEdit}>
-                                <i className="fa-solid fa-pen-to-square"></i>
-                            </button>
-                        </div>
+                        {
+                            user.role == "TEACHER" && 
+                            <div className="docs__actions">
+                                <button className="docs__edit" onClick={onOpenEdit}>
+                                    <i className="fa-solid fa-pen-to-square"></i>
+                                </button>
+                            </div>
+                        }
+                        
                         
                     </>
                 }

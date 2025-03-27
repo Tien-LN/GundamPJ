@@ -37,7 +37,7 @@ const login = async (req, res) => {
       httpOnly: true, // bảo vệ cookie khỏi javascript trên trình duyệt
       secure: process.env.NODE_ENV === "production" ? true : false, // Chỉ bật trên môi trường production
       sameSite: "Lax",
-      maxAge: 3600000,
+      maxAge: 1800000,
     });
 
     res.json({

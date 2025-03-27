@@ -92,7 +92,11 @@ const listApproved = async (req, res) => {
           deleted: false,
         },
         select: {
-          course: true,
+          course: {
+            include: {
+              docsCourse: true
+            }
+          }
         }
       });
 

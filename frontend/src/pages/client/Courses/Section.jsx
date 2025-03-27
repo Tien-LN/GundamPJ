@@ -19,9 +19,11 @@ function Section(){
                 const res_docs = await axios.get(`http://localhost:3000/api/docsCourse/${courseId}`, {
                     withCredentials: true
                 });
-                setDocs(res_docs.data.docsCourse);
+                const docsCourse = res_docs.data.docsCourse.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                setDocs(docsCourse);
                 setCourse(res.data);
                 setUser(res_user.data);
+                
                 
             } catch(error) {
                 console.error("Lỗi khi lấy khóa học: ", error);
@@ -29,10 +31,28 @@ function Section(){
         }
         fetchApi();
     }, []);
+    const handleDeleteDocs = (id) => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.delete(`http://localhost:3000/api/docsCourse/${courseId}/${id}`, {
+                    withCredentials: true
+                });
+
+                console.log(res.data);
+                window.location.reload();
+            } catch(error) {
+                console.log("Lỗi khi xóa bài giảng", error);
+            }
+        }
+        fetchApi();
+    }
     return (
         <>
             <div className="lessons">
-                <Link to={`/courses/${course.id}/AddDocs`} className="lessons__add"><i className="fa-solid fa-plus"></i></Link>
+                {user.role == "TEACHER" && 
+                    <Link to={`/courses/${course.id}/AddDocs`} className="lessons__add"><i className="fa-solid fa-plus"></i></Link>
+                }
+                
                 <div className="lessons__containnerImg">
 
                     {course.imageUrl ? 
@@ -54,6 +74,9 @@ function Section(){
                                 docs.map((item, index) => (
                                     <li key={index} className="lessons__lessons-item">
                                         <Link to={item.id} className="lessons__lessons-link">{`Lessons ${index+1}: ${item.title}`}</Link>
+                                        { user.role == "TEACHER" && 
+                                            <button className="lessons__lessons-delete" onClick={() => {handleDeleteDocs(item.id)}}><i className="fa-solid fa-minus"></i></button>
+                                        }
                                     </li>
                                 ))
                             }

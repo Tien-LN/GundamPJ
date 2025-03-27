@@ -50,10 +50,17 @@ $color-text-unit-title: #FF4028;
         &-item{
             padding: 10px 0;
             border-bottom: 1px solid rgb(0,0,0,0.3);
+            position: relative;
         }
         &-link{
             text-decoration: none;
             color: #000;
+        }
+        &-delete{
+            position: absolute;
+            bottom: 10.8px;
+            right: 5px;
+            cursor: pointer;
         }
     }
 }

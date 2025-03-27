@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "./Exam.scss";
 import { format } from "date-fns";
+import { convertTimeLimit } from "../../../helpers/client/Time/convertExamTimeLimit";
 function Exam(){
     const {courseId} = useParams();
     
@@ -15,7 +16,8 @@ function Exam(){
         description: "",
         courseId: courseId,
         startDate: "",
-        endDate: ""
+        endDate: "",
+        timeLimit: 0
     });
     // console.log(data);
     useEffect(()=>{
@@ -37,8 +39,15 @@ function Exam(){
                 const res = await axios.get(`http://localhost:3000/api/exams/?courseId=${courseId}`, {
                     withCredentials: true
                 });
-
-                setExams(res.data);
+                
+                const now = new Date();
+                const filterExams = res.data.filter((exam) => {
+                    const startDate = new Date(exam.startDate);
+                    const endDate = new Date(exam.endDate);
+                    return now >= startDate && now <= endDate;
+                })
+                setExams(filterExams);
+                
 
             } catch(error){
                 console.log("Lỗi", error);
@@ -97,6 +106,29 @@ function Exam(){
         fetchApi();
 
     }
+    const handleChangeTimeLimit = (event) => {
+        let newTime = parseInt(event.target.value)*60;
+        setData({
+            ...data,
+            ["timeLimit"]: newTime
+        });
+    }
+    const handleDeleteExam = (id) => {
+        const fetchApi = async() => {
+            try {
+                const res = await axios.delete(`http://localhost:3000/api/exams/${courseId}/exams/${id}`,
+                    {withCredentials: true}
+                );
+
+                console.log(res.data);
+                window.location.reload();
+            } catch(error) {
+                console.log("Lỗi khi xóa bài kiểm tra", error);
+            }
+        }
+        fetchApi();
+    }
+    // console.log(data);
     return (
         <>
             <div className="exams">
@@ -141,6 +173,10 @@ function Exam(){
                                     />
                                 </div>
                                 <div className="exams__box">
+                                    <label htmlFor="exams-timeLimit">phút</label>
+                                    <input type="number" className="exams__timeLimit" id="exams-timeLimit" min="1" value={data.timeLimit/60} onChange={handleChangeTimeLimit} />
+                                </div>
+                                <div className="exams__box">
                                     <button type="submit">Tạo mới</button>
                                 </div>
                             </form>
@@ -154,9 +190,15 @@ function Exam(){
                         <div key={index} className="exams__exam">
                             {
                                 user?.role == "TEACHER" && 
-                                <Link className="exams__exam-edit" to={`edit/${exam.id}`}>
-                                    <i className="fa-solid fa-gear"></i>
-                                </Link>
+                                <>
+                                    <Link className="exams__exam-edit" to={`edit/${exam.id}`}>
+                                        <i className="fa-solid fa-gear"></i>
+                                    </Link>
+                                    <button className="exams__exam-delete" onClick={() => {handleDeleteExam(exam.id)}}>
+                                        <i className="fa-solid fa-minus"></i>
+                                    </button>
+                                </>
+                                
                             }
                             <Link to={`${exam.id}`}>
                                 <div className="exams__exam-title">{exam.title}</div>
@@ -168,6 +210,10 @@ function Exam(){
 
                                     <span className="exams__exam-endDate">
                                         <b>Ngày kết thúc: </b>{format(new Date(exam.endDate), "dd/MM/yyyy")}
+                                    </span>
+
+                                    <span className="exams__exam-timeLimit">
+                                        <b>Thời gian làm: </b>{convertTimeLimit(exam.timeLimit)}
                                     </span>
                                 </div>
                             </Link>

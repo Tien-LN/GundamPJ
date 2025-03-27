@@ -12,7 +12,7 @@ function AddDocs(){
     });
     const navigate = useNavigate();
     // console.log(courseId);
-    console.log(data);
+    // console.log(data);
     const handleChange = (event) => {
         // console.log(event);
         setData({

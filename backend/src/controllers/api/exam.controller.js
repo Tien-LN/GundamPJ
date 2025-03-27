@@ -299,11 +299,54 @@ const deleteQuestion = async (req, res) => {
     return res.status(500).json({message: "server error!"});
   }
 }
+
+// [DELETE] api/exams/:courseId/exams/:examId
+const deleteExam = async(req, res) => {
+  try {
+    const examId = req.params.examId;
+    const questions = await prisma.question.findMany({
+      where: {
+        examId: examId
+      },
+      select: {
+        id: true
+      }
+    });
+
+    
+    const questionIds = questions.map(q => q.id);
+    
+    if(questionIds.length > 0){
+      await Promise.all(
+        questionIds.map(id => 
+          prisma.questionOption.deleteMany({
+            where: {
+              questionId: id
+            }
+          })
+        )
+      );
+
+      await prisma.question.deleteMany({
+        where: {id: {in: questionIds}}
+      });
+    }
+    await prisma.exam.delete({
+      where: {
+        id: examId
+      }
+    });
+    return res.send("Đã xóa thành công!!");
+  } catch(error){ 
+    return res.status(500).json({message: "server error!"});
+  }
+}
 module.exports = {
   index,
   createPost,
   createQuestion,
   getQuestions,
   changeQuestionPatch,
-  deleteQuestion
+  deleteQuestion,
+  deleteExam
 };

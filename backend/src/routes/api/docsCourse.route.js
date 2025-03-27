@@ -33,4 +33,12 @@ router.patch(
     checkAccessToCourse,
     controller.editDocs
 )
+
+router.delete(
+    "/:courseId/:docsId",
+    verifyUser,
+    checkAccessToCourse,
+    checkRole(["ADMIN", "TEACHER"]),
+    controller.deleteDoc
+)
 module.exports = router;

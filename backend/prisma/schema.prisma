@@ -125,6 +125,7 @@ model Exam {
   questions   Question[]
   UserExam    UserExam[]
   deleted     Boolean    @default(false)
+  timeLimit   Int        @default(3600)
 }
 
 enum QuestionType {
@@ -217,9 +218,10 @@ model doc {
 }
 
 model docsOfCourse {
-  id       String @id @default(uuid())
-  title    String
-  content  String
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId String
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
+  createdAt DateTime @default(now())
 }

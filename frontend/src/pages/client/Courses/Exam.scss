@@ -7,6 +7,7 @@
         height: calc(100vh - 120px);
         position: absolute;
         background: rgb(0,0,0,0.2);
+        z-index: 20;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -91,6 +92,20 @@
             &:hover{
                 transform: rotate(360deg);
                 
+            }
+        }
+        &-delete{
+            position: absolute;
+            top: 13px;
+            right: 50px;
+            transition: all 1s;
+            padding: 4px;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            &:hover{
+                border: 1px solid #ddd;
+                border-radius: 5px;
             }
         }
     }

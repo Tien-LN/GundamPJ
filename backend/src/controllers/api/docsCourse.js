@@ -83,3 +83,21 @@ module.exports.editDocs = async(req, res) => {
         return res.status(500).json({message : "server error"});
     }
 }
+
+// [DELETE] /api/docsCourse/:courseId/:docsId
+module.exports.deleteDoc = async(req, res) => {
+    try{
+        const courseId = req.params.courseId;
+        const docsId = req.params.docsId;
+        await prisma.docsOfCourse.delete({
+            where: {
+                id: docsId,
+                courseId: courseId
+            }
+        });
+        
+        return res.send("Đã xóa bài giảng thành công!!!");
+    } catch(error){
+        return res.status(500).json({message : "server error"});
+    }
+}

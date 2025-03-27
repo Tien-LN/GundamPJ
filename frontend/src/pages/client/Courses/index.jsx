@@ -64,21 +64,26 @@ function Courses(){
                 </>
                 :
                 <>
+    
                     <h1 className="courses__header">Khóa học đã đăng ký</h1>
                     <ul className="courses__type">
                     {
                         courses && 
                         courses.map((item, index) => 
-                            <li className="subject">
-                            <h2 className="courses__type-title">Khóa học : {item.course.name}</h2>
+                            <li key={index} className="subject">
+                            <Link to={`/courses/${item.course.id}`}>
+                                <h2 className="courses__type-title">Khóa học : {item.course.name}</h2>
+                            </Link>
+                            
 
                             <div className="subject__containner">
-                                hiển thị thông tin bài học           
+                                
                             </div>
                         </li>
                         )
                     }
-                </ul>
+                    </ul>
+                    <Link to="/enrollments">Tham gia khóa học</Link>
                 </>
                 }
                 
