@@ -1,0 +1,103 @@
+.exams{
+    position: relative;
+    &__model{
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 120px);
+        position: absolute;
+        background: rgb(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        &-box{
+            border-radius: 5px;
+            padding: 10px 15px;
+            background-color: #fff;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        &-title{
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+    }
+    &__form{
+        width: 100%;
+    }
+    &__box{
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        
+        & > label{
+            width: 150px;
+            font-weight: bold;
+            // display: inline-block;
+        }
+        input {
+            outline: none;
+            border: 0;
+            width: 50%;
+            border-bottom: 1px solid #ddd;
+        }
+        button{
+            margin-left: auto;
+            padding: 4px 5px;
+        }
+    }
+    &__description{
+        width: 100%;
+        margin: 4px 10px;
+    }
+    
+    &__exam{
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 10px 20px;
+        padding: 10px 20px;
+        position: relative;
+        a{
+            color: #000;
+        }
+        &-title{
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        &-description{
+            margin-bottom: 10px;
+        }
+        &-time{
+            display: flex;
+            flex-wrap: wrap;
+            span{
+                margin-right: 20px;
+            }
+        }
+        &-edit{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: all 1s;
+            padding: 6px;
+            &:hover{
+                transform: rotate(360deg);
+                
+            }
+        }
+    }
+    &__add{
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+        padding: 10px 20px;
+    }
+}

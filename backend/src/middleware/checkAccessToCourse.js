@@ -45,6 +45,7 @@ const checkAccessToCourse = async (req, res, next) => {
       next();
     } else {
       // return res.send("OKK");
+      // return res.send(courseId);
       const course = await prisma.course.findFirst({
         where: {
           teacherId: userId,
@@ -52,6 +53,7 @@ const checkAccessToCourse = async (req, res, next) => {
           deleted: false,
         },
       });
+      
       if (!course) {
         return res.status(403).json({
           message: "Course not found!!!",

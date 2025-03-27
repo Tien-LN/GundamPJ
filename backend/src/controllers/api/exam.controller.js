@@ -3,23 +3,12 @@ const { prisma } = require("../../config/db");
 const index = async (req, res) => {
   try {
     const courseId = req.query.courseId;
-    const userId = req.user.id;
-
-    const isEnrolled = await prisma.enrollment.findFirst({
-      where: {
-        courseId: courseId,
-        userId: userId,
-        status: "APPROVED",
-        deleted: false,
-      },
-    });
-
-    if (!isEnrolled) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
+    
     const course = await prisma.course.findFirst({
-      where: { id: courseId },
+      where: { 
+        id: courseId,
+        deleted: false
+      },
       include: {
         exams: true,
       },
@@ -29,17 +18,21 @@ const index = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    return res.status(200).json(course);
+    return res.status(200).json(course.exams);
   } catch (error) {
     return res.status(500).json({ message: "Server error!", error });
   }
 };
 
 const createPost = async (req, res) => {
+  if(!req.body.courseId || !req.body.startDate || !req.body.endDate){
+    return res.status(404).json({message: "Bad request"});
+  }
   if (req.body.questions && req.body.questions.length == 0)
     delete req.body.questions;
   if (req.body.UserExam && req.body.UserExam.length == 0)
     delete req.body.UserExam;
+
   const course = await prisma.course.findUnique({
     where: { id: req.body.courseId },
   });
@@ -55,13 +48,14 @@ const createPost = async (req, res) => {
 const createQuestion = async (req, res) => {
   try {
     const id = req.params.id;
-
+    if(req.body.courseId) delete req.body.courseId;
     const exam = await prisma.exam.findUnique({
       where: { id: id },
     });
     if (!exam) {
       return res.status(400).json({ message: "Không tìm thấy bài thi!" });
     }
+    
     if (!req.body.QuestionType) req.body.QuestionType = "OBJECTIVE";
     const questionType = req.body.QuestionType;
     const question = await prisma.question.create({
@@ -71,21 +65,21 @@ const createQuestion = async (req, res) => {
         content: req.body.content,
       },
     });
-
+  
     if (questionType == "OBJECTIVE" || questionType == "DROPDOWN") {
-      if (!req.body.questions || req.body.questions.length <= 1) {
+      if (!req.body.answers || req.body.answers.length <= 1) {
         return res.status(400).json({ message: "Cần thêm câu trả lời" });
       }
-
+      // return res.send(req.body);
       await Promise.all(
-        req.body.questions.map((item) =>
+        req.body.answers.map((item) =>
           prisma.questionOption.create({
             data: {
               questionId: question.id,
               content: item[0],
-              isCorrect: item[1],
+              isCorrect: (item[1]=='true'),
             },
-          })
+          })  
         )
       );
     } else if (questionType == "FILL") {
@@ -145,12 +139,22 @@ const createQuestion = async (req, res) => {
 const getQuestions = async (req, res) => {
   try {
     const examId = req.params.examId;
+    
+    const questions = await prisma.exam.findFirst({
+      where: {
+        id: examId,
+        deleted: false
+      },
+      include: {
+        questions: {
+          include: {
+            options: true
+          }
+        }
+      }
+    })
 
-    const questions = await prisma.question.findMany({
-      where: { examId: examId },
-    });
-
-    res.status(200).json(questions);
+    return res.send(questions.questions);
   } catch (error) {
     res.status(500).json({ error: "Lỗi server" });
   }
@@ -273,10 +277,33 @@ const changeQuestionPatch = async (req, res) => {
   }
 };
 
+// [DELETE] api/exams/:courseId/exams/:examId/:questionId
+const deleteQuestion = async (req, res) => {
+  try {
+    const questionId = req.params.questionId;
+    
+    await prisma.questionOption.deleteMany({
+      where: {
+        questionId: questionId
+      }
+    });
+    const result = await prisma.question.delete({
+      where: {
+        id: questionId
+      }
+    });
+    
+    
+    return res.send("Đã xóa thành công!!");
+  } catch(error) {
+    return res.status(500).json({message: "server error!"});
+  }
+}
 module.exports = {
   index,
   createPost,
   createQuestion,
   getQuestions,
   changeQuestionPatch,
+  deleteQuestion
 };
