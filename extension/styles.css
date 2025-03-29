@@ -1,0 +1,54 @@
+.gundam-stats-button {
+  background: none;
+  border: none;
+  color: #1a73e8;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+.gundam-stats-button:hover {
+  background-color: rgba(26, 115, 232, 0.1);
+  border-radius: 4px;
+}
+
+#gundam-stats-panel {
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+#gundam-stats-panel .stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e8eaed;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+#gundam-stats-panel .course-stats {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+#gundam-stats-panel .exam-stats {
+  background: white;
+  border-left: 3px solid #1a73e8;
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+
+#gundam-stats-panel p {
+  margin: 4px 0;
+  color: #3c4043;
+  font-size: 14px;
+}
+
+#gundam-stats-panel h4 {
+  color: #1a73e8;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gundam Meet Statistics</title>
+    <link rel="stylesheet" href="css/popup.css" />
+  </head>
+  <body>
+    <div class="header">
+      <h1>Gundam Meet Statistics</h1>
+    </div>
+
+    <!-- Form đăng nhập -->
+    <div id="loginForm" class="login-form">
+      <h2>Đăng nhập</h2>
+      <div class="form-group">
+        <input type="text" id="username" placeholder="Tên đăng nhập" required />
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" placeholder="Mật khẩu" required />
+      </div>
+      <button id="loginBtn" class="btn-primary">Đăng nhập</button>
+      <p id="loginError" class="error-message"></p>
+    </div>
+
+    <!-- Phần hiển thị thống kê -->
+    <div id="statisticsContent" class="content" style="display: none">
+      <!-- Thông tin người dùng -->
+      <div class="user-info">
+        <span id="userName"></span>
+        <button id="logoutBtn" class="btn-secondary">Đăng xuất</button>
+      </div>
+
+      <!-- Phần dành cho Student -->
+      <div id="studentStats" class="stats-section" style="display: none">
+        <h3>Thống kê của bạn</h3>
+        <div class="stats-grid">
+          <div class="stats-item">
+            <span class="stats-label">Tỷ lệ tham gia:</span>
+            <span id="attendanceRate">-</span>
+          </div>
+          <div class="stats-item">
+            <span class="stats-label">Điểm trung bình:</span>
+            <span id="averageScore">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phần dành cho Teacher/Admin -->
+      <div id="teacherStats" class="stats-section" style="display: none">
+        <h3>Danh sách học viên</h3>
+        <div class="course-select">
+          <select id="courseSelect">
+            <option value="">Chọn khóa học...</option>
+          </select>
+        </div>
+        <div id="studentList" class="student-list">
+          <!-- Danh sách học viên sẽ được thêm vào đây -->
+        </div>
+      </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/popup.js"></script>
+  </body>
+</html>

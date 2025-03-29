@@ -21,9 +21,13 @@ router.get(
   verifyUser,
   checkAccessToCourse,
   controller.getCourseWithId
-
-)
-router.patch("/:id", verifyUser, checkRole(["ADMIN"]), controller.deleteCourse);
+);
+router.delete(
+  "/:id",
+  verifyUser,
+  checkRole(["ADMIN"]),
+  controller.deleteCourse
+);
 
 router.delete(
   "/delete/permanent/:id",

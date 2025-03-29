@@ -6,7 +6,7 @@ const index = async (req, res) => {
   const courses = await prisma.course.findMany({
     where: { deleted: false },
     select: {
-      id: true, 
+      id: true,
       name: true,
       description: true,
       price: true,
@@ -16,21 +16,19 @@ const index = async (req, res) => {
       imageUrl: true,
       teacher: { select: { name: true } },
     },
-    orderBy: {
-      startDate: true
-    }
   });
   res.send(courses);
 };
-const getCourseWithId = async(req,res) => {
-  try{
+const getCourseWithId = async (req, res) => {
+  try {
     const course = req.course;
-    if(!course) return res.status(404).json({message: "course does not found!"});
+    if (!course)
+      return res.status(404).json({ message: "course does not found!" });
     return res.send(course);
-  } catch(error) {
-    return res.status(500).json({message: "Server Error!"});
+  } catch (error) {
+    return res.status(500).json({ message: "Server Error!" });
   }
-}
+};
 const getCourseDelete = async (req, res) => {
   const courses = await prisma.course.findMany({
     where: { deleted: true },
@@ -50,8 +48,12 @@ const getCourseDelete = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  
-  if (!req.body.teacherId || !req.body.startDate || !req.body.endDate || !req.body.price) {
+  if (
+    !req.body.teacherId ||
+    !req.body.startDate ||
+    !req.body.endDate ||
+    !req.body.price
+  ) {
     return res.status(400).json({ message: "Bad request" });
   }
   req.body.price = parseInt(req.body.price);
@@ -59,7 +61,7 @@ const createPost = async (req, res) => {
   if (req.body.enrollments && req.body.enrollments.length == 0)
     delete req.body.enrollments;
   if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
-  
+
   const result = await prisma.course.create({
     data: req.body,
   });
@@ -122,7 +124,7 @@ const coursePatch = async (req, res) => {
       delete req.body.enrollments;
     if (req.body.exams && req.body.exams.length == 0) delete req.body.exams;
 
-    if(req.body.price) req.body.price = parseInt(req.body.price);
+    if (req.body.price) req.body.price = parseInt(req.body.price);
 
     await prisma.course.update({
       where: {
@@ -307,5 +309,5 @@ module.exports = {
   restoreCourse,
   updateCourseImage,
   getCourseBySlug,
-  getCourseWithId
+  getCourseWithId,
 };

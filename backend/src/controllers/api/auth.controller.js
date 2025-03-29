@@ -7,7 +7,7 @@ const hashPassword = require("../../utils/hashPassword.js");
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const user = await prisma.user.findUnique({
       where: { email },
       include: { role: true },
@@ -37,7 +37,7 @@ const login = async (req, res) => {
       httpOnly: true, // bảo vệ cookie khỏi javascript trên trình duyệt
       secure: process.env.NODE_ENV === "production" ? true : false, // Chỉ bật trên môi trường production
       sameSite: "Lax",
-      maxAge: 1800000,
+      maxAge: 5 * 60 * 60 * 1000, // 5 hours
     });
 
     res.json({
@@ -116,4 +116,129 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = { login, changePassword, logout };
+// [POST] /api/auth/refresh-token
+const refreshToken = async (req, res) => {
+  try {
+    // Check if the JWT cookie exists
+    if (!req.cookies || !req.cookies.jwt) {
+      return res.status(401).json({ message: "Không tìm thấy token" });
+    }
+
+    const token = req.cookies.jwt;
+
+    try {
+      // Verify the existing token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+      // Get user from database to ensure they still exist
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        include: { role: true },
+      });
+
+      if (!user) {
+        return res.status(401).json({ message: "Người dùng không tồn tại" });
+      }
+
+      // Generate a new token
+      const newToken = jwt.sign(
+        {
+          id: user.id,
+          role: user.role?.roleType,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "5h" }
+      );
+
+      // Set the new token in a cookie
+      res.cookie("jwt", newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: "Lax",
+        maxAge: 5 * 60 * 60 * 1000, // 5 hours
+      });
+
+      return res.status(200).json({
+        message: "Token refreshed successfully",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role?.roleType,
+        },
+      });
+    } catch (error) {
+      // If token verification fails but it's just expired (not tampered)
+      if (error.name === "TokenExpiredError") {
+        try {
+          // Decode without verification to get the user ID
+          const decoded = jwt.decode(token);
+          if (!decoded || !decoded.id) {
+            return res.status(401).json({ message: "Token không hợp lệ" });
+          }
+
+          // Get user from database
+          const user = await prisma.user.findUnique({
+            where: { id: decoded.id },
+            include: { role: true },
+          });
+
+          if (!user) {
+            return res
+              .status(401)
+              .json({ message: "Người dùng không tồn tại" });
+          }
+
+          // Generate a new token
+          const newToken = jwt.sign(
+            {
+              id: user.id,
+              role: user.role?.roleType,
+            },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "5h" }
+          );
+
+          // Set the new token in a cookie
+          res.cookie("jwt", newToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production" ? true : false,
+            sameSite: "Lax",
+            maxAge: 5 * 60 * 60 * 1000, // 5 hours in milliseconds
+          });
+
+          return res.status(200).json({
+            message: "Token refreshed successfully",
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role?.roleType,
+            },
+          });
+        } catch (innerError) {
+          return res.status(401).json({
+            message: "Không thể làm mới token",
+            error: innerError.message,
+          });
+        }
+      }
+
+      return res
+        .status(401)
+        .json({ message: "Token không hợp lệ", error: error.message });
+    }
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    return res
+      .status(500)
+      .json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+module.exports = {
+  login,
+  changePassword,
+  logout,
+  refreshToken, // Add this to the exports
+};
