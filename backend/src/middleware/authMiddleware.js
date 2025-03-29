@@ -5,6 +5,7 @@ const verifyUser = async (req, res, next) => {
   try {
     console.log("Middleware verifyUser được gọi");
     const token = req.cookies.jwt;
+    // console.log(token);
     if (!token) {
       return res.status(401).json({ message: "Bạn chưa đăng nhập" });
     }

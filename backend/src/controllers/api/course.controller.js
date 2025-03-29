@@ -15,9 +15,6 @@ const index = async (req, res) => {
       deleted: true,
       imageUrl: true,
       teacher: { select: { name: true } },
-    },
-    orderBy: {
-      startDate: true
     }
   });
   res.send(courses);

@@ -38,10 +38,7 @@ function Courses(){
                 }
                 
                 <Link className="adminCourses__create" to="/admin/courses/create">+</Link>
-                <div className="adminCourses__charts">
-                    Chart - Dũng
-                    Làm cái đéo thống kê đường cho cái khóa học tạo theo thời gian ấy, trục x : thời gian, y : số lượng khóa
-                </div>
+               
                 <div className="adminCourses__sort">
                     <select className="adminCourses__sortOptions">
                         <option value="default">Mặc định</option>
