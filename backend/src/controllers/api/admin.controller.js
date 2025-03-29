@@ -10,7 +10,7 @@ const slugify = require("slugify");
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, role, courseIds } = req.body;
+    const { name, email, role } = req.body;
 
     const emailCheck = await validateEmail(email);
     if (!emailCheck.valid) {
@@ -53,15 +53,15 @@ const registerUser = async (req, res) => {
     });
 
     // Thêm các khóa học vào bảng Enrollment
-    if (courseIds && Array.isArray(courseIds) && courseIds.length > 0) {
-      const enrollments = courseIds.map((courseId) => ({
-        userId: newUser.id,
-        courseId,
-        status: "APPROVED",
-      }));
+    // if (courseIds && Array.isArray(courseIds) && courseIds.length > 0) {
+    //   const enrollments = courseIds.map((courseId) => ({
+    //     userId: newUser.id,
+    //     courseId,
+    //     status: "APPROVED",
+    //   }));
 
-      await prisma.enrollment.createMany({ data: enrollments });
-    }
+    //   await prisma.enrollment.createMany({ data: enrollments });
+    // }
 
     await sendEmail(
       email,
@@ -200,7 +200,6 @@ const registerMultipleUsers = async (req, res) => {
             lower: true,
             strict: true,
           }),
-          courseIds: user.courseIds || [],
         };
       })
     );
@@ -212,17 +211,17 @@ const registerMultipleUsers = async (req, res) => {
     });
 
     // Thêm các khóa học vào bảng Enrollment
-    for (const user of hashedUsers) {
-      if (user.courseIds && user.courseIds.length > 0) {
-        const enrollments = user.courseIds.map((courseId) => ({
-          userId: user.id,
-          courseId,
-          status: "APPROVED",
-        }));
+    // for (const user of hashedUsers) {
+    //   if (user.courseIds && user.courseIds.length > 0) {
+    //     const enrollments = user.courseIds.map((courseId) => ({
+    //       userId: user.id,
+    //       courseId,
+    //       status: "APPROVED",
+    //     }));
 
-        await prisma.enrollment.createMany({ data: enrollments });
-      }
-    }
+    //     await prisma.enrollment.createMany({ data: enrollments });
+    //   }
+    // }
 
     // Gửi email cho từng user
     for (const user of hashedUsers) {

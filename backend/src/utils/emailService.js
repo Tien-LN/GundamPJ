@@ -48,7 +48,7 @@ const validateEmail = async (email) => {
       `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${email}`
     );
 
-    console.log(response);
+    // console.log(response);
 
     if (!response.data) {
       return { valid: false, message: "❌ Không nhận được phản hồi từ API." };
