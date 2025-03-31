@@ -153,8 +153,8 @@ const getQuestions = async (req, res) => {
         }
       }
     })
-
-    return res.send(questions.questions);
+  
+    return res.send(questions);
   } catch (error) {
     res.status(500).json({ error: "Lỗi server" });
   }

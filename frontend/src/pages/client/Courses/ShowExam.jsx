@@ -1,13 +1,17 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import renderMathInElement from "katex/dist/contrib/auto-render";
+import "./ShowExam.scss";
 function ShowExam(){
     const {courseId, examId} = useParams();
     const [questions, setQuestions] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [answers, setAnswers] = useState({});
+    const [timeLeft, setTimeLeft] = useState(99999);
+    const timeLimit = useRef();
     const optionsContent = useRef({});
+    const questionIdType = useRef({});
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchApi = async () => {
             try {
@@ -16,7 +20,10 @@ function ShowExam(){
                 })
 
 
-                setQuestions(res_questions.data);
+                setQuestions(res_questions.data.questions);
+                setTimeLeft(res_questions.data.timeLimit);
+                timeLimit.current = res_questions.data.timeLimit;
+                // console.log(timeLimit.current);
             } catch(error){
                 console.error("Lỗi khi lấy câu hỏi ", error);
             }
@@ -27,8 +34,8 @@ function ShowExam(){
     }, []);
     useEffect(() => {
         if(!questions || questions.length == 0) return;
-        setIsLoading(false);
-        setTimeout(() => {
+        
+        const renderMath = () => {
             const contentElements = document.querySelectorAll(".startExams__questions-content");
             if (contentElements && contentElements.length > 0) {
                 contentElements.forEach((content) => {
@@ -42,18 +49,35 @@ function ShowExam(){
                 })
                 
             }
-        }, 100);
-    }, [questions, isLoading]);
+        }
+
+        renderMath();
+
+        const observer  = new MutationObserver(() => {
+            renderMath();
+        })
+
+        const targetNode = document.querySelector(".startExams");
+        if(targetNode){
+            observer.observe(targetNode, {childList: true, subtree: true});
+        }
+
+        return () => observer.disconnect();
+    }, [questions]);
     useEffect(()=> {
         if(!questions || questions.length == 0) return;
         let newAnswesrs = {...answers};
         if(!optionsContent.current){
             optionsContent.current = {};
         }
+        if(!questionIdType.current){
+            questionIdType.current = {};
+        }
         questions.forEach((question, index) => {
             question.options.forEach((opt) => {
                 optionsContent.current[opt.id] = opt.content;
             })
+            questionIdType.current[question.id] = question.type;
             if(!newAnswesrs[question.id]){
                 if(question.type == "DROPDOWN" || question.type == "OBJECTIVE"){
                     newAnswesrs[question.id] = question.options[0]?.id || null;
@@ -81,6 +105,18 @@ function ShowExam(){
         setAnswers(newAnswesrs);
 
     }, [questions]);
+    useEffect(() => {
+        if (timeLeft <= 0) {
+            handleSubmit(); 
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft]);
     const handleObjectiveChange = (questionId, optId) => {
         setAnswers(prev => ({
             ...prev,
@@ -111,6 +147,16 @@ function ShowExam(){
             };
         });
     }
+    const handleDeleteReordering = (questionId, opt_index) => {
+        setAnswers((prevAnswers) => {
+            let newAnswerOptions = [...prevAnswers[questionId]];
+            newAnswerOptions[opt_index] = '';
+            return {
+                ...prevAnswers,
+                [questionId]: newAnswerOptions
+            };
+        });
+    }
     const handleAddMatching = (questionId, optId) => {
         setAnswers((prevAnswers) => {
             let newAnswerOptions = [...prevAnswers[questionId]];
@@ -126,16 +172,58 @@ function ShowExam(){
             };
         })
     }
-    console.log(questions);
-    console.log(answers);
+    const handleDeleteMatching = (questionId, opt_index) => {
+        setAnswers((prevAnswers) => {
+            let newAnswerOptions = [...prevAnswers[questionId]];
+            newAnswerOptions[opt_index][1] = '';
+            return {
+                ...prevAnswers,
+                [questionId]: newAnswerOptions
+            };
+        })
+    }
+    const handleSubmit = () => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.post(`http://localhost:3000/api/userExams/${examId}`, {
+                    courseId: courseId,
+                    timeDo: timeLimit.current - timeLeft,
+                    answers: answers,
+                    questionIdType: questionIdType.current
+                }, {
+                    withCredentials: true
+                });
+
+                console.log("Đã gửi thành công");
+                console.log(res.data);
+                navigate(`/courses/${courseId}/exams`);
+            } catch(error) {
+                console.error("Lỗi khi gửi câu hỏi", error);
+            }
+        }
+        fetchApi();
+    }
+    
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+    // console.log(questions);
+    // console.log(answers);
+    // console.log(questionIdType.current);
     return (
         <>
             <div className="startExams">
                 <h1 className="startExams__intro">Làm đề thi</h1>
+
+                <div className="startExams__timer">
+                    ⏳ Thời gian còn lại: <b>{formatTime(timeLeft)}</b>
+                </div>
                 {
                     questions && 
                 questions.map((question, index) => (
-                    <div className="startExams__questions-question" key={index}>
+                    <div className="startExams__questions-question" key={question.id}>
                         <div key={index} className="startExams__index"><b>Câu {index + 1} : </b></div>
                         <div className="startExams__questions-content">
                             <div dangerouslySetInnerHTML={{__html: question.content}} /> 
@@ -161,12 +249,17 @@ function ShowExam(){
                             }
                             {
                                 question.type == "OBJECTIVE" && 
-                                question.options.map((opt) => (
-                                    <div key={opt.id} className="startExams__answers-box">
-                                        <input type="radio" className="startExams__answers-objective" id={`startExams-option-${opt.id}`} checked={answers[question.id] == opt.id} onChange={() => {handleObjectiveChange(question.id, opt.id)}}/>
-                                        <label htmlFor={`startExams-option-${opt.id}`}>{opt.content}</label>
-                                    </div>
-                                ))
+                                <div className="startExams__answers-objective">
+                                    {
+                                        question.options.map((opt) => (
+                                            <div key={opt.id} className="startExams__answers-box">
+                                                <input type="radio" className="startExams__answers-objective" id={`startExams-option-${opt.id}`} checked={answers[question.id] == opt.id} onChange={() => {handleObjectiveChange(question.id, opt.id)}}/>
+                                                <label htmlFor={`startExams-option-${opt.id}`}>{opt.content}</label>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                                
                             }
                             {
                                 question.type == "REORDERING" && 
@@ -175,8 +268,8 @@ function ShowExam(){
                                         {
                                             answers[question.id] && 
                                             answers[question.id].map((answer, answer_index) => (
-                                                <div key={answer_index} className="reordering__box">
-                                                    {optionsContent.current[answer]}
+                                                <div key={answer_index} className="reordering__box" onClick={() => {handleDeleteReordering(question.id, answer_index)}}>
+                                                    {answer ? optionsContent.current[answer] : (answer_index == answers[question.id].length - 1 ? "___" : "___ /")}
                                                 </div>
                                             ))
                                         }
@@ -211,9 +304,9 @@ function ShowExam(){
                                             {
                                                 answers[question.id] && 
                                                 answers[question.id].map((ans, ans_index) => (
-                                                <tr key={ans_index}>
+                                                <tr key={ans[0] + "-" + ans[1]}>
                                                     <td>{optionsContent.current[ans[0]]}</td>
-                                                    <td>{ans[1] ? optionsContent.current[ans[1]] : '___'}</td>
+                                                    <td onClick={() => {handleDeleteMatching(question.id, ans_index)}}>{ans[1] ? optionsContent.current[ans[1]] : '___'}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -238,7 +331,7 @@ function ShowExam(){
                     
                 ))}
                 
-                <button className="startExams__submit">
+                <button className="startExams__submit" onClick={handleSubmit}>
                     Gửi bài làm
                 </button>
             </div>

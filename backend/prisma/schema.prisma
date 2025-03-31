@@ -156,20 +156,13 @@ model QuestionOption {
   UserAnswer UserAnswer[]
 }
 
-enum ExamStatus {
-  IN_PROGRESS
-  COMPLETED
-}
-
 model UserExam {
   id          String       @id @default(uuid())
   user        User         @relation(fields: [userId], references: [id])
   userId      String
   exam        Exam         @relation(fields: [examId], references: [id])
   examId      String
-  startTime   DateTime
-  endTime     DateTime?
-  status      ExamStatus   @default(IN_PROGRESS)
+  timeDo      Int?
   userAnswers UserAnswer[]
 }
 
@@ -181,11 +174,11 @@ model UserAnswer {
   questionId       String
   questionOption   QuestionOption? @relation(fields: [questionOptionId], references: [id])
   questionOptionId String?
+  num              Int?
+  value            String?
+  left             Boolean         @default(false)
   User             User?           @relation(fields: [userId], references: [id])
   userId           String?
-  score            Float
-  timeTaken        Int?
-  deleted          Boolean         @default(false)
 }
 
 enum AnnouncementVisibility {

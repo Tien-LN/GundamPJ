@@ -1,0 +1,97 @@
+.startExams{
+    padding: 0 20px;
+    position: relative;
+    &__timer{
+        text-align: right;
+        position: sticky;
+        top: 20px;
+        right: 0;
+    }
+    &__intro{
+        text-align: center;
+        margin: 20px 0;
+    }
+    &__index{
+        text-decoration: underline;
+        margin-bottom: 5px;
+    }
+    &__questions{
+        &-question{
+            margin: 20px 0; 
+        }
+        &-content{
+            margin-bottom: 5px;
+        }
+    }
+    &__answers{
+        &-dropdown{
+            border: 0;
+            border-bottom: 1px solid #ddd;
+            width: 100%;
+            max-width: 150px;
+        }
+        &-fillInput{
+            border: 0;
+            border-bottom: 1px solid #ddd;
+            outline: none;
+        }
+        &-matching{
+            table{
+                border: 1px solid #ddd;
+                padding: 3px 5px;
+                margin-bottom: 10px;
+                border-spacing: 5px;
+
+                th{
+                    border-bottom: 1px solid #ddd;
+                    text-align: center;
+                }
+                td{
+                    text-align: center;
+                }
+                
+            }
+            &Letters{
+                display: flex;
+                flex-wrap: wrap;
+                button{
+                    padding: 3px 5px;
+                    margin-right: 7px;
+                }
+            }
+            
+        }
+        &-reordering{
+            &Box{
+                display: flex;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                .reordering__box{
+                    margin-right: 4px;
+                    min-width: 47px;
+                    &:hover{
+                        text-decoration: line-through;
+                    }
+                }
+            }
+            &Letters{
+                display: flex;
+                .reordering__box{
+                    margin-right: 10px;
+                    padding: 3px 5px;
+                }
+            }
+
+        }
+        &-objective{
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px 0;
+        }
+        &-box{
+            display: flex;
+            width: 100%;
+            max-width: 200px;
+        }
+    }
+}

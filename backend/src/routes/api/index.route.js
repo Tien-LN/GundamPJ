@@ -12,6 +12,7 @@ const systemConfig = require("../../config/dotenv");
 const lessonRoutes = require("./lesson.route");
 const statisticsRoutes = require("./statistics.route");
 const docsCourseRoutes = require("./docsCourse.route");
+const userExam = require("./userExam.route");
 module.exports = (app) => {
   app.use(systemConfig.API_route + "/announcements", announRoutes);
 
@@ -38,4 +39,6 @@ module.exports = (app) => {
   app.use("/api/lessons", lessonRoutes);
 
   app.use("/api/statistics", statisticsRoutes);
+
+  app.use(systemConfig.API_route + "/userExams", userExam);
 };
