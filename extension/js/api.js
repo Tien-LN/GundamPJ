@@ -1,6 +1,35 @@
 // Xử lý gọi API và lấy dữ liệu
 
 /**
+ * Lấy thông tin thống kê của người dùng
+ * @param {string} userId - ID của người dùng
+ * @returns {Promise<Object>} - Thông tin thống kê
+ */
+async function getUserStatistics(userId) {
+  try {
+    const response = await fetch(`${API_URL}/statistics/user/${userId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        error.message || "Không thể lấy thông tin thống kê người dùng"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get user statistics error:", error);
+    throw error;
+  }
+}
+
+/**
  * Lấy thông tin thống kê của học viên
  * @param {string} studentId - ID của học viên
  * @returns {Promise<Object>} - Thông tin thống kê
@@ -34,13 +63,16 @@ async function getStudentStatistics(studentId) {
  */
 async function getCourseStudents(courseId) {
   try {
-    const response = await fetch(`${API_URL}/courses/${courseId}/students`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/statistics/course/${courseId}/students`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -133,6 +165,7 @@ async function getAuthToken() {
   }
 }
 
+window.getUserStatistics = getUserStatistics;
 window.getStudentStatistics = getStudentStatistics;
 window.getCourseStudents = getCourseStudents;
 window.getCourses = getCourses;

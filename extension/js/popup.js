@@ -42,15 +42,42 @@ document.addEventListener("DOMContentLoaded", async () => {
       "userName"
     ).textContent = `Xin chào, ${userData.user.name}`;
 
-    if (userData.user.role === "student") {
+    if (userData.user.role.roleType === "STUDENT") {
       studentStats.style.display = "block";
       teacherStats.style.display = "none";
       // Lấy thống kê của học viên
-      const stats = await getStudentStatistics(userData.user.id);
+      const stats = await getUserStatistics(userData.user.id);
+
+      // Calculate attendance rate
+      let totalAttended = 0;
+      let totalLessons = 0;
+
+      Object.values(stats.attendanceStats).forEach((courseAttendance) => {
+        totalAttended += courseAttendance.attended || 0;
+        totalLessons += courseAttendance.total || 0;
+      });
+
+      const attendanceRate =
+        totalLessons > 0 ? Math.round((totalAttended / totalLessons) * 100) : 0;
+
+      // Calculate average score across all exams
+      let totalScore = 0;
+      let examCount = 0;
+
+      stats.courseStats.forEach((course) => {
+        course.examStats.forEach((exam) => {
+          totalScore += exam.averageScore;
+          examCount++;
+        });
+      });
+
+      const averageScore =
+        examCount > 0 ? (totalScore / examCount).toFixed(1) : "-";
+
       document.getElementById(
         "attendanceRate"
-      ).textContent = `${stats.attendanceRate}%`;
-      document.getElementById("averageScore").textContent = stats.averageScore;
+      ).textContent = `${attendanceRate}%`;
+      document.getElementById("averageScore").textContent = averageScore;
     } else {
       studentStats.style.display = "none";
       teacherStats.style.display = "block";
