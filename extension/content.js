@@ -87,27 +87,184 @@ function addStatisticsButton(participantItem) {
   const menuButton = participantItem.querySelector('[role="button"]');
   if (!menuButton) return;
 
-  const statsButton = document.createElement("button");
-  statsButton.textContent = "Xem thống kê";
-  statsButton.style.cssText = `
-    background: none;
-    border: none;
-    color: #1a73e8;
-    cursor: pointer;
-    padding: 8px;
-    margin-left: 8px;
-  `;
+  chrome.storage.local.get(["userData"], async (data) => {
+    if (!data.userData) return;
 
-  statsButton.addEventListener("click", async () => {
-    // Giả lập userId, trong thực tế cần lấy từ dữ liệu người dùng
-    const userId = "user-123";
-    const stats = await fetchUserStatistics(userId);
-    const panel = document.getElementById("gundam-stats-panel");
-    panel.style.display = "block";
-    displayStatistics(stats);
+    const userRole = data.userData.roleType;
+    const currentUserId = data.userData.id;
+
+    const statsButton = document.createElement("button");
+    statsButton.textContent = "Xem thống kê";
+    statsButton.style.cssText = `
+      background: none;
+      border: none;
+      color: #1a73e8;
+      cursor: pointer;
+      padding: 8px;
+      margin-left: 8px;
+    `;
+
+    statsButton.addEventListener("click", async () => {
+      const panel = document.getElementById("gundam-stats-panel");
+
+      if (userRole === "STUDENT") {
+        const stats = await getUserStatistics(currentUserId);
+        panel.style.display = "block";
+        displayStatistics(stats);
+      } else if (userRole === "ADMIN" || userRole === "TEACHER") {
+        showCourseSelection(panel);
+      }
+    });
+
+    menuButton.parentElement.appendChild(statsButton);
   });
+}
 
-  menuButton.parentElement.appendChild(statsButton);
+async function showCourseSelection(panel) {
+  try {
+    const courses = await getCourses();
+
+    let html = `
+      <div class="course-selection">
+        <h4>Chọn khóa học</h4>
+        <div class="course-list">
+    `;
+
+    courses.forEach((course) => {
+      html += `
+        <div class="course-item" data-course-id="${course.id}" style="margin: 8px 0; cursor: pointer; padding: 8px; border: 1px solid #eee; border-radius: 4px;">
+          ${course.name}
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+
+    const content = document.getElementById("stats-content");
+    content.innerHTML = html;
+    panel.style.display = "block";
+
+    document.querySelectorAll(".course-item").forEach((item) => {
+      item.addEventListener("click", async () => {
+        const courseId = item.getAttribute("data-course-id");
+        showCourseStudents(courseId);
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+  }
+}
+
+async function showCourseStudents(courseId) {
+  try {
+    const students = await getCourseStudents(courseId);
+
+    let html = `
+      <div class="students-list">
+        <h4>Danh sách học viên</h4>
+        <button id="back-to-courses" style="margin-bottom: 16px; padding: 4px 8px;">← Quay lại</button>
+        <div class="students">
+    `;
+
+    students.forEach((enrollment) => {
+      html += `
+        <div class="student-item" data-student-id="${enrollment.user.id}" style="margin: 8px 0; cursor: pointer; padding: 8px; border: 1px solid #eee; border-radius: 4px;">
+          ${enrollment.user.name}
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+
+    const content = document.getElementById("stats-content");
+    content.innerHTML = html;
+
+    document.querySelectorAll(".student-item").forEach((item) => {
+      item.addEventListener("click", async () => {
+        const studentId = item.getAttribute("data-student-id");
+        showStudentStatistics(studentId);
+      });
+    });
+
+    document.getElementById("back-to-courses").addEventListener("click", () => {
+      const panel = document.getElementById("gundam-stats-panel");
+      showCourseSelection(panel);
+    });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+  }
+}
+
+async function showStudentStatistics(studentId) {
+  try {
+    const stats = await getStudentStatistics(studentId);
+
+    let html = `
+      <div class="student-statistics">
+        <h4>${stats.name} - Thống kê</h4>
+        <button id="back-to-students" style="margin-bottom: 16px; padding: 4px 8px;">← Quay lại</button>
+    `;
+
+    if (stats.enrollments && stats.enrollments.length > 0) {
+      stats.enrollments.forEach((enrollment) => {
+        const course = enrollment.course;
+
+        html += `
+          <div class="course-stats" style="margin-bottom: 16px;">
+            <h5 style="margin: 0 0 8px 0;">${course.name}</h5>
+            <p>Tiến độ: ${
+              course.lessons.filter((lesson) => lesson.date <= new Date())
+                .length
+            }/${course.lessons.length} bài học</p>
+        `;
+
+        if (course.exams && course.exams.length > 0) {
+          course.exams.forEach((exam) => {
+            if (exam.UserExam && exam.UserExam.length > 0) {
+              const userExam = exam.UserExam[0];
+
+              html += `
+                <div class="exam-stats" style="margin-left: 16px;">
+                  <p>${exam.title}</p>
+              `;
+
+              if (userExam.userAnswers && userExam.userAnswers.length > 0) {
+                const totalScore = userExam.userAnswers.reduce(
+                  (sum, answer) => sum + (answer.score || 0),
+                  0
+                );
+                const averageScore = totalScore / userExam.userAnswers.length;
+
+                html += `
+                  <p>Điểm: ${averageScore.toFixed(1)}</p>
+                `;
+              }
+
+              html += `</div>`;
+            }
+          });
+        }
+
+        html += `</div>`;
+      });
+    } else {
+      html += `<p>Không có dữ liệu khóa học</p>`;
+    }
+
+    html += `</div>`;
+
+    const content = document.getElementById("stats-content");
+    content.innerHTML = html;
+
+    document
+      .getElementById("back-to-students")
+      .addEventListener("click", () => {
+        const panel = document.getElementById("gundam-stats-panel");
+        showCourseSelection(panel);
+      });
+  } catch (error) {
+    console.error("Error fetching student statistics:", error);
+  }
 }
 
 // Theo dõi thay đổi DOM để thêm nút thống kê

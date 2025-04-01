@@ -4,12 +4,7 @@ const statisticsController = require("../../controllers/api/statistics.controlle
 const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
 
 // Lấy thống kê của học viên
-router.get(
-  "/user/:userId",
-  verifyUser,
-  checkRole(["ADMIN", "TEACHER"]),
-  statisticsController.getUserStatistics
-);
+router.get("/user/:userId", verifyUser, statisticsController.getUserStatistics);
 
 // Lấy thống kê tỷ lệ tham gia và điểm trung bình cho học viên
 router.get(

@@ -29,6 +29,7 @@ async function login(email, password) {
     }
 
     const userData = await response.json();
+    console.log(userData);
 
     // Lưu thông tin người dùng vào storage
     await saveUserData(userData);
