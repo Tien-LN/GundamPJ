@@ -58,7 +58,7 @@ function Header() {
                             <div className='nav-link'>
                                 <NavLink to="/" className="nav-link-c">Trang chủ</NavLink>
                                 <NavLink to="/courses" className="nav-link-c">Khoá học của tôi</NavLink>
-                                <NavLink to="/statistics" className="nav-link-c">Thống kê</NavLink>
+                                {/* <NavLink to="/statistics" className="nav-link-c">Thống kê</NavLink> */}
                             </div>
 
                             <div className='dropdown-container'>

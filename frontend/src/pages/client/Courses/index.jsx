@@ -77,10 +77,11 @@ function Courses(){
                             
 
                             <div className="subject__containner">
-                                {item.course.docsCourse && 
-                                item.course.docsCourse.map((docs, docs__index) => (
-                                    <Link to={`/courses/${item.course.id}/${docs.id}`}>Lesson {docs__index + 1} : {docs.title}</Link>
-                                ))
+                                {item.course.docsCourse &&
+                                    item.course.docsCourse.map((docs, docs__index) => (
+                                        <Link to={`/courses/${item.course.id}/${docs.id}`}>Lesson {docs__index + 1} : {docs.title}</Link>
+                                    ))
+                            
                                 }
                             </div>
                         </li>

@@ -11,9 +11,9 @@ function CoursesDefault(){
                 <li>
                     <NavLink to={`/courses/${courseId}`} className={handleActiveLink} end>Chi tiết Khóa học</NavLink>
                 </li>
-                <li>
+                {/* <li>
                     <NavLink to={`/courses/${courseId}/excercise`} className={handleActiveLink}>Bài tập về nhà</NavLink>
-                </li>
+                </li> */}
                 <li>
                     <NavLink to={`/courses/${courseId}/exams`} className={handleActiveLink}>Ôn luyện đề thi</NavLink>
                 </li>

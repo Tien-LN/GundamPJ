@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../../controllers/api/enrollment.controller");
 const { verifyUser, checkRole } = require("../../middleware/authMiddleware");
+const checkAccessToCourse = require('../../middleware/checkAccessToCourse');
 
 router.get("/", verifyUser, checkRole(["ADMIN", "TEACHER"]), controller.index);
 
@@ -15,9 +16,10 @@ router.delete(
 );
 
 router.get(
-  "/list/:id",
+  "/list/:courseId",
   verifyUser,
   checkRole(["ADMIN", "TEACHER"]),
+  checkAccessToCourse,
   controller.list
 );
 

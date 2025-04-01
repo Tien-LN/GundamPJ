@@ -56,12 +56,19 @@ $bg-img-lessons: (
     &__containner{
         width: 100%;
         background-color: $color-bg-subject;
-        padding: 20px 70px;
+        padding: 20px 20px;
         border-radius: 32px;
         margin-bottom: 20px;
-        min-height: 200px;
+        height: auto;
         display: flex;
         flex-direction: column;
+        a{
+            color: black;
+            margin-bottom: 10px;
+            &:hover{
+                color: blue;
+            }
+        }
     }
     &__time{
         display: flex;

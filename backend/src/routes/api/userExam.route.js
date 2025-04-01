@@ -6,7 +6,11 @@ const controller = require('../../controllers/api/userExam.controller');
 const { verifyUser, checkRole } = require("../../middleware/authMiddleware.js");
 const checkAccessToCourse = require("../../middleware/checkAccessToCourse");
 
-router.get("/", controller.index);
+router.get(
+    "/",
+    verifyUser,
+    controller.index
+);
 
 router.post(
     "/:examId",
