@@ -52,7 +52,7 @@ function Header() {
         <>
             <div className='om'>
                 <div className="header-container">
-                    <img className="logo" src="/img/logo.png" />
+                    <Link to=""><img className="logo" src="/img/Frame-769.png" /></Link>
                     {user ? (
                         <nav className="nav-bar">
                             <div className='nav-link'>
