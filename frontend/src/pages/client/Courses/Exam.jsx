@@ -19,6 +19,8 @@ function Exam(){
         endDate: "",
         timeLimit: 0
     });
+    const [didExam, setDidExam] = useState([]); 
+    const [openDidExam, setOpenDidExam] = useState(true);
     // console.log(data);
     useEffect(()=>{
         const fetchApi = async() => {
@@ -26,7 +28,11 @@ function Exam(){
                 const res_user = await axios.get("http://localhost:3000/api/users/getPermission", {
                     withCredentials: true
                 });
+                const res_did_exam = await axios.get(`http://localhost:3000/api/userExams`,{
+                    withCredentials: true
+                });
                 setUser(res_user.data);
+                setDidExam(res_did_exam.data);
             } catch(error){
                 console.log("Lỗi", error);
             }
@@ -39,14 +45,24 @@ function Exam(){
                 const res = await axios.get(`http://localhost:3000/api/exams/?courseId=${courseId}`, {
                     withCredentials: true
                 });
+                const res_user = await axios.get("http://localhost:3000/api/users/getPermission", {
+                    withCredentials: true
+                });
                 
-                const now = new Date();
-                const filterExams = res.data.filter((exam) => {
-                    const startDate = new Date(exam.startDate);
-                    const endDate = new Date(exam.endDate);
-                    return now >= startDate && now <= endDate;
-                })
-                setExams(filterExams);
+                if(res_user.data.role == "TEACHER"){
+                    setExams(res.data);
+                }
+                else {
+                    const now = new Date();
+                    const filterExams = res.data.filter((exam) => {
+                        const startDate = new Date(exam.startDate);
+                        const endDate = new Date(exam.endDate);
+                        return now >= startDate && now <= endDate;
+                    })
+                    setExams(filterExams);
+                }
+                
+                
                 
 
             } catch(error){
@@ -128,7 +144,16 @@ function Exam(){
         }
         fetchApi();
     }
+    const handleToggle = () => {
+        setOpenDidExam(prev => !prev);
+    }
+    const formatTime = (x) => {
+        let minutes = Math.floor(x/60, 0);
+        let secs = x%60;
+        return `${minutes} phút ${secs} giây`
+    }
     // console.log(data);
+    console.log(didExam);
     return (
         <>
             <div className="exams">
@@ -221,9 +246,28 @@ function Exam(){
                     )
                     )
                 }
+                {
+                    didExam && 
+                    <button className="exams__didOpen" onClick={handleToggle}>
+                        {openDidExam == true ? "Các lượt nộp bài" : "Đóng"}
+                    </button>   
+                }
+                {
+                    openDidExam && 
+                    <div className="exams__did">
+                        {
+                            didExam.map((exam) => (
+                                <div className="exams__did-show">
+                                    <div className="exams__did-showTitle"><b>bài :</b> {exam.exam.title}</div>
+                                    <div className="exams__did-showTime"><b>Làm trong :</b> {formatTime(exam.timeDo)}</div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                }
                 {user?.role == "TEACHER" &&
                 <> 
-                    <button className="exams__add" onClick={onAddExam   }>Tạo đề thi</button>
+                    <button className="exams__add" onClick={onAddExam  }>Tạo đề thi</button>
                 </>
                 }
             </div>

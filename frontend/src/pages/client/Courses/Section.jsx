@@ -7,7 +7,8 @@ function Section(){
     const {courseId} = useParams();
     const [user, setUser] = useState({});
     const [docs, setDocs] = useState([]);
-    useEffect(() => {
+    const [enrollment, setEnrollment] = useState([]);
+    useEffect(() => { 
         const fetchApi = async() => {
             try{
                 const res = await axios.get(`http://localhost:3000/api/courses/${courseId}`, {
@@ -19,11 +20,17 @@ function Section(){
                 const res_docs = await axios.get(`http://localhost:3000/api/docsCourse/${courseId}`, {
                     withCredentials: true
                 });
+                
                 const docsCourse = res_docs.data.docsCourse.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
                 setDocs(docsCourse);
                 setCourse(res.data);
                 setUser(res_user.data);
-                
+                if(res_user.data.role == "TEACHER"){
+                    const enrollments  = await axios.get(`http://localhost:3000/api/enrollments/list/${courseId}`, {
+                        withCredentials: true
+                    });
+                    setEnrollment(enrollments.data);
+                }
                 
             } catch(error) {
                 console.error("Lỗi khi lấy khóa học: ", error);
@@ -46,12 +53,44 @@ function Section(){
         }
         fetchApi();
     }
+    const handleApproval = (id) => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.patch(`http://localhost:3000/api/enrollments/approve/${id}`, {},{
+                    withCredentials: true
+                })
+                console.log(res.data);
+                window.location.reload();
+            } catch(error) {   
+                console.error("Lỗi khi chấp nhận học viên", error);
+            }
+        }
+        fetchApi();
+    }
+    const handleReject = (id) => {
+        const fetchApi = async() => {
+            try{
+                const res = await axios.patch(`http://localhost:3000/api/enrollments/reject/${id}`, {},{
+                    withCredentials: true
+                })
+                console.log(res.data);
+                window.location.reload();
+                
+            } catch(error) {   
+                console.error("Lỗi khi từ chối học viên", error);
+            }
+        }
+        fetchApi();
+    }
+    console.log(enrollment);
     return (
         <>
             <div className="lessons">
                 {user.role == "TEACHER" && 
                     <Link to={`/courses/${course.id}/AddDocs`} className="lessons__add"><i className="fa-solid fa-plus"></i></Link>
                 }
+
+                
                 
                 <div className="lessons__containnerImg">
 
@@ -62,7 +101,34 @@ function Section(){
                     }
                     
                 </div>
-                
+
+                {user.role == "TEACHER" && 
+                    <div className="lessons__enrollments">
+                        <div className="lessons__enrollments-title">Đang chờ tham gia: </div>
+                        <div className="lessons__enrollments-box">
+                            {
+                                enrollment?.length > 0 ? (
+                                    enrollment.map((enroll, enroll_index) => (
+                                        <div className="lessons__enrollments-user" key={enroll.id}>
+                                            <div className="lessons__enrollments-userWait">
+                                                <div className="lessons__enrollments-userWait-name">{enroll.user.name}</div>
+                                                <button className="lessons__enrollments-userWait-approve" onClick={() => {handleApproval(enroll.id)}}><i className="fa-solid fa-thumbs-up"></i></button>
+                                                <button className="lessons__enrollments-userWait-reject" onClick={() => {handleReject(enroll.id)}}><i className="fa-solid fa-thumbs-down"></i></button>
+                                                
+                                            </div>
+                                        </div>
+                                    ))
+                                )
+                                : 
+                                (
+                                    <div>Chưa có</div>
+                                )
+                                
+                            }
+                        </div>
+                        
+                    </div>
+                }
                 
                 <ul className="lessons__units">
                     <div className="lessons__units-hr"></div>

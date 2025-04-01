@@ -52,13 +52,13 @@ function Header() {
         <>
             <div className='om'>
                 <div className="header-container">
-                    <img className="logo" src="/img/logo.png" />
+                    <Link to=""><img className="logo" src="/img/Frame-769.png" /></Link>
                     {user ? (
                         <nav className="nav-bar">
                             <div className='nav-link'>
                                 <NavLink to="/" className="nav-link-c">Trang chủ</NavLink>
                                 <NavLink to="/courses" className="nav-link-c">Khoá học của tôi</NavLink>
-                                <NavLink to="/statistics" className="nav-link-c">Thống kê</NavLink>
+                                {/* <NavLink to="/statistics" className="nav-link-c">Thống kê</NavLink> */}
                             </div>
 
                             <div className='dropdown-container'>

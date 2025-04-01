@@ -2,7 +2,27 @@ const { prisma } = require("../../config/db");
 
 // [GET] /api/userExams 
 module.exports.index = async(req, res) => {
-    res.send("OK");
+    const userId = req.user.id;
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId
+        },
+        include: {
+            userExams: {
+                include: {
+                    userAnswers: {
+                        include: {
+                            question: true,
+                            questionOption: true
+                        }
+                    },
+                    exam: true
+                }
+            }
+        }
+    });
+
+    res.send(user.userExams);
 }
 
 // [POST] /api/userExams/:examId 

@@ -57,17 +57,20 @@ const enrollDelete = async (req, res) => {
   }
 };
 
-// [GET] /api/enrollments/list/:id
+// [GET] /api/enrollments/list/:courseId
 const list = async (req, res) => {
   try {
-    const id = req.params.id;
+    const courseId = req.params.courseId;
 
     const enrolls = await prisma.enrollment.findMany({
       where: {
-        courseId: id,
+        courseId: courseId,
         status: "PENDING",
         deleted: false, // Kiểm tra trạng thái deleted
       },
+      include: {
+        user: true
+      }
     });
     res.send(enrolls);
   } catch (error) {

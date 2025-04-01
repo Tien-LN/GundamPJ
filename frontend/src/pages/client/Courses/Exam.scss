@@ -115,4 +115,27 @@
         bottom: 10px;
         padding: 10px 20px;
     }
+    &__didOpen{
+        border: 0;
+        border-bottom: 1px solid #ddd;
+        margin: 20px 0;
+        margin-left: 20px;
+        background: transparent;
+        font-size: 17px;
+        transition: all 0.6s;
+        &:hover{
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+    }
+    &__did{
+        padding: 10px 20px;
+        &-show{
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            // display: flex;
+            
+        }
+    }
 }
