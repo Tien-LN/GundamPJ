@@ -9,13 +9,6 @@ const checkAccessToCourse = async (req, res, next) => {
 
     // Nếu người dùng là admin, cho phép truy cập
     if (userRole === "ADMIN") {
-      const course = await prisma.course.findFirst({
-        where: {
-          id: courseId,
-          deleted: false,
-        },
-      });
-      req.course = course;
       return next();
     }
 
