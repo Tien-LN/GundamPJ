@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "./Exam.scss";
@@ -11,6 +11,7 @@ function Exam(){
     const [user, setUser] = useState({});
     const [addExam, setAddExam] = useState(false);
     const [exams, setExams] = useState([]);
+    const didQuestion = useRef({});
     const [data, setData] = useState({
         title: "",
         description: "",
@@ -19,6 +20,7 @@ function Exam(){
         endDate: "",
         timeLimit: 0
     });
+    const [didQuestionReady, setDidQuestionReady] = useState(false);
     const [didExam, setDidExam] = useState([]); 
     const [openDidExam, setOpenDidExam] = useState(true);
     // console.log(data);
@@ -32,6 +34,7 @@ function Exam(){
                     withCredentials: true
                 });
                 setUser(res_user.data);
+                if(res_did_exam.data.length > 0){}
                 setDidExam(res_did_exam.data);
             } catch(error){
                 console.log("Lỗi", error);
@@ -70,7 +73,70 @@ function Exam(){
             }
         }
         fetchApi();
-    }, [addExam]);  
+    }, [addExam]); 
+    function compareVietnameseStrings(str1, str2) {
+        return str1
+            .normalize("NFD") 
+            .replace(/[\u0300-\u036f]/g, "") 
+            .toLowerCase()
+            .localeCompare(
+                str2
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase(),
+                "vi", 
+                { sensitivity: "base" } 
+            );
+    }
+    useEffect(() => {
+        if(!didExam) return;
+        if(didExam.length == 0) return;
+    
+        for (const exam of didExam) {
+            if (!didQuestion.current[exam.id]) {
+                didQuestion.current[exam.id] = {}; 
+            }
+            
+            
+            for (const userAns of exam.userAnswers) {
+                
+                if(userAns.question.type == "OBJECTIVE" || userAns.question.type == "DROPDOWN") {
+                    didQuestion.current[exam.id][userAns.questionId] = {
+                        answer: userAns.questionOption.content,
+                        isCorrect: userAns.questionOption.isCorrect
+                    };
+                } else if(userAns.question.type == "FILL") {
+                    let userRes = userAns.value;
+                    let teacherRes = userAns.questionOption.content;
+                    let isCorrect = (compareVietnameseStrings(userRes, teacherRes) == 0);
+                    didQuestion.current[exam.id][userAns.questionId] = { answer: userRes, isCorrect };
+                } else if(userAns.question.type == "REORDERING") {
+                    didQuestion.current[exam.id][userAns.questionId] = didQuestion.current[exam.id][userAns.questionId] || {};
+                    didQuestion.current[exam.id][userAns.questionId][userAns.num] = {
+                        answer: userAns.questionOption.content,
+                        order: userAns.questionOption.num
+                    };
+                } else if(userAns.question.type == "MATCHING") {
+                    didQuestion.current[exam.id][userAns.questionId] = didQuestion.current[exam.id][userAns.questionId] || {};
+                    if (!didQuestion.current[exam.id][userAns.questionId][userAns.num]) {
+                        didQuestion.current[exam.id][userAns.questionId][userAns.num] = {};
+                    }
+                    if (userAns.left) {
+                        didQuestion.current[exam.id][userAns.questionId][userAns.num] = {
+                            ...didQuestion.current[exam.id][userAns.questionId][userAns.num],
+                            left: userAns.questionOption
+                        };
+                    } else {
+                        didQuestion.current[exam.id][userAns.questionId][userAns.num] = {
+                            ...didQuestion.current[exam.id][userAns.questionId][userAns.num],
+                            right: userAns.questionOption
+                        };
+                    }   
+                }
+            }
+        }
+        setDidQuestionReady(true);
+    }, [didExam]);
     const onAddExam = () => {
         setAddExam(true);
     }
@@ -152,8 +218,70 @@ function Exam(){
         let secs = x%60;
         return `${minutes} phút ${secs} giây`
     }
-    // console.log(data);
-    console.log(didExam);
+    
+    const getDidQuestion = (id, type, didExamId) => {
+        
+        if (!didQuestion.current[didExamId] || !didQuestion.current[didExamId][id]) return null;
+    
+        const questionData = didQuestion.current[didExamId][id];
+    
+        
+        if (type == "OBJECTIVE" || type == "DROPDOWN" || type == "FILL") {
+            return (
+                <div>
+                    <b>Chọn:</b> {questionData.answer} | 
+                    <span style={{ color: questionData.isCorrect ? "green" : "red", fontWeight: "bold" }}>
+                        {questionData.isCorrect ? "Đúng" : "Sai"}
+                    </span>
+                </div>
+            );
+        } 
+        
+        else if (type == "REORDERING") {
+            const entries = Object.entries(questionData);
+            const sortedEntries = entries.sort((a, b) => Number(a[0]) - Number(b[0]));
+            
+            return (
+                <div style={{ marginTop: "10px" }}>
+                    <b>Kết quả sắp xếp:</b>
+                    {sortedEntries.map(([key, { answer, order }], index) => {
+                        const userOrder = Number(key);
+                        const isCorrect = userOrder === order;
+                        return (
+                            <div key={key}>
+                                <span style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>
+                                    {userOrder}. {answer} ({isCorrect ? "Đúng" : "Sai"})
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        } 
+        
+        else if (type == "MATCHING") {
+            const entries = Object.entries(questionData);
+            // console.log(entries);
+            return (
+                <div>
+                    <b>Danh sách cặp nối</b>
+                    {entries.map(([key, pair]) => {
+                        const isCorrect = pair.left.num === pair.right.num;
+                        return (
+                            <div key={key}>
+                                <span style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>
+                                    {pair.left.content} - {pair.right.content} ({isCorrect ? "Đúng" : "Sai"})
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        }
+    };
+    
+    // console.log(didExam);
+    // console.log(didQuestion.current);
     return (
         <>
             <div className="exams">
@@ -257,9 +385,51 @@ function Exam(){
                     <div className="exams__did">
                         {
                             didExam.map((exam) => (
-                                <div className="exams__did-show">
+                                <div className="exams__did-show" key={exam.id}>
                                     <div className="exams__did-showTitle"><b>bài :</b> {exam.exam.title}</div>
                                     <div className="exams__did-showTime"><b>Làm trong :</b> {formatTime(exam.timeDo)}</div>
+                                    <div className="exams__did-showQuestion">
+                                        <h3>Danh sách câu trả lời : </h3>
+                                        {
+                                            exam.exam.questions.map((question, q_index) => (
+                                                <div className="exams__did-showQuestion-question" key={question.id}>
+                                                    <div className="exams__did-showQuestion-title">
+                                                        <b>Câu hỏi {q_index + 1}: </b><div dangerouslySetInnerHTML={{__html: question.content}} /> 
+                                                    </div>
+                                                    {
+                                                        question.type == "OBJECTIVE" && 
+                                                        <>
+                                                            {getDidQuestion(question.id, question.type, exam.id)}
+                                                        </>
+                                                    }
+                                                    {
+                                                        question.type == "DROPDOWN" && 
+                                                        <>
+                                                            {getDidQuestion(question.id, question.type, exam.id)}
+                                                        </>
+                                                    }
+                                                    {
+                                                        question.type == "FILL" && 
+                                                        <>
+                                                            {getDidQuestion(question.id, question.type, exam.id)}
+                                                        </>
+                                                    }
+                                                    {
+                                                        question.type == "REORDERING" && 
+                                                        <>
+                                                            {getDidQuestion(question.id, question.type, exam.id)}
+                                                        </>
+                                                    }
+                                                    {
+                                                        question.type == "MATCHING" && 
+                                                        <>
+                                                            {getDidQuestion(question.id, question.type, exam.id)}
+                                                        </>
+                                                    }
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
                                 </div>
                             ))
                         }

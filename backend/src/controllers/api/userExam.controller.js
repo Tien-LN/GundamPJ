@@ -16,7 +16,15 @@ module.exports.index = async(req, res) => {
                             questionOption: true
                         }
                     },
-                    exam: true
+                    exam: {
+                        include : {
+                            questions: {
+                                include :{
+                                    options : true
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -56,7 +64,7 @@ module.exports.sendExam = async(req, res) => {
                         }
                     })
                 )
-                
+                 
             } else if(type == "FILL") {
                 for (const optionKey in answers[questionId]) {
                    promises.push(

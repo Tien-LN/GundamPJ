@@ -134,8 +134,34 @@
         &-show{
             border: 1px solid #ddd;
             border-radius: 4px;
+            padding: 10px 20px;
+            margin: 20px 0;
             // display: flex;
-            
+            &Title{
+                text-align: center;
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            &Time{
+                margin-bottom: 10px;
+                color: #4f2e2e;
+            }
+            &Question{
+                h3{
+                    margin-bottom: 5px;
+                }
+                &-question{
+                    // display: flex;
+                    margin-bottom: 20px;
+                }
+                &-title{
+                    display: flex;
+                    b{
+                        margin-right: 20px;
+                        text-decoration: underline;
+                    }
+                }
+            }
         }
     }
 }

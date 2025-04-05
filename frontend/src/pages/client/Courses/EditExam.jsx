@@ -27,7 +27,7 @@ function EditExam(){
                     withCredentials: true
                 })
                 setUser(res_user.data);
-                setQuestions(res.data);
+                setQuestions(res.data.questions);
 
                 setTimeout(() => {
                     const contentElement = document.querySelectorAll(".editExams__question-content");
