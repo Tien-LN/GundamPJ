@@ -112,7 +112,7 @@ const statisticsController = {
           },
         },
       });
-
+      console.log(student);
       res.status(200).json(student);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -125,13 +125,19 @@ const statisticsController = {
       const { courseId } = req.params;
 
       // Logic lấy danh sách học viên trong khóa học
-      const students = await prisma.enrollment.findMany({
+      const enrollments = await prisma.enrollment.findMany({
         where: { courseId, status: "APPROVED" },
         include: {
           user: true,
         },
       });
-
+      const students = enrollments.map((enrollment) => ({
+        id: enrollment.user.id,
+        name: enrollment.user.name,
+        email: enrollment.user.email,
+        enrollmentId: enrollment.id,
+        enrollmentDate: enrollment.createdAt,
+      }));
       res.status(200).json(students);
     } catch (error) {
       res.status(500).json({ error: error.message });

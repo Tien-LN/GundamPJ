@@ -9,7 +9,7 @@ router.get("/user/:userId", verifyUser, statisticsController.getUserStatistics);
 // Lấy thống kê tỷ lệ tham gia và điểm trung bình cho học viên
 router.get(
   "/student/:studentId",
-  verifyUser,
+  checkRole(["ADMIN", "TEACHER"]),
   statisticsController.getStudentStatistics
 );
 
