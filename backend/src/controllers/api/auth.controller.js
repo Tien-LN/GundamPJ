@@ -20,7 +20,7 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
-    } 
+    }
 
     const token = await jwt.sign(
       {
@@ -51,6 +51,7 @@ const login = async (req, res) => {
         dateOfBirth: user.dateOfBirth,
         address: user.address,
         name: user.name,
+        avatar: user.avatar,
         mustChangePassword: user.mustChangePassword,
       },
     });
@@ -64,7 +65,7 @@ const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
 
-    const userId = req.body.id;
+    const userId = req.user.id;
 
     if (!newPassword) {
       return res.status(400).json({ message: "Vui lòng nhập mật khẩu mới" });
@@ -72,15 +73,13 @@ const changePassword = async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (!user.mustChangePassword) {
-      if (!oldPassword) {
-        return res.status(400).json({ message: "Vui lòng nhập mật khẩu cũ" });
-      }
+    if (!oldPassword) {
+      return res.status(400).json({ message: "Vui lòng nhập mật khẩu cũ" });
+    }
 
-      const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Mật khẩu không chính xác" });
-      }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Mật khẩu không chính xác" });
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -89,7 +88,6 @@ const changePassword = async (req, res) => {
       where: { id: userId },
       data: {
         password: hashedPassword,
-        mustChangePassword: false,
       },
     });
 

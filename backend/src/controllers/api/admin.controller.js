@@ -29,8 +29,8 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Role không hợp lệ" });
     }
 
-    const tempPassword = generateRandomPassword();
-    const hashedPassword = await hashPassword(tempPassword);
+    const _tempPassword = generateRandomPassword();
+    const hashedPassword = await hashPassword(_tempPassword);
 
     const newUser = await prisma.user.create({
       data: {
@@ -70,7 +70,7 @@ const registerUser = async (req, res) => {
     
     Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:
       - Email: ${email}
-      - Mật khẩu: ${tempPassword}
+      - Mật khẩu: ${_tempPassword}
     
     📢 Khuyến cáo: Vui lòng đăng nhập và đổi mật khẩu ngay lần đầu tiên để bảo vệ tài khoản của bạn.
     
@@ -84,7 +84,7 @@ const registerUser = async (req, res) => {
         <p>Cảm ơn bạn đã đăng ký khóa học của chúng tôi! Dưới đây là thông tin đăng nhập của bạn:</p>
         <ul>
           <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Mật khẩu:</strong> ${tempPassword}</li>
+          <li><strong>Mật khẩu:</strong> ${_tempPassword}</li>
         </ul>
         <p style="color: red; font-weight: bold;">
           📢 Lưu ý: Để bảo vệ tài khoản của bạn, hãy đăng nhập và đổi mật khẩu ngay lần đầu tiên.
@@ -195,7 +195,7 @@ const registerMultipleUsers = async (req, res) => {
           password: await hashPassword(tempPassword),
           roleId: roleRecord.id,
           mustChangePassword: true,
-          tempPassword: tempPassword,
+          _tempPassword: tempPassword, // Lưu tạm thời để gửi email, không lưu vào DB
           slug: slugify(`${user.name} - ${user.email.slice(0, 8)}`, {
             lower: true,
             strict: true,
@@ -228,14 +228,14 @@ const registerMultipleUsers = async (req, res) => {
       await sendEmail(
         user.email,
         "Chào mừng bạn đến với PSTUDY!",
-        `Xin chào ${user.name},\n\nCảm ơn bạn đã đăng ký! Dưới đây là thông tin đăng nhập:\n- Email: ${user.email}\n- Mật khẩu: ${user.tempPassword}\n\n📢 Vui lòng đổi mật khẩu ngay lần đầu tiên.\n\nTrân trọng,\nĐội ngũ PSTUDY`,
+        `Xin chào ${user.name},\n\nCảm ơn bạn đã đăng ký! Dưới đây là thông tin đăng nhập:\n- Email: ${user.email}\n- Mật khẩu: ${user._tempPassword}\n\n📢 Vui lòng đổi mật khẩu ngay lần đầu tiên.\n\nTrân trọng,\nĐội ngũ PSTUDY`,
         `<div style="font-family: Arial, sans-serif;">
           <h2>Chào mừng bạn đến với PSTUDY!</h2>
           <p>Xin chào <strong>${user.name}</strong>,</p>
           <p>Cảm ơn bạn đã đăng ký! Dưới đây là thông tin đăng nhập của bạn:</p>
           <ul>
             <li><strong>Email:</strong> ${user.email}</li>
-            <li><strong>Mật khẩu:</strong> ${user.tempPassword}</li>
+            <li><strong>Mật khẩu:</strong> ${user._tempPassword}</li>
           </ul>
           <p><a href="https://yourwebsite.com/reset-password">Đổi mật khẩu ngay</a></p>
           <p>Trân trọng,<br><strong>Đội ngũ PSTUDY</strong></p>

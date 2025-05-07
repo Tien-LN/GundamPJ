@@ -6,6 +6,26 @@ const createLesson = async (req, res) => {
     const { courseId } = req.params;
     const { date, title, description } = req.body;
 
+    // Kiểm tra khóa học tồn tại
+    const course = await prisma.course.findUnique({
+      where: { id: courseId, deleted: false },
+    });
+
+    if (!course) {
+      return res.status(404).json({ message: "Không tìm thấy khóa học" });
+    }
+
+    // Kiểm tra quyền truy cập (giáo viên phụ trách khóa học)
+    if (
+      req.user.role.roleType === "TEACHER" &&
+      req.user.id !== course.teacherId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền tạo bài học cho khóa học này" });
+    }
+
+    // Tạo bài học mới
     const lesson = await prisma.lesson.create({
       data: {
         courseId,
@@ -15,26 +35,55 @@ const createLesson = async (req, res) => {
       },
     });
 
-    res.status(201).json({ message: "Lesson created successfully", lesson });
+    res.status(201).json({ message: "Tạo bài học thành công", lesson });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Lỗi khi tạo bài học:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
 
 // Cập nhật buổi học
 const updateLesson = async (req, res) => {
   try {
-    const { lessonId } = req.params;
+    const { lessonId, courseId } = req.params;
     const { date, title, description } = req.body;
 
-    const lesson = await prisma.lesson.update({
-      where: { id: lessonId },
-      data: { date: new Date(date), title, description },
+    // Kiểm tra bài học tồn tại và thuộc khóa học
+    const lesson = await prisma.lesson.findFirst({
+      where: { id: lessonId, courseId, deleted: false },
+      include: { course: true },
     });
 
-    res.status(200).json({ message: "Lesson updated successfully", lesson });
+    if (!lesson) {
+      return res.status(404).json({ message: "Không tìm thấy bài học" });
+    }
+
+    // Kiểm tra quyền truy cập (giáo viên phụ trách khóa học)
+    if (
+      req.user.role.roleType === "TEACHER" &&
+      req.user.id !== lesson.course.teacherId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền cập nhật bài học này" });
+    }
+
+    // Cập nhật bài học
+    const updatedLesson = await prisma.lesson.update({
+      where: { id: lessonId },
+      data: {
+        date: date ? new Date(date) : undefined,
+        title,
+        description,
+      },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Cập nhật bài học thành công", lesson: updatedLesson });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Lỗi khi cập nhật bài học:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
 
@@ -44,6 +93,32 @@ const softDeleteLessons = async (req, res) => {
     const { courseId } = req.params;
     const { lessonIds } = req.body;
 
+    if (!Array.isArray(lessonIds) || lessonIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Danh sách ID bài học không hợp lệ" });
+    }
+
+    // Kiểm tra khóa học tồn tại
+    const course = await prisma.course.findUnique({
+      where: { id: courseId, deleted: false },
+    });
+
+    if (!course) {
+      return res.status(404).json({ message: "Không tìm thấy khóa học" });
+    }
+
+    // Kiểm tra quyền truy cập (giáo viên phụ trách khóa học)
+    if (
+      req.user.role.roleType === "TEACHER" &&
+      req.user.id !== course.teacherId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền xóa bài học của khóa học này" });
+    }
+
+    // Xóa mềm các bài học
     await prisma.lesson.updateMany({
       where: {
         id: { in: lessonIds },
@@ -52,9 +127,10 @@ const softDeleteLessons = async (req, res) => {
       data: { deleted: true },
     });
 
-    res.status(200).json({ message: "Lessons soft deleted successfully" });
+    res.status(200).json({ message: "Xóa bài học thành công" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Lỗi khi xóa bài học:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
 

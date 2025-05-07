@@ -1,97 +1,297 @@
 .myaccount__container {
-    height: calc(100vh - 83px);
-    background: url(https://s3-alpha-sig.figma.com/img/181d/b508/981cd0ea5bd87c5c26338289ef0325bb?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=SQzLfj1KhzIt7MKDAnwoENQpyYbsZ6CSSy0Ids0cq1dQRDl8TouhDBhOiEqzzSUDHEAFJI7lfP66Rjn~RjFTfJqIiHe2rLBVegc74TUSSFFIhVMtJ2GCNlRaku5UXIdtqfMWDSHTwAZRF-hsS1gRp0LlTZbdoU-Ek7-5f5qHaXk4q-q7ZFn7nkkSZSn0S9ZIybF-I0f4PCb3BkAPolqHhdvypxlAtE-d1wtw2JW2Cg0KiOT3BugcezP2-is9l4G8dXUKteqdGqSwx-Wt4AWGYRNATgdfwDlygVXQG29Vmas73LVgE6gtvwp9T8Bb1hdXDRQbE5Ma2CQXQcPBNKJCIg__),
-        linear-gradient(to right, #575961, #7d3737);
-    background-blend-mode: overlay;
-    background-size: cover;
-    background-position: center;
+    min-height: calc(100vh - 83px);
+    background: linear-gradient(135deg, #1c1c38 0%, #2d3a4f 100%);
+    padding: 60px 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.myaccount__box-heading {
-    color: #fff;
-    font-size: 25px;
-    letter-spacing: 4px;
-    margin-bottom: 5px;
-}
-
-.myaccount__box-heading-container {
-    margin-bottom: 20px;
-}
-
-.myaccount__box-avatar {
-    width: 140px;
-    height: 140px;
-    border-radius: 20px;
-    border: 1px solid #fff;
+    font-family: 'Roboto', sans-serif;
 }
 
 .myaccount__box {
-    padding: 96px 20px;
-    background: linear-gradient(45deg, #000C33, #902D2D);
-    border-radius: 20px;
-    width: 65%;
-    height: 90%;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.myaccount__box-heading-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.myaccount__box-heading {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.myaccount__box-avatar-container {
+    position: relative;
+}
+
+.myaccount__box-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4a6cf7;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-edit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-upload-container {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.avatar-upload {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+}
+
+.avatar-upload input[type="file"] {
+    display: none;
+}
+
+.upload-button {
+    padding: 10px 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+    background-color: #3a5bd9;
+}
+
+.avatar-preview-container {
+    margin: 15px 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #4a6cf7;
+}
+
+.avatar-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.save-avatar-btn {
+    padding: 8px 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.save-avatar-btn:hover {
+    background-color: #3a5bd9;
+}
+
+.save-avatar-btn:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.cancel-btn {
+    padding: 8px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background-color: #d32f2f;
 }
 
 .myaccount__box-info {
-    color: #fff;
-    letter-spacing: 1px;
-    font-size: 15px;
+    color: #333;
 }
 
-.myaccount__box-info--descript {
-    font-size: 15px;
-    letter-spacing: 2px;
-}
-
-.myaccount__box-info--name {
-    width: 300px;
-    padding: 5px 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+.myaccount__box-info--name,
+.myaccount__box-info--date,
+.myaccount__box-info--phone,
+.myaccount__box-info--gender,
+.myaccount__box-info--address,
+.myaccount__box-info--password {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
 }
 
-.myaccount__box-info--date {
-    padding: 5px 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
+.myaccount__box-info--name:hover,
+.myaccount__box-info--date:hover,
+.myaccount__box-info--phone:hover,
+.myaccount__box-info--gender:hover,
+.myaccount__box-info--address:hover,
+.myaccount__box-info--password:hover {
+    background-color: #f0f0f0;
 }
 
-.myaccount__box-info--phone {
-    padding: 5px 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.myaccount__box-info--address {
-    padding: 5px 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.myaccount__box-info--gender {
-    padding: 5px 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
+.myaccount__box-info--name-box,
+.myaccount__box-info--date-box,
+.myaccount__box-info--phone-box,
+.myaccount__box-info--address-box,
+.myaccount__box-info--password-box {
+    flex: 1;
 }
 
 .myaccount__box-info--name-change {
     cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #4a6cf7;
+    color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.myaccount__box-info--name-change:hover {
+    background-color: #3a5bd9;
+    transform: translateY(-2px);
+}
+
+.myaccount__box-info input,
+.myaccount__box-info select,
+.react-datepicker__input-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.password-fields input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.myaccount__box-info button {
+    padding: 8px 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.myaccount__box-info button:hover {
+    background-color: #3a5bd9;
+}
+
+.myaccount__box-info--descript {
+    font-size: 16px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.global-error {
+    background-color: rgba(244, 67, 54, 0.1);
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #f44336;
+}
+
+.success-message {
+    color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+    border-left: 4px solid #4caf50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .myaccount__box {
+        padding: 30px 20px;
+    }
+    
+    .myaccount__box-heading-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .myaccount__box-avatar {
+        margin-top: 15px;
+    }
+    
+    .myaccount__box-info--name,
+    .myaccount__box-info--date,
+    .myaccount__box-info--phone,
+    .myaccount__box-info--gender,
+    .myaccount__box-info--address {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .myaccount__box-info--name-change {
+        margin-top: 10px;
+        align-self: flex-end;
+    }
 }

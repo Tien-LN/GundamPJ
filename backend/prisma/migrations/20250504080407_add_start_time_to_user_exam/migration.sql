@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "UserExam" ADD COLUMN     "startTime" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;

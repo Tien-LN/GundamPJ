@@ -36,15 +36,14 @@ $color-footer: #9A9ADE;
 }
 
 .error404{
-    background: url("/img/bg-404.jpg");
+    background: linear-gradient(135deg, #1c1c38 0%, #2d3a4f 100%);
     width: 100%;
     height: 100vh;
-    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-position: center;
-    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
     
     &__meteor{
         position: absolute;
@@ -115,4 +114,4 @@ $color-footer: #9A9ADE;
         }
         
     }
-}   
+}

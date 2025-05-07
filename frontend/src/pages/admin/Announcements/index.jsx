@@ -1,325 +1,477 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import "./Announcements.scss";
-import { AuthLogin } from "../../../helpers/admin/Auth";
-import {format}  from "date-fns";
+import { format } from "date-fns";
 import { useSearchParams } from "react-router-dom";
-function Announcements(){
-    const checkPermission = AuthLogin();
-    // console.log(checkPermission.user.id);
-    const [MapCourses, setMapCourses] = useState({});
-    const [sortQuery, setSortQuery] = useState("");
-    const [roles, setRoles] = useState([]);
-    const [courses, setCourses] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [announs, setAnnouns] = useState([]);
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [data, setData] = useState({
+import { AuthLogin } from "../../../helpers/admin/Auth";
+import "./Announcements.scss";
+
+function Announcements() {
+  const checkPermission = AuthLogin();
+  const [mapCourses, setMapCourses] = useState({});
+  const [roles, setRoles] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    roleVisibility: "",
+    courseIds: [],
+  });
+
+  // Modal handlers
+  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => setIsModalOpen(true);
+
+  // Click outside modal to close
+  useEffect(() => {
+    const modalElement = document.querySelector("#modalChooseCourses");
+    const handleClickOutside = (event) => {
+      if (event.target === modalElement) {
+        closeModal();
+      }
+    };
+
+    if (modalElement) {
+      modalElement.addEventListener("click", handleClickOutside);
+      return () =>
+        modalElement.removeEventListener("click", handleClickOutside);
+    }
+  }, [isModalOpen]);
+
+  // Fetch roles and courses
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [rolesResponse, coursesResponse] = await Promise.all([
+          axios.get("http://localhost:3000/api/roles", {
+            withCredentials: true,
+          }),
+          axios.get("http://localhost:3000/api/courses", {
+            withCredentials: true,
+          }),
+        ]);
+
+        setRoles(rolesResponse.data);
+        setCourses(coursesResponse.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fetch announcements
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        setIsLoading(true);
+        const queryString = searchParams.toString();
+        const response = await axios.get(
+          `http://localhost:3000/api/announcements?${queryString}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        setAnnouncements(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, [searchParams]);
+
+  // Create course name map
+  useEffect(() => {
+    if (courses && courses.length > 0) {
+      const newMap = {};
+      for (const course of courses) {
+        newMap[course.id] = course.name;
+      }
+      setMapCourses(newMap);
+    }
+  }, [courses]);
+
+  // Form handlers
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFilterChange = (e) => {
+    const selectedValue = e.target.value;
+    const selectedName = e.target.name;
+
+    if (selectedValue) {
+      searchParams.set(selectedName, selectedValue);
+    } else {
+      searchParams.delete(selectedName);
+    }
+
+    setSearchParams(searchParams);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.title || !formData.content) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const dataToSubmit = {
+        ...formData,
+        authorId: checkPermission.user.id,
+      };
+
+      await axios.post(
+        "http://localhost:3000/api/announcements/create",
+        dataToSubmit,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      // Reset form and refresh announcements
+      setFormData({
         title: "",
         content: "",
         roleVisibility: "",
-        courseIds: []
-    })
-    const [submit, setSubmit] = useState(false);
+        courseIds: [],
+      });
 
-    const onClose = () => {
-        setIsOpen(false);
+      // Refresh announcements list
+      const queryString = searchParams.toString();
+      const response = await axios.get(
+        `http://localhost:3000/api/announcements?${queryString}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setAnnouncements(response.data);
+      alert("Announcement created successfully!");
+    } catch (error) {
+      console.error("Error creating announcement:", error);
+      alert("Failed to create announcement");
     }
-    const onOpen = () => {
-        setIsOpen(true);
+  };
+
+  const handleCourseSelection = () => {
+    const modalElement = document.querySelector("#modalChooseCourses");
+    if (modalElement) {
+      const courseCheckboxes = modalElement.querySelectorAll("[data-pick]");
+      const selectedCourseIds = [];
+
+      for (const checkbox of courseCheckboxes) {
+        if (checkbox.checked) {
+          selectedCourseIds.push(checkbox.value);
+        }
+      }
+
+      setFormData({
+        ...formData,
+        courseIds: selectedCourseIds,
+      });
+
+      closeModal();
     }
-    useEffect(() => {
-        const ModalPick = document.querySelector("#modalChooseCourses");
-        const handleClickOutSide = (event) => {
-            // console.log(event);
-            if(event.target === ModalPick){
-                onClose();
-            }
-        }
-        if(ModalPick){
-            ModalPick.removeEventListener("click", handleClickOutSide);
-            ModalPick.addEventListener("click", handleClickOutSide);    
-        }
-    }, [isOpen]);
-    useEffect(()=>{
-        const fetchApi = async() => {
-            try{
-                const res = await axios.get("http://localhost:3000/api/roles", {
-                    withCredentials: true
-                });
-                const res_courses = await axios.get("http://localhost:3000/api/courses", {
-                    withCredentials: true
-                });
-                // console.log(res.data);
-                setRoles(res.data);
-                setCourses(res_courses.data);
-            } catch(error){
-                console.error("Lỗi", error);
-            }
-            
-        }
-        fetchApi();
+  };
 
-        
-    }, []);
-
-    // Lấy thông báo 
-    useEffect(()=> {
-        const fetchApi = async() => {
-            try{
-                const queryString = searchParams.toString();
-                // console.log(queryString);
-                const res_announs = await axios.get(`http://localhost:3000/api/announcements?${queryString}`, {
-                    withCredentials: true
-                });
-                // console.log(res_announs.data);
-                setAnnouns(res_announs.data);
-            } catch(error){
-                console.error("Lỗi", error);
-            }
-            
-        }
-        fetchApi();
-    }, [searchParams]);
-    useEffect(()=>{
-        if(submit == true){
-            const createAnnoun = async() => {
-                try{
-                    const res = await axios.post("http://localhost:3000/api/announcements/create", data, {
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        withCredentials: true
-                    });
-                    
-                    console.log("Đã tạo thành công!");
-                    window.location.reload();
-                } catch(error) {
-                    console.error("Lỗi khi tạo thông báo : ", error);
-                }
-            }
-            createAnnoun();
-            setSubmit(false);
-        }
-    }, [submit]);
-    useEffect(()=>{
-        if (courses && courses.length > 0) {
-            const newMap = {};
-            for (const course of courses) {
-                newMap[course.id] = course.name;
-            }
-            setMapCourses(newMap);
-        }
-    }, [courses]);
-    // console.log(courses);
-    // console.log(announs);
-    // console.log(MapCourses);
-    const handleSubmit = () => {
-        const ModalPick = document.querySelector("#modalChooseCourses");
-        if(ModalPick){
-            const courseButtons = ModalPick.querySelectorAll("[data-pick]");
-            const courseIds = [];
-
-            for (const button of courseButtons) {
-                if(button.checked == true){
-                    courseIds.push(button.value);
-                }
-            }
-            
-            setData({
-                ...data,
-                ["courseIds"] : courseIds,
-                ["authorId"] : checkPermission.user.id
-            });
-            
-            onClose();
-            setSubmit(true);
-        }
-    }
-    const handleChooseCourses = (e) => {
-        e.preventDefault();
-
-        onOpen();
-    }
-    const handleChange = (e) => {
-        setData({
-            ...data,
-            [e.target.name]: e.target.value
+  const handleDeleteAnnouncement = async (id) => {
+    if (window.confirm("Are you sure you want to delete this announcement?")) {
+      try {
+        await axios.delete(`http://localhost:3000/api/announcements/${id}`, {
+          withCredentials: true,
         });
-    }
-    const getCoursesName = (x) => {
 
-        if(!x || x.length == 0) return "";
-        let result = x.map(courseId => 
-            `${MapCourses[courseId]}`
-        ).join(", ");
-        if(result.length > 30) result = result.slice(0, 30) + "...";
-    
-        return result;
+        // Remove the deleted announcement from state
+        setAnnouncements(announcements.filter((item) => item.id !== id));
+      } catch (error) {
+        console.error("Error deleting announcement:", error);
+        alert("Failed to delete announcement");
+      }
     }
-    const addSearchParams = (e) => {
-        const selectedValue = e.target.value;
-        const selectedName = e.target.name;
+  };
 
-        if(selectedValue){
-            searchParams.set(selectedName, selectedValue);
-        } else {
-            searchParams.delete(selectedName);
-        }
+  const getCoursesName = (courseIds) => {
+    if (!courseIds || courseIds.length === 0) return "All courses";
 
-        setSearchParams(searchParams);
-    }
-    const handleDeleteAnnouncement = (id) => {
-        const fetchApi = async() => {
-            try {
-                const res = await axios.delete(`http://localhost:3000/api/announcements/${id}`, {
-                    withCredentials: true
-                });
-    
-                console.log("Đã xóa thành công");
-                window.location.reload();
-            } catch(error){
-                console.error("Lỗi khi xóa thông báo", error);
-            }
-        };
-        fetchApi();
-    }
-    const handleDeleteData = () => {
-        setData({
-            title: "",
-            content: "",
-            roleVisibility: "",
-            courseIds: []
-        });
-    }
-    // console.log(data);
-    return (
-        <>
-            {
-                isOpen && 
-                <div className="announcements__chooseModal" id="modalChooseCourses" >
-                    <div className="announcements__Modal">
-                        <h1 className="announcements__Modal-title">Chọn môn học</h1>
-                        <table className="announcements__Modal-table">
-                            <thead>
-                                <tr>
-                                    <th>Đến</th>
-                                    <th>Tên</th>
-                                    <th>Giáo viên</th>
-                                    <th>Ngày bắt đầu</th>
-                                    <th>Ngày kết thúc</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    courses && 
-                                    courses.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>
-                                                <input type="checkbox" name="id" value={item.id} data-pick/>
-                                            </td>
-                                            <td>{item.name}</td>
-                                            <td>{item.teacher.name}</td>
-                                            <td>{format(new Date(item.startDate), "dd/MM/yyyy")}</td>
-                                            <td>{format(new Date(item.endDate), "dd/MM/yyyy")}</td>
-                                        </tr>
-                                    ))
-                                }
-                            </tbody>
-                        </table>
-                        <button className="announcements__Modal-submit" onClick={handleSubmit}>Gửi</button>
-                    </div>
-                </div>
-            }
-           
-            <div className="announcements">
-                <h1 className="announcements__title">Trang quản lý thông báo</h1>
-                <div className="announcements__containner">
-                    <div className="announcements__views">
-                        <span className="announcements__views-title">Tất cả thông báo</span>
-                        <div className="announcements__views-options">
-                            <select className="announcements__views-sort" name="createdAt" onChange={addSearchParams}>
-                                <option value="">Mặc định</option>
-                                <option value="asc">Ngày tạo sớm nhất</option>
-                                <option value="desc">Ngày tạo trễ</option>
-                            </select>
-                            <select className="announcements__views-filter" name="roleVisibility" onChange={addSearchParams}>
-                                <option value="">Tất cả</option>
-                                <option value="ALL">ALL</option>
-                                {
-                                    roles && 
-                                        roles.map((item,index) => 
-                                        <option key={index} value={item.roleType}>{item.title}</option>
-                                        )
-                                }
-                            </select>
-                        </div>
-                        <ul className="announcements__list">
-                            {announs && 
-                                announs.map((announ,index) => 
-                                    <li className="announcements__box" key={index}>
-                                    <div className="announcements__box-contain_content">
-                                        <div className="announcements__box-title">
-                                            <span className="announcements__createdAt"><b>date: </b>{format(new Date(announ.createdAt), "dd/MM/yyyy")}</span>
-                                            <span className="announcements__courses"><b>Môn: </b>{getCoursesName(announ.courseIds)}</span>
-                                        </div>
-                                        <div className="announcements__title">
-                                            <b>Tiêu đề: </b>{announ.title}
-                                        </div>
-                                        <div className="announcements__box-content">
-                                            <b>Nội dung: </b>{announ.content}
-                                        </div>
-                                    </div>
-                                    <div className="announcements__box-contain_actions">
-                                        {/* <button className="announcements__config">Sửa</button> */}
-                                        <button className="announcements__delete" onClick={() => {handleDeleteAnnouncement(announ.id)}}>Xóa</button>
-                                    </div>
-                                </li>
-                                )
-                                
-                            }
-                            
-                        </ul>
+    let result = courseIds
+      .map((courseId) => mapCourses[courseId])
+      .filter(Boolean)
+      .join(", ");
 
-                    </div>
-                    <div className="announcements__create">
-                        <h2 className="announcements__create-title">Tạo thông báo mới</h2>
-                        <form className="announcements__create-form" method="POST" onSubmit={handleChooseCourses}>
-                            <div className="announcements__create-formBox">
-                                <label htmlFor="announ__title">Tiêu đề</label>
-                                <input className="announcements__create-title" type="text" name="title" id="announ__title" value={data.title} onChange={handleChange}/>
-                            </div>
-                            <div className="announcements__create-formBox">
-                                <label htmlFor="announ__visibly">Tới</label>
-                                <div className="announcements__create-visiblyBox" id="announ__visibly">
-                                    <input type="radio" name="roleVisibility" className="announcements__create-visibly-chooseOption" id="role_ALL" value={data.roleVisibility} onChange={handleChange}/>
-                                    <label htmlFor="role_ALL">ALL</label>
-                                    {roles && 
-                                        roles.map((item, index) => (
-                                            <div className="announcements__create-visibly-choose" key={index}>
-                                                <input type="radio" name="roleVisibility" className="announcements__create-visibly-chooseOption" id={`role_${item.roleType}`} value={item.roleType} onChange={handleChange}/>
-                                                <label htmlFor={`role_${item.roleType}`}>{item.title}</label>
-                                            </div>
-                                        ))
-                                    }
-                                    
-                                </div>
-                            </div>
-                            <div className="announcements__create-formBox">
-                                <label htmlFor="announ__content">Nội dung</label>
-                                <textarea rows={5} className="announcements__create-content" name="content" id="announ__content" value={data.content} onChange={handleChange}/>
-                            </div>
-                    
-                            <div className="announcements__create-actions">
-                                    <button type="button" className="announcements__create-delete" onClick={handleDeleteData}>Xóa</button>
-                                    <button type="submit" className="announcements__create-submit">Gửi</button>
-                            </div>
-                        </form>
-                        
-                    </div>
-                </div>
+    if (result.length > 30) result = result.slice(0, 30) + "...";
+    return result;
+  };
+
+  return (
+    <div className="admin-announcements">
+      {/* Course Selection Modal */}
+      {isModalOpen && (
+        <div className="admin-modal" id="modalChooseCourses">
+          <div className="admin-modal__content">
+            <h2 className="admin-modal__title">Select Courses</h2>
+
+            <div className="admin-modal__body">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Course Name</th>
+                    <th>Teacher</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.map((course) => (
+                    <tr key={course.id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          data-pick
+                          value={course.id}
+                          defaultChecked={formData.courseIds.includes(
+                            course.id
+                          )}
+                        />
+                      </td>
+                      <td>{course.name}</td>
+                      <td>{course.teacher?.name || "No teacher assigned"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-        </>
-    )
+
+            <div className="admin-modal__actions">
+              <button
+                className="admin-btn admin-btn--secondary"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="admin-btn admin-btn--primary"
+                onClick={handleCourseSelection}
+              >
+                Confirm Selection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="admin-card">
+        <div className="admin-card__header">
+          <h1 className="admin-card__title">Announcements</h1>
+        </div>
+
+        <div className="admin-announcements__container">
+          {/* Announcements List */}
+          <div className="admin-announcements__list">
+            <div className="admin-announcements__filters">
+              <div className="filter-group">
+                <label>Filter by Role:</label>
+                <select
+                  name="roleVisibility"
+                  onChange={handleFilterChange}
+                  value={searchParams.get("roleVisibility") || ""}
+                >
+                  <option value="">All Roles</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.roleType}>
+                      {role.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Sort by:</label>
+                <select
+                  name="createdAt"
+                  onChange={handleFilterChange}
+                  value={searchParams.get("createdAt") || ""}
+                >
+                  <option value="">Default</option>
+                  <option value="desc">Newest First</option>
+                  <option value="asc">Oldest First</option>
+                </select>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="admin-loading">
+                <i className="fa-solid fa-spinner fa-spin"></i>
+                <span>Loading announcements...</span>
+              </div>
+            ) : announcements.length > 0 ? (
+              <div className="announcement-items">
+                {announcements.map((announcement) => (
+                  <div className="announcement-item" key={announcement.id}>
+                    <div className="announcement-item__header">
+                      <h3 className="announcement-item__title">
+                        {announcement.title}
+                      </h3>
+                      <div className="announcement-item__meta">
+                        <span className="announcement-item__date">
+                          {format(
+                            new Date(announcement.createdAt),
+                            "MMM dd, yyyy"
+                          )}
+                        </span>
+                        <span className="announcement-item__author">
+                          by {announcement.author?.name}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="announcement-item__content">
+                      {announcement.content}
+                    </div>
+
+                    <div className="announcement-item__footer">
+                      <div className="announcement-item__courses">
+                        <i className="fa-solid fa-book"></i>
+                        {getCoursesName(announcement.courseIds)}
+                      </div>
+
+                      <div className="announcement-item__actions">
+                        <button
+                          className="admin-btn admin-btn--danger admin-btn--sm"
+                          onClick={() =>
+                            handleDeleteAnnouncement(announcement.id)
+                          }
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="admin-empty">
+                <i className="fa-solid fa-bullhorn"></i>
+                <p>No announcements found</p>
+              </div>
+            )}
+          </div>
+
+          {/* Create Announcement Form */}
+          <div className="admin-announcements__form">
+            <h2 className="admin-announcements__form-title">
+              Create New Announcement
+            </h2>
+
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="title">Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Announcement title"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="content">Content</label>
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleInputChange}
+                  placeholder="Announcement content"
+                  rows="6"
+                  required
+                ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="roleVisibility">Visible to</label>
+                <select
+                  id="roleVisibility"
+                  name="roleVisibility"
+                  value={formData.roleVisibility}
+                  onChange={handleInputChange}
+                >
+                  <option value="">All Roles</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.roleType}>
+                      {role.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Courses</label>
+                <div className="course-selector">
+                  <div className="course-selector__display">
+                    {formData.courseIds.length > 0
+                      ? getCoursesName(formData.courseIds)
+                      : "No courses selected"}
+                  </div>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--secondary"
+                    onClick={openModal}
+                  >
+                    <i className="fa-solid fa-list"></i>
+                    Select Courses
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--secondary"
+                  onClick={() =>
+                    setFormData({
+                      title: "",
+                      content: "",
+                      roleVisibility: "",
+                      courseIds: [],
+                    })
+                  }
+                >
+                  <i className="fa-solid fa-times"></i>
+                  Clear
+                </button>
+                <button type="submit" className="admin-btn admin-btn--primary">
+                  <i className="fa-solid fa-paper-plane"></i>
+                  Publish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
+
 export default Announcements;

@@ -1,96 +1,144 @@
+.admin-courses {
+  .admin-card {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
 
-@keyframes showInput{
-    0%{
-        color: #000;
-        
+    &__actions {
+      display: flex;
+      gap: 12px;
     }
-    100%{
-        color: #5945dd;
-        text-decoration: underline;
-    }
-}
-.createCourses{
-    &__title{
-        margin-left: 20px;
-        margin-bottom: 20px;
-    }
-    
-    &__form{
-        display: flex;
-        flex-direction: column;
 
+    &__filters {
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+
+      select {
+        max-width: 240px;
+      }
     }
-    &__box{
-        display: flex;
-        margin: 10px 0;
-        flex-wrap: wrap;
-        & > label{
-            font-weight: bold;
-            margin-right: 20px;
-            width: 100%;
-            max-width: 130px;    
-        }
-        &Price{
-            input[name="price"]{
-                width: 0;
-                padding: 0;
-                margin: 0;
-                border: 0;
-                display: inline;
-                &:focus{
-                    & + label{
-                        transition: all 0.3s;
-                        animation: showInput 1s linear infinite;
-                    }
-                }
-            }
-        }
-        
-    }
-    &__name{
-        flex: 1;
-        margin-right: 20px;
-        border: 0;
-        border-bottom: 1px solid #ddd;
-        outline: none;
-    }
-    &__teacher{
-        flex: 1;
-        margin-right: 20px;
-        outline: none;
-        border: 0;
-        border-bottom: 1px solid #ddd;
-    }
-    &__description{
-        width: 100%;
-        margin: 0 20px;
-    }
-    [data-preview-img]{
-        width: 200px;
-        aspect-ratio: 1;
-        object-fit: cover;
-    }
-    &__startDate{
-        width: 100%;
-        outline: none;
-        border: 0;
-        border-bottom: 1px solid #ddd;
-    }
-    &__endDate{
-        width: 100%;
-        outline: none;
-        border: 0;
-        border-bottom: 1px solid #ddd;
-    }
+  }
 }
-.react-datepicker-wrapper{
-    flex: 1;
-    margin-right: 20px;
-}
-@media(max-width: 692px){
-    .adminCourses{
-        &__box{
-            width: 100%;
-        }
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+
+  i {
+    margin-right: 8px;
+  }
+
+  &--primary {
+    background-color: #3f51b5;
+    color: white;
+
+    &:hover {
+      background-color: darken(#3f51b5, 10%);
     }
+  }
+
+  &--secondary {
+    background-color: transparent;
+    color: #3f51b5;
+    border: 1px solid #3f51b5;
+
+    &:hover {
+      background-color: rgba(63, 81, 181, 0.1);
+    }
+  }
+
+  &--danger {
+    background-color: #f44336;
+    color: white;
+
+    &:hover {
+      background-color: darken(#f44336, 10%);
+    }
+  }
+}
+
+.admin-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: #6c757d;
+
+  i {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: #3f51b5;
+  }
+}
+
+.admin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: #6c757d;
+
+  i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #e0e0e0;
+  }
+
+  p {
+    margin-bottom: 24px;
+    font-size: 16px;
+  }
+}
+
+.course-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .course-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  span {
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-card {
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
 }

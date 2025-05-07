@@ -1,0 +1,236 @@
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2980b9;
+$success-color: #27ae60;
+$error-color: #e74c3c;
+$text-color: #333;
+$light-gray: #f5f5f5;
+$border-color: #ddd;
+$box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+.document-list {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: $box-shadow;
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 1.8rem;
+    color: $text-color;
+    margin-bottom: 1rem;
+  }
+
+  &__course-info {
+    background-color: $light-gray;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  &__upload-btn {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    i {
+      margin-right: 0.5rem;
+    }
+
+    &:hover {
+      background-color: $secondary-color;
+    }
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    background-color: $light-gray;
+    border-radius: 8px;
+
+    i {
+      font-size: 3rem;
+      color: #95a5a6;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #7f8c8d;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: $secondary-color;
+      }
+    }
+  }
+
+  &__container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $box-shadow;
+    }
+
+    &-icon {
+      font-size: 2rem;
+      color: #e74c3c;
+      margin-right: 1rem;
+    }
+
+    &-info {
+      flex: 1;
+
+      h3 {
+        font-size: 1.1rem;
+        margin: 0;
+        color: $text-color;
+      }
+    }
+
+    &-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  &__view-btn,
+  &__delete-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $light-gray;
+    }
+  }
+
+  &__view-btn {
+    color: $primary-color;
+  }
+
+  &__delete-btn {
+    color: $error-color;
+  }
+
+  &__footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  &__back-btn {
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 0.5rem;
+    }
+
+    &:hover {
+      background-color: #bdc3c7;
+    }
+  }
+}
+
+.document-list-loading,
+.document-list-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+
+  .spinner {
+    font-size: 2rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+
+  i {
+    font-size: 2rem;
+    color: $error-color;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: $text-color;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .document-list {
+    padding: 1.5rem;
+    margin: 1rem;
+
+    &__container {
+      grid-template-columns: 1fr;
+    }
+  }
+}

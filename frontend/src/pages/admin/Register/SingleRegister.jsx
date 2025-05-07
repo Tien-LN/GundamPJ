@@ -1,85 +1,159 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function SingleRegister(){
-    const navigate = useNavigate();
-    const [data, setData] = useState({
-        email: "",
-        name: "",
-        role: ""
-    })
-    const [roles, setRoles] = useState([]);
-    const handleChange = (e) => {
-        setData({
-            ...data,
-            [e.target.name] : e.target.value
-        });
-    }
-    useEffect(()=>{
-        const fetchApi = async() => {
-            try{
-                const res = await axios.get("http://localhost:3000/api/roles", {
-                    withCredentials: true
-                });
+function SingleRegister() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    role: "STUDENT",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-                // console.log(res.data);
-                setRoles(res.data);
-            } catch(error){
-                console.error("Lỗi", error);
-            }
-            
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/admin/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
         }
-        fetchApi();
-    }, []);
-    const handleSubmit = async (e)=>{
-        e.preventDefault();
-        
-        try{
-            const res = await axios.post("http://localhost:3000/api/admin/register", data, {
-                headers: {
-                    "Content-Type" : "application/json"
-                },
-                withCredentials: true
-            });
-            // console.log(res);
-            
-            console.log("Tạo user thành công !!");
-            navigate("/admin/registers");
-            
-        } catch(error){
-            console.error("Lỗi", error);
-        }
+      );
+
+      setSuccess(
+        "User registered successfully! A temporary password has been sent to their email."
+      );
+      setFormData({
+        name: "",
+        email: "",
+        role: "STUDENT",
+      });
+    } catch (error) {
+      console.error(
+        "Registration error:",
+        error.response?.data || error.message
+      );
+      setError(
+        error.response?.data?.message ||
+          "Failed to register user. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
-    return (
-        <>
-            <h1 className="singleRegister__title">Đăng ký tài khoản cá nhân</h1>
-            
-            <form className="singleRegister" method="POST" onSubmit={handleSubmit}>
-                <div className="singleRegister__box">
-                    <label htmlFor="email">Email</label>
-                    <input className="singleRegister__email" type="email" name="email" id="email" value={data.email} onChange={handleChange} required/>
-                </div>
-                <div className="singleRegister__box">
-                    <label htmlFor="name">Họ tên</label>
-                    <input className="singleRegister__name" type="text" name="name" id="name" value={data.name} onChange={handleChange} required/>
-                </div>
-                <div className="singleRegister__box">
-                    <label htmlFor="role">Vai trò</label>
-                    <select className="singleRegister__role" name="role" id="role" value={data.role} onChange={handleChange}>
-                        <option value="" disabled>Chọn vai trò</option>
-                        {roles && 
-                            roles.map((item,index) => (
-                                <option value={item.roleType} key={index}>{item.title}</option>
-                            ))
-                        }
-                    </select>
-                </div>
-                <div className="singleRegister__box">
-                    <button type="submit" className="singleRegister__submit">Tạo</button>
-                </div>
-            </form>
-        </>
-    )
+  };
+
+  return (
+    <div className="admin-register-single">
+      <div className="admin-card">
+        <div className="admin-card__header">
+          <h1 className="admin-card__title">Register New User</h1>
+        </div>
+
+        {error && (
+          <div className="alert alert--error">
+            <i className="fa-solid fa-circle-exclamation"></i>
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="alert alert--success">
+            <i className="fa-solid fa-circle-check"></i>
+            {success}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter user's full name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter user's email address"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="role">Role</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="STUDENT">Student</option>
+              <option value="TEACHER">Teacher</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              className="admin-btn admin-btn--secondary"
+              onClick={() => navigate("/admin/registers/multi")}
+            >
+              <i className="fa-solid fa-users"></i>
+              Bulk Register
+            </button>
+            <button
+              type="submit"
+              className="admin-btn admin-btn--primary"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                  Registering...
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-user-plus"></i>
+                  Register User
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
+
 export default SingleRegister;

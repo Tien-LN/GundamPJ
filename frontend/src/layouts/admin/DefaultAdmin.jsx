@@ -1,24 +1,47 @@
 import Header from "./Header";
 import Sider from "./Sider";
 import "./Default.scss";
-import {Outlet} from "react-router-dom";
-function DefaultAdmin(){
-    return (
-        <>
-            <header className="admin__header">
-                <Header/>
-            </header>
+import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 
-            
-            <main className="admin__main">
-                <Sider/>
-                <div className="offset-2" id="offset-2"></div>
-                <div className="admin__main-containner">
-                    <Outlet/>
-                </div>
-                
-            </main>
-        </>
-    )
+function DefaultAdmin() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <div className="admin-layout">
+      <header className="admin__header">
+        <Header
+          sidebarOpen={sidebarOpen}
+          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        />
+      </header>
+
+      <div className="admin__container">
+        <aside className={`admin__sidebar ${sidebarOpen ? "open" : "closed"}`}>
+          <Sider />
+        </aside>
+
+        <main className="admin__content">
+          <div className="admin__main-container">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 }
+
 export default DefaultAdmin;

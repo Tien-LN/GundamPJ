@@ -1,15 +1,141 @@
-.dashboard{
-    &__user{
-        &-avatarContain{
-            padding: 5px;
-            border: 2px solid #ddd;
-            width: auto;
-            display: inline-block;
-            img{
-                width: 100%;
-                max-width: 320px;
-                object-fit: cover;
-            }
-        }
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.dashboard-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+
+  &__icon {
+    font-size: 24px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  &__trend {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    margin-top: 8px;
+
+    &.up {
+      color: #4caf50;
     }
+
+    &.down {
+      color: #f44336;
+    }
+
+    i {
+      margin-right: 4px;
+    }
+  }
+}
+
+.admin-card {
+  &__subtitle {
+    color: #6c757d;
+    margin-top: 8px;
+  }
+}
+
+.user-profile {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+
+  &__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+
+  &__role {
+    font-size: 14px;
+    color: #3f51b5;
+    background-color: rgba(63, 81, 181, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 0 0 16px 0;
+  }
+
+  &__description {
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    &__avatar {
+      margin-bottom: 16px;
+    }
+  }
 }

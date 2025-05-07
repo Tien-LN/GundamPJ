@@ -36,9 +36,9 @@ module.exports = (app) => {
 
   app.use(systemConfig.API_route + "/docsCourse", docsCourseRoutes);
 
-  app.use("/api/lessons", lessonRoutes);
+  app.use(systemConfig.API_route + "/lessons", lessonRoutes);
 
-  app.use("/api/statistics", statisticsRoutes);
+  app.use(systemConfig.API_route + "/statistics", statisticsRoutes);
 
   app.use(systemConfig.API_route + "/userExams", userExam);
 };

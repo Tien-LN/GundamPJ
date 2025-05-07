@@ -1,0 +1,205 @@
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2980b9;
+$success-color: #27ae60;
+$error-color: #e74c3c;
+$text-color: #333;
+$light-gray: #f5f5f5;
+$border-color: #ddd;
+$box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+.upload-document {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: $box-shadow;
+
+  &__title {
+    font-size: 1.8rem;
+    color: $text-color;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  &__course-info {
+    background-color: $light-gray;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  &__success {
+    background-color: rgba($success-color, 0.1);
+    color: $success-color;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+    }
+  }
+
+  &__error {
+    background-color: rgba($error-color, 0.1);
+    color: $error-color;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+    }
+  }
+
+  &__form {
+    &-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        font-size: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        }
+      }
+
+      input[type="file"] {
+        display: block;
+        margin-top: 0.5rem;
+        padding: 0.5rem 0;
+      }
+    }
+
+    &-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+  }
+
+  &__file-info {
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+
+    i {
+      margin-right: 0.5rem;
+    }
+  }
+
+  &__submit-btn {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $secondary-color;
+    }
+
+    &:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+
+    i {
+      margin-right: 0.5rem;
+    }
+  }
+
+  &__cancel-btn {
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #bdc3c7;
+    }
+  }
+}
+
+.upload-document-loading,
+.upload-document-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+
+  .spinner {
+    font-size: 2rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+
+  i {
+    font-size: 2rem;
+    color: $error-color;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: $text-color;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .upload-document {
+    padding: 1.5rem;
+    margin: 1rem;
+
+    &__form-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    &__submit-btn,
+    &__cancel-btn {
+      width: 100%;
+    }
+  }
+}
