@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import TinyEditor from "../../../components/TinyEditor";
 function AddDocs() {
@@ -9,6 +9,25 @@ function AddDocs() {
     title: "",
     content: "",
     courseId: courseId,
+    files: []
+  });
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: acceptedFiles => {
+      setData(prev => ({
+        ...prev,
+        files: [...prev.files, ...acceptedFiles]
+      }));
+    },
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-powerpoint': ['.ppt'],
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+      'text/plain': ['.txt']
+    },
+    maxSize: 10 * 1024 * 1024 // 10MB
   });
   const [user, setUser] = useState({});
   const [course, setCourse] = useState({});
@@ -74,25 +93,43 @@ function AddDocs() {
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const fetchApi = async () => {
-      try {
-        const res = await axios.post(
-          `http://localhost:3000/api/docsCourse/${courseId}`,
-          data,
-          {
-            withCredentials: true,
+    
+    try {
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('content', data.content);
+      formData.append('courseId', courseId);
+      
+      // Add files if any
+      data.files.forEach(file => {
+        formData.append('files', file);
+      });
+      
+      const res = await axios.post(
+        `http://localhost:3000/api/docsCourse/${courseId}`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
           }
-        );
+        }
+      );
 
-        navigate(`/courses/${courseId}`);
-      } catch (error) {
-        console.error("Lỗi khi tạo bài giảng", error);
-        setError("Có lỗi xảy ra khi tạo bài giảng");
-      }
-    };
-    fetchApi();
+      navigate(`/courses/${courseId}`);
+    } catch (error) {
+      console.error("Lỗi khi tạo bài giảng", error);
+      setError("Có lỗi xảy ra khi tạo bài giảng");
+    }
+  };
+  
+  const removeFile = (index) => {
+    setData(prev => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== index)
+    }));
   };
   // Hiển thị trạng thái loading
   if (loading) {
@@ -129,7 +166,7 @@ function AddDocs() {
             <span style={{ marginLeft: "8px" }}>{error}</span>
           </div>
         )}
-        <form className="addDocs__form" onSubmit={handleSubmit}>
+        <form className="addDocs__form" onSubmit={handleSubmit} {...getRootProps()}>
           <div className="addDocs__box">
             <label htmlFor="doc__title">Tiêu đề</label>
             <input
@@ -147,6 +184,38 @@ function AddDocs() {
             {/* <textarea className="addDocs__content" id="doc__content" name="content" value={data.content} onChange={handleChange}/> */}
           </div>
           <div className="addDocs__box">
+            <input {...getInputProps()} />
+            {isDragActive ? (
+              <div className="addDocs__dropzone">
+                <i className="fa-solid fa-file-arrow-up"></i>
+                <p>Thả tệp vào đây để tải lên</p>
+              </div>
+            ) : (
+              <p className="addDocs__drop-hint">
+                Kéo thả tệp vào đây, hoặc click để chọn tệp
+              </p>
+            )}
+            
+            {data.files.length > 0 && (
+              <div className="addDocs__file-list">
+                <h4>Tệp đã chọn:</h4>
+                <ul>
+                  {data.files.map((file, index) => (
+                    <li key={index}>
+                      <span>{file.name}</span>
+                      <button 
+                        type="button" 
+                        onClick={() => removeFile(index)}
+                        className="addDocs__remove-file"
+                      >
+                        <i className="fa-solid fa-xmark"></i>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
             <button type="submit" className="addDocs__submit">
               Tạo mới
             </button>

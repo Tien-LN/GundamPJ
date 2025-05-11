@@ -11,6 +11,8 @@ function MultiRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [invalidEmails, setInvalidEmails] = useState([]);
+  const [existingEmails, setExistingEmails] = useState([]);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -88,7 +90,8 @@ function MultiRegister() {
       setSuccess(
         `Successfully registered ${validUsers.length} users! Temporary passwords have been sent to their emails.`
       );
-
+      setInvalidEmails(response.data.invalidEmails || []);
+      setExistingEmails(response.data.existingEmails || []);
       // Reset form after successful submission
       setRows(4);
       setData(Array(4).fill({ email: "", name: "", role: "" }));
@@ -101,6 +104,8 @@ function MultiRegister() {
         error.response?.data?.message ||
           "Failed to register users. Please check your data and try again."
       );
+      setInvalidEmails(error.response?.data?.invalidEmails || []);
+      setExistingEmails(error.response?.data?.existingEmails || []);
     } finally {
       setIsLoading(false);
     }
@@ -288,6 +293,87 @@ function MultiRegister() {
           </button>
         </div>
       </div>
+      {invalidEmails.length > 0 && (
+        <div
+          className="alert alert--warning"
+          style={{
+            marginTop: 16,
+            background: "#fff8e1",
+            border: "1px solid #ffd54f",
+            color: "#b26a00",
+            borderRadius: 8,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: "bold",
+              fontSize: 16,
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ marginRight: 8 }}>
+              <i className="fa-solid fa-triangle-exclamation"></i>
+            </span>
+            Invalid Email(s) - Cannot Create Account
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {invalidEmails.map((item, idx) => (
+              <li key={idx} style={{ marginBottom: 4, fontSize: 15 }}>
+                <span style={{ fontWeight: "bold", color: "#d84315" }}>
+                  {item.email}
+                </span>
+                <span style={{ marginLeft: 8, color: "#b26a00" }}>
+                  <i
+                    className="fa-solid fa-xmark"
+                    style={{ color: "#d84315", marginRight: 4 }}
+                  ></i>
+                  {item.reason}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {existingEmails.length > 0 && (
+        <div
+          className="alert alert--warning"
+          style={{
+            marginTop: 16,
+            background: "#f3e5f5",
+            border: "1px solid #ce93d8",
+            color: "#4a148c",
+            borderRadius: 8,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: "bold",
+              fontSize: 16,
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ marginRight: 8 }}>
+              <i className="fa-solid fa-user-check"></i>
+            </span>
+            Existing Email(s) - Already Registered
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {existingEmails.map((email, idx) => (
+              <li key={idx} style={{ marginBottom: 4, fontSize: 15 }}>
+                <span style={{ fontWeight: "bold", color: "#6a1b9a" }}>
+                  {email}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

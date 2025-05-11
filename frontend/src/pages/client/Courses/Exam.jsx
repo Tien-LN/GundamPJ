@@ -99,22 +99,19 @@ function Exam(){
             
             
             for (const userAns of exam.userAnswers) {
-                
-                if(userAns.question.type == "OBJECTIVE" || userAns.question.type == "DROPDOWN") {
+                  if(userAns.question.type == "OBJECTIVE" || userAns.question.type == "DROPDOWN") {
                     didQuestion.current[exam.id][userAns.questionId] = {
-                        answer: userAns.questionOption.content,
-                        isCorrect: userAns.questionOption.isCorrect
-                    };
-                } else if(userAns.question.type == "FILL") {
-                    let userRes = userAns.value;
-                    let teacherRes = userAns.questionOption.content;
-                    let isCorrect = (compareVietnameseStrings(userRes, teacherRes) == 0);
-                    didQuestion.current[exam.id][userAns.questionId] = { answer: userRes, isCorrect };
-                } else if(userAns.question.type == "REORDERING") {
+                        answer: userAns.questionOption ? userAns.questionOption.content : 'Không có câu trả lời',
+                        isCorrect: userAns.questionOption ? userAns.questionOption.isCorrect : false
+                    };                } else if(userAns.question.type == "FILL") {
+                    let userRes = userAns.value || '';
+                    let teacherRes = userAns.questionOption ? userAns.questionOption.content : '';
+                    let isCorrect = teacherRes ? (compareVietnameseStrings(userRes, teacherRes) == 0) : false;
+                    didQuestion.current[exam.id][userAns.questionId] = { answer: userRes, isCorrect };                } else if(userAns.question.type == "REORDERING") {
                     didQuestion.current[exam.id][userAns.questionId] = didQuestion.current[exam.id][userAns.questionId] || {};
                     didQuestion.current[exam.id][userAns.questionId][userAns.num] = {
-                        answer: userAns.questionOption.content,
-                        order: userAns.questionOption.num
+                        answer: userAns.questionOption ? userAns.questionOption.content : 'Không có câu trả lời',
+                        order: userAns.questionOption ? userAns.questionOption.num : 0
                     };
                 } else if(userAns.question.type == "MATCHING") {
                     didQuestion.current[exam.id][userAns.questionId] = didQuestion.current[exam.id][userAns.questionId] || {};
@@ -225,12 +222,11 @@ function Exam(){
     
         const questionData = didQuestion.current[didExamId][id];
     
-        
         if (type == "OBJECTIVE" || type == "DROPDOWN" || type == "FILL") {
             return (
-                <div>
-                    <b>Chọn:</b> {questionData.answer} | 
-                    <span style={{ color: questionData.isCorrect ? "green" : "red", fontWeight: "bold" }}>
+                <div className="exams__did-answer">
+                    <span className="exams__did-label">Câu trả lời:</span> {questionData.answer} 
+                    <span className={`exams__did-result ${questionData.isCorrect ? "correct" : "incorrect"}`}>
                         {questionData.isCorrect ? "Đúng" : "Sai"}
                     </span>
                 </div>
@@ -242,39 +238,41 @@ function Exam(){
             const sortedEntries = entries.sort((a, b) => Number(a[0]) - Number(b[0]));
             
             return (
-                <div style={{ marginTop: "10px" }}>
-                    <b>Kết quả sắp xếp:</b>
-                    {sortedEntries.map(([key, { answer, order }], index) => {
-                        const userOrder = Number(key);
-                        const isCorrect = userOrder === order;
-                        return (
-                            <div key={key}>
-                                <span style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>
-                                    {userOrder}. {answer} ({isCorrect ? "Đúng" : "Sai"})
-                                </span>
-                            </div>
-                        );
-                    })}
+                <div className="exams__did-reordering">
+                    <div className="exams__did-label">Kết quả sắp xếp:</div>
+                    <div className="exams__did-reorderingItems">
+                        {sortedEntries.map(([key, { answer, order }], index) => {
+                            const userOrder = Number(key);
+                            const isCorrect = userOrder === order;
+                            return (
+                                <div key={key} className={`exams__did-reorderingItem ${isCorrect ? "correct" : "incorrect"}`}>
+                                    <span className="number">{userOrder}.</span> 
+                                    <span className="content">{answer}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             );
         } 
         
         else if (type == "MATCHING") {
             const entries = Object.entries(questionData);
-            // console.log(entries);
             return (
-                <div>
-                    <b>Danh sách cặp nối</b>
-                    {entries.map(([key, pair]) => {
-                        const isCorrect = pair.left.num === pair.right.num;
-                        return (
-                            <div key={key}>
-                                <span style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>
-                                    {pair.left.content} - {pair.right.content} ({isCorrect ? "Đúng" : "Sai"})
-                                </span>
-                            </div>
-                        );
-                    })}
+                <div className="exams__did-matching">
+                    <div className="exams__did-label">Danh sách cặp nối:</div>
+                    <div className="exams__did-matchingItems">
+                        {entries.map(([key, pair]) => {
+                            const isCorrect = pair.left.num === pair.right.num;
+                            return (
+                                <div key={key} className={`exams__did-matchingItem ${isCorrect ? "correct" : "incorrect"}`}>
+                                    <span className="left">{pair.left.content}</span>
+                                    <span className="connector">→</span>
+                                    <span className="right">{pair.right.content}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             );
         }
@@ -293,11 +291,11 @@ function Exam(){
                             <form className="exams__form" method="POST" onSubmit={handleSubmit}>
                                 <div className="exams__box">
                                     <label htmlFor="exams-title">Tiêu đề</label>
-                                    <input name="title" className="exams__title" id="exams-title" onChange={handleChange}/>
+                                    <input name="title" className="exams__title" id="exams-title" onChange={handleChange} placeholder="Nhập tiêu đề đề thi"/>
                                 </div>
                                 <div className="exams__box">
                                     <label htmlFor="exams-description">Mô tả</label>
-                                    <textarea rows="5" name="description" className="exams__description" id="exams-description" onChange={handleChange}/>
+                                    <textarea rows="5" name="description" className="exams__description" id="exams-description" onChange={handleChange} placeholder="Mô tả nội dung đề thi"/>
                                 </div>
                                 <div className="exams__box">
                                     <label htmlFor="exams-startDate">Ngày bắt đầu</label>
@@ -305,7 +303,7 @@ function Exam(){
                                         selected={data.startDate}
                                         onChange={(date) => handleDateChange(date, "startDate")}
                                         dateFormat="dd/MM/yyyy"
-                                        placeholderText="Chọn ngày"
+                                        placeholderText="Chọn ngày bắt đầu"
                                         id="exams-startDate"
                                         name="startDate"
                                         className="exams__startDate"
@@ -318,7 +316,7 @@ function Exam(){
                                         selected={data.endDate}
                                         onChange={(date) => handleDateChange(date, "endDate")}
                                         dateFormat="dd/MM/yyyy"
-                                        placeholderText="Chọn ngày"
+                                        placeholderText="Chọn ngày kết thúc"
                                         id="exams-endDate"
                                         name="endDate"
                                         className="exams__endDate"
@@ -326,29 +324,37 @@ function Exam(){
                                     />
                                 </div>
                                 <div className="exams__box">
-                                    <label htmlFor="exams-timeLimit">phút</label>
+                                    <label htmlFor="exams-timeLimit">Thời gian (phút)</label>
                                     <input type="number" className="exams__timeLimit" id="exams-timeLimit" min="1" value={data.timeLimit/60} onChange={handleChangeTimeLimit} />
-                                </div>
-                                <div className="exams__box">
-                                    <button type="submit">Tạo mới</button>
+                                </div>                                <div className="exams__box">
+                                    <button type="submit" className="exams__submit-btn">Tạo mới</button>
                                 </div>
                             </form>
                         </div>
                         
+                    </div>                }
+                <h1 className="exams__intro">Danh sách đề thi</h1>
+                
+                {didExam && didExam.length > 0 && (
+                    <div className="exams__actions">
+                        <button className="exams__viewAll" onClick={handleToggle}>
+                            <i className="fa-solid fa-clock-rotate-left"></i> 
+                            {openDidExam ? "Ẩn lịch sử làm bài" : "Xem lịch sử làm bài"}
+                        </button>
                     </div>
-                }
-                <h1 className="exams__intro">Trang đề thi</h1>
+                )}
+                
                 {exams && 
                     exams.map((exam, index) => (
                         <div key={index} className="exams__exam">
                             {
                                 user?.role == "TEACHER" && 
                                 <>
-                                    <Link className="exams__exam-edit" to={`edit/${exam.id}`}>
+                                    <Link className="exams__exam-edit" to={`edit/${exam.id}`} title="Chỉnh sửa đề thi">
                                         <i className="fa-solid fa-gear"></i>
                                     </Link>
-                                    <button className="exams__exam-delete" onClick={() => {handleDeleteExam(exam.id)}}>
-                                        <i className="fa-solid fa-minus"></i>
+                                    <button className="exams__exam-delete" onClick={() => {handleDeleteExam(exam.id)}} title="Xóa đề thi">
+                                        <i className="fa-solid fa-trash"></i>
                                     </button>
                                 </>
                                 
@@ -365,20 +371,28 @@ function Exam(){
                                         <b>Ngày kết thúc: </b>{format(new Date(exam.endDate), "dd/MM/yyyy")}
                                     </span>
 
-                                    <span className="exams__exam-timeLimit">
-                                        <b>Thời gian làm: </b>{convertTimeLimit(exam.timeLimit)}
+                                    <span className="exams__exam-timeLimit">                                        <b>Thời gian làm: </b>{convertTimeLimit(exam.timeLimit)}
                                     </span>
                                 </div>
                             </Link>
+                            <div className="exams__exam-actions">
+                                <Link to={`${exam.id}`} className="exams__exam-do">
+                                    <i className="fa-solid fa-pen-to-square"></i> Làm bài
+                                </Link>
+                                <Link to={`${exam.id}/history`} className="exams__exam-history">
+                                    <i className="fa-solid fa-clock-rotate-left"></i> Lịch sử làm bài
+                                </Link>
+                            </div>
                         </div>
                     )
-                    )
-                }
+                    )                }
                 {
-                    didExam && 
-                    <button className="exams__didOpen" onClick={handleToggle}>
-                        {openDidExam == true ? "Các lượt nộp bài" : "Đóng"}
-                    </button>   
+                    didExam && didExam.length > 0 && !openDidExam && 
+                    <div className="exams__toggle-container">
+                        <button className="exams__didOpen" onClick={handleToggle}>
+                            <i className="fa-solid fa-chevron-down"></i> Hiển thị lịch sử làm bài cũ
+                        </button>
+                    </div>
                 }
                 {
                     openDidExam && 
@@ -386,15 +400,15 @@ function Exam(){
                         {
                             didExam.map((exam) => (
                                 <div className="exams__did-show" key={exam.id}>
-                                    <div className="exams__did-showTitle"><b>bài :</b> {exam.exam.title}</div>
-                                    <div className="exams__did-showTime"><b>Làm trong :</b> {formatTime(exam.timeDo)}</div>
+                                    <div className="exams__did-showTitle">{exam.exam.title}</div>
+                                    <div className="exams__did-showTime"><b>Thời gian làm bài:</b> {formatTime(exam.timeDo)}</div>
                                     <div className="exams__did-showQuestion">
-                                        <h3>Danh sách câu trả lời : </h3>
+                                        <h3>Kết quả bài làm:</h3>
                                         {
                                             exam.exam.questions.map((question, q_index) => (
                                                 <div className="exams__did-showQuestion-question" key={question.id}>
                                                     <div className="exams__did-showQuestion-title">
-                                                        <b>Câu hỏi {q_index + 1}: </b><div dangerouslySetInnerHTML={{__html: question.content}} /> 
+                                                        <b>Câu {q_index + 1}:</b><div dangerouslySetInnerHTML={{__html: question.content}} /> 
                                                     </div>
                                                     {
                                                         question.type == "OBJECTIVE" && 
@@ -434,11 +448,6 @@ function Exam(){
                             ))
                         }
                     </div>
-                }
-                {user?.role == "TEACHER" &&
-                <> 
-                    <button className="exams__add" onClick={onAddExam  }>Tạo đề thi</button>
-                </>
                 }
             </div>
             

@@ -1,0 +1,280 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const cloudinary = require("../../config/cloudinary");
+
+const cloudinaryController = {
+  // [POST] /api/cloudinary/upload
+  async uploadImage(req, res) {
+    try {
+      const { image, userId, lessonId } = req.body;
+
+      if (!image || !userId || !lessonId) {
+        return res.status(400).json({
+          success: false,
+          error: "Thiếu thông tin: hình ảnh, ID người dùng hoặc ID buổi học",
+        });
+      }
+
+      // Kiểm tra xem buổi học có tồn tại không
+      const lesson = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+      });
+
+      if (!lesson) {
+        return res.status(404).json({
+          success: false,
+          error: "Không tìm thấy buổi học",
+        });
+      }
+
+      // Kiểm tra xem người dùng có tồn tại không
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: "Không tìm thấy người dùng",
+        });
+      }
+
+      // Upload hình ảnh lên Cloudinary
+      // Định dạng tên file: attendance_userId_lessonId_timestamp
+      const timestamp = new Date().getTime();
+      const fileName = `attendance_${userId}_${lessonId}_${timestamp}`;
+
+      const uploadResult = await cloudinary.uploader.upload(image, {
+        folder: "attendance",
+        public_id: fileName,
+        overwrite: true,
+        resource_type: "image",
+      });
+
+      if (!uploadResult || !uploadResult.secure_url) {
+        return res.status(500).json({
+          success: false,
+          error: "Không thể tải lên hình ảnh",
+        });
+      }
+
+      // Tạo hoặc cập nhật hình ảnh điểm danh
+      const attendanceImage = await prisma.attendanceImage.upsert({
+        where: {
+          userId_lessonId: {
+            userId: userId,
+            lessonId: lessonId,
+          },
+        },
+        update: {
+          imageUrl: uploadResult.secure_url,
+          publicId: uploadResult.public_id,
+          verified: false, // Chưa được xác nhận
+          updatedAt: new Date(),
+        },
+        create: {
+          userId: userId,
+          lessonId: lessonId,
+          imageUrl: uploadResult.secure_url,
+          publicId: uploadResult.public_id,
+          verified: false,
+        },
+      });
+
+      // Trả về kết quả
+      res.status(200).json({
+        success: true,
+        message: "Đã tải lên hình ảnh điểm danh thành công",
+        data: {
+          id: attendanceImage.id,
+          imageUrl: uploadResult.secure_url,
+          verificationStatus: "pending",
+        },
+      });
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Đã xảy ra lỗi khi tải lên hình ảnh",
+      });
+    }
+  },
+
+  // [POST] /api/cloudinary/verify
+  async verifyAttendanceImage(req, res) {
+    try {
+      const { attendanceImageId, imageId, verified, approve, userId, lessonId } = req.body;
+
+      // Nếu có attendanceImageId hoặc imageId, tìm theo ID
+      const imageIdentifier = attendanceImageId || imageId;
+      
+      if (imageIdentifier) {
+        const attendanceImage = await prisma.attendanceImage.findUnique({
+          where: { id: imageIdentifier },
+        });
+
+        if (!attendanceImage) {
+          return res.status(404).json({
+            success: false,
+            error: "Không tìm thấy hình ảnh điểm danh",
+          });
+        }
+
+        // Cập nhật trạng thái xác minh (hỗ trợ cả verified và approve để tương thích với cả 2 cách gọi API)
+        const isVerified = typeof verified !== 'undefined' ? verified : approve;
+        
+        const updatedImage = await prisma.attendanceImage.update({
+          where: { id: imageIdentifier },
+          data: {
+            verified: isVerified,
+            updatedAt: new Date(),
+          },
+        });
+
+        // Nếu được xác nhận, thêm/cập nhật bản ghi điểm danh
+        if (isVerified) {
+          await prisma.attendance.upsert({
+            where: {
+              userId_lessonId: {
+                userId: attendanceImage.userId,
+                lessonId: attendanceImage.lessonId,
+              },
+            },
+            update: {
+              attended: true,
+            },
+            create: {
+              userId: attendanceImage.userId,
+              lessonId: attendanceImage.lessonId,
+              attended: true,
+            },
+          });
+        }
+
+        res.status(200).json({
+          success: true,
+          message: isVerified ? "Đã xác nhận điểm danh" : "Đã từ chối điểm danh",
+          data: updatedImage,
+        });
+      }
+      // Nếu không có imageId nhưng có userId và lessonId
+      else if (userId && lessonId) {
+        const attendanceImage = await prisma.attendanceImage.findUnique({
+          where: {
+            userId_lessonId: {
+              userId: userId,
+              lessonId: lessonId,
+            },
+          },
+        });
+
+        if (!attendanceImage) {
+          return res.status(404).json({
+            success: false,
+            error:
+              "Không tìm thấy hình ảnh điểm danh cho học viên và buổi học này",
+          });
+        }
+
+        // Cập nhật trạng thái xác minh (hỗ trợ cả verified và approve)
+        const isVerified = typeof verified !== 'undefined' ? verified : approve;
+        const updatedImage = await prisma.attendanceImage.update({
+          where: { id: attendanceImage.id },
+          data: {
+            verified: isVerified,
+            updatedAt: new Date(),
+          },
+        });
+
+        // Nếu được xác nhận, thêm/cập nhật bản ghi điểm danh
+        if (isVerified) {
+          await prisma.attendance.upsert({
+            where: {
+              userId_lessonId: {
+                userId: userId,
+                lessonId: lessonId,
+              },
+            },
+            update: {
+              attended: true,
+            },
+            create: {
+              userId: userId,
+              lessonId: lessonId,
+              attended: true,
+            },
+          });
+        }
+
+        res.status(200).json({
+          success: true,
+          message: isVerified ? "Đã xác nhận điểm danh" : "Đã từ chối điểm danh",
+          data: updatedImage,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: "Thiếu thông tin để xác minh hình ảnh điểm danh",
+        });
+      }
+    } catch (error) {
+      console.error("Verify attendance image error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Đã xảy ra lỗi khi xác minh hình ảnh điểm danh",
+      });
+    }
+  },
+
+  // [GET] /api/cloudinary/attendance/:userId/:lessonId
+  async getAttendanceImage(req, res) {
+    try {
+      const { userId, lessonId } = req.params;
+
+      if (!userId || !lessonId) {
+        return res.status(400).json({
+          success: false,
+          error: "Thiếu thông tin người dùng hoặc buổi học",
+        });
+      }
+
+      const attendanceImage = await prisma.attendanceImage.findUnique({
+        where: {
+          userId_lessonId: {
+            userId: userId,
+            lessonId: lessonId,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      if (!attendanceImage) {
+        return res.status(404).json({
+          success: false,
+          error: "Không tìm thấy hình ảnh điểm danh",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: attendanceImage,
+      });
+    } catch (error) {
+      console.error("Get attendance image error:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Đã xảy ra lỗi khi lấy hình ảnh điểm danh",
+      });
+    }
+  },
+};
+
+module.exports = cloudinaryController;

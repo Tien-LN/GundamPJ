@@ -79,7 +79,7 @@ function Footer() {
 
           <div className="footer-col contact-col">
             <h3>Liên hệ</h3>
-            <ul className="contact-info">
+            <ul className="contact-info" style={{ padding: "10px 20px" }}>
               <li>
                 <i className="fa-solid fa-location-dot"></i>
                 <span>123 Education Street, Learning City, 10000</span>

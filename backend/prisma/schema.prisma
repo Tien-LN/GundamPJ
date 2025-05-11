@@ -52,6 +52,7 @@ model User {
   avatar             String?
   Course             Course[]
   attendances        Attendance[] // Thêm quan hệ ngược lại với Attendance
+  attendanceImages   AttendanceImage[] // Quan hệ với AttendanceImage
 }
 
 model Course {
@@ -84,15 +85,35 @@ model Lesson {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   attendances Attendance[] // Quan hệ với Attendance
+  attendanceImages AttendanceImage[] // Quan hệ với AttendanceImage
 }
 
 model Attendance {
-  id       String  @id @default(uuid())
-  lessonId String
-  lesson   Lesson  @relation(fields: [lessonId], references: [id])
-  userId   String
-  user     User    @relation(fields: [userId], references: [id])
-  attended Boolean // Học viên có điểm danh hay không
+  id        String    @id @default(uuid())
+  lessonId  String
+  lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  attended  Boolean   // Học viên có điểm danh hay không
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model AttendanceImage {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  lessonId  String
+  lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  imageUrl  String    // URL hình ảnh từ Cloudinary
+  publicId  String    // Public ID của hình ảnh trên Cloudinary
+  verified  Boolean   @default(false) // Trạng thái xác minh
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, lessonId])
 }
 
 enum EnrollmentStatus {

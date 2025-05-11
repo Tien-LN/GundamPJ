@@ -22,6 +22,15 @@ router.post(
   examController.createQuestion
 );
 
+// Add new route for the URL format used in frontend
+router.post(
+  "/:courseId/exams/:examId/createQuestion",
+  verifyUser,
+  checkRole(["TEACHER", "ADMIN"]),
+  checkAccessToCourse,
+  examController.createQuestion
+);
+
 router.get(
   "/:courseId/exams/:examId/questions",
   verifyUser,
@@ -51,5 +60,5 @@ router.delete(
   checkRole(["TEACHER", "ADMIN"]),
   checkAccessToCourse,
   examController.deleteExam
-)
+);
 module.exports = router;

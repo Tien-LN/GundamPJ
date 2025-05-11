@@ -147,21 +147,113 @@ const statisticsController = {
   // [POST] /api/statistics/attendance
   async markAttendance(req, res) {
     try {
-      const { studentId, courseId, status } = req.body;
+      console.log("Received attendance request via statistics API:", req.body);
 
-      // Logic điểm danh học viên
-      const attendance = await prisma.attendance.create({
-        data: {
-          studentId,
-          courseId,
-          status,
-          date: new Date(),
+      // Forward to the new attendance API structure
+      const { userId, lessonId, attended, studentId, courseId, status } =
+        req.body;
+
+      // Validate required data
+      if (!userId && !studentId) {
+        return res.status(400).json({ error: "Missing student/user ID" });
+      }
+
+      if (!lessonId) {
+        return res.status(400).json({ error: "Missing lesson ID" });
+      }
+
+      // Determine attendance status
+      const isAttended =
+        attended !== undefined ? attended : status === "PRESENT";
+
+      // Check for existing attendance record
+      const existingAttendance = await prisma.attendance.findFirst({
+        where: {
+          userId: userId || studentId,
+          lessonId: lessonId,
         },
       });
 
-      res.status(200).json(attendance);
+      let attendance;
+
+      if (existingAttendance) {
+        // Update existing record
+        attendance = await prisma.attendance.update({
+          where: {
+            id: existingAttendance.id,
+          },
+          data: {
+            attended: isAttended,
+          },
+        });
+      } else {
+        // Create new record
+        attendance = await prisma.attendance.create({
+          data: {
+            userId: userId || studentId,
+            lessonId: lessonId,
+            attended: isAttended,
+          },
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Điểm danh thành công",
+        data: attendance,
+      });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error("Error in statistics attendance endpoint:", error);
+      res.status(500).json({
+        error: error.message || "Lỗi khi xử lý điểm danh",
+      });
+    }
+  },
+
+  // [GET] /api/statistics/lesson/:lessonId/attendance
+  async getLessonAttendance(req, res) {
+    try {
+      const { lessonId } = req.params;
+
+      if (!lessonId) {
+        return res.status(400).json({ error: "Thiếu ID buổi học" });
+      }
+
+      // Lấy danh sách điểm danh cho buổi học
+      const attendances = await prisma.attendance.findMany({
+        where: {
+          lessonId: lessonId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      // Thống kê
+      const totalStudents = attendances.length;
+      const presentStudents = attendances.filter((a) => a.attended).length;
+      const absentStudents = totalStudents - presentStudents;
+      const attendanceRate =
+        totalStudents > 0 ? (presentStudents / totalStudents) * 100 : 0;
+
+      res.status(200).json({
+        total: totalStudents,
+        present: presentStudents,
+        absent: absentStudents,
+        attendanceRate: attendanceRate.toFixed(2) + "%",
+        attendances: attendances,
+      });
+    } catch (error) {
+      console.error("Error getting lesson attendance:", error);
+      res
+        .status(500)
+        .json({ error: error.message || "Lỗi khi lấy thông tin điểm danh" });
     }
   },
 };

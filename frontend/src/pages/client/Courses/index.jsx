@@ -167,6 +167,20 @@ function Courses() {
                         <i className="fa-solid fa-list-check"></i> Quản lý bài
                         học
                       </Link>
+                      <Link
+                        to={`/courses/${item.id}/upload-document`}
+                        className="btn-document"
+                      >
+                        <i className="fa-solid fa-file-upload"></i> Quản lý tài
+                        liệu
+                      </Link>
+                      <Link
+                        to={`/courses/${item.id}/exams`}
+                        className="btn-exam"
+                      >
+                        <i className="fa-solid fa-clipboard-check"></i> Quản lý
+                        bài kiểm tra
+                      </Link>
                     </div>
                   </div>
                 </div>

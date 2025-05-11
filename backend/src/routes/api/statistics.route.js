@@ -17,7 +17,6 @@ router.get(
 router.get(
   "/course/:courseId/students",
   verifyUser,
-  checkRole(["ADMIN", "TEACHER"]),
   statisticsController.getCourseStudents
 );
 
@@ -27,6 +26,13 @@ router.post(
   verifyUser,
   checkRole(["ADMIN", "TEACHER"]),
   statisticsController.markAttendance
+);
+
+// Lấy danh sách điểm danh theo buổi học
+router.get(
+  "/lesson/:lessonId/attendance",
+  verifyUser,
+  statisticsController.getLessonAttendance
 );
 
 module.exports = router;

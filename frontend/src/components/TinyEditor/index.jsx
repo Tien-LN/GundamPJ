@@ -3,6 +3,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import "katex/dist/katex.min.css";
 import katex from "katex";
 import renderMathInElement from "katex/dist/contrib/auto-render";
+import "./TinyEditor.css"; // Import custom styles
 
 export default function App({ initialValue, onChange }) {
   return (

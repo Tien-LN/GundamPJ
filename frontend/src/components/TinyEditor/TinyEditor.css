@@ -1,0 +1,15 @@
+/* TinyEditor custom styles */
+.tox-tinymce {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+    min-height: 300px !important; /* Set minimum height */
+}
+
+.tox-statusbar {
+    border-top: 1px solid #d1d5db !important;
+}
+
+.tox-edit-area__iframe {
+    background-color: #ffffff !important;
+}

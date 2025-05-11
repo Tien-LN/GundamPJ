@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "./UploadDocument.scss";
@@ -14,6 +14,7 @@ function UploadDocument() {
   const [user, setUser] = useState({});
   const [course, setCourse] = useState({});
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Kiểm tra quyền truy cập
   useEffect(() => {
@@ -90,20 +91,20 @@ function UploadDocument() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("title", title);
-      formData.append("courseId", courseId);
-
-      await axios.post("http://localhost:3000/api/docs/create", formData, {
+      formData.append("courseId", courseId);      console.log("Uploading document:", title, file.name, file.size, file.type);
+      const response = await axios.post("http://localhost:3000/api/docs/create", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      
+      console.log("Upload response:", response.data);
 
       setSuccess(true);
       setTitle("");
       setFile(null);
-      // Reset file input
-      document.getElementById("file-upload").value = "";
+      if (fileInputRef.current) fileInputRef.current.value = "";
 
       setTimeout(() => {
         setSuccess(false);
@@ -113,7 +114,10 @@ function UploadDocument() {
     } catch (error) {
       console.error("Lỗi khi upload tài liệu:", error);
       setError(
-        error.response?.data?.message || "Có lỗi xảy ra khi upload tài liệu"
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+          "Có lỗi xảy ra khi upload tài liệu"
       );
       setLoading(false);
     }
@@ -181,6 +185,7 @@ function UploadDocument() {
           <input
             type="file"
             id="file-upload"
+            ref={fileInputRef}
             onChange={handleFileChange}
             required
           />

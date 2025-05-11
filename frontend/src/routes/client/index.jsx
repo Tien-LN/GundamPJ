@@ -25,6 +25,8 @@ import Exam from "../../pages/client/Courses/Exam.jsx";
 import ShowExam from "../../pages/client/Courses/ShowExam.jsx";
 import EditExam from "../../pages/client/Courses/EditExam.jsx";
 import CreateExam from "../../pages/client/Courses/CreateExam.jsx";
+import ExamHistory from "../../pages/client/Courses/ExamHistory.jsx";
+import ExamAttemptDetail from "../../pages/client/Courses/ExamAttemptDetail.jsx";
 import DocumentList from "../../pages/client/Courses/DocumentList.jsx";
 import UploadDocument from "../../pages/client/Courses/UploadDocument.jsx";
 
@@ -84,28 +86,35 @@ export const routes = [
           {
             path: "upload-document",
             element: <UploadDocument />,
-          },
-          {
-            path: "exams",
-            children: [
-              {
-                index: true,
-                element: <Exam />,
+          },              {
+                path: "exams",
+                children: [
+                  {
+                    index: true,
+                    element: <Exam />,
+                  },
+                  {
+                    path: "create",
+                    element: <CreateExam />,
+                  },
+                  {
+                    path: "edit/:examId",
+                    element: <EditExam />,
+                  },
+                  {
+                    path: ":examId",
+                    element: <ShowExam />,
+                  },
+                  {
+                    path: ":examId/history",
+                    element: <ExamHistory />,
+                  },
+                  {
+                    path: ":examId/attempts/:attemptId",
+                    element: <ExamAttemptDetail />,
+                  },
+                ],
               },
-              {
-                path: "create",
-                element: <CreateExam />,
-              },
-              {
-                path: "edit/:examId",
-                element: <EditExam />,
-              },
-              {
-                path: ":examId",
-                element: <ShowExam />,
-              },
-            ],
-          },
           {
             path: ":docsId",
             element: <ShowDocs />,

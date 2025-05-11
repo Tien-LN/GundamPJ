@@ -9,7 +9,9 @@ function CourseDetail() {
   const { courseId } = useParams();
   const [user, setUser] = useState({});
   const [docs, setDocs] = useState([]);
+  const [lessons, setLessons] = useState([]);
   const [enrollment, setEnrollment] = useState([]);
+  const [enrollmentStatus, setEnrollmentStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,20 +35,53 @@ function CourseDetail() {
           }
         );
 
-        // Lấy danh sách bài học
-        const res_docs = await axios.get(
-          `http://localhost:3000/api/docsCourse/${courseId}`,
-          {
-            withCredentials: true,
+        // Lấy danh sách tài liệu khóa học
+        try {
+          const res_docs = await axios.get(
+            `http://localhost:3000/api/docs/${courseId}/docs`,
+            {
+              withCredentials: true,
+            }
+          );
+
+          console.log("Dữ liệu tài liệu:", res_docs.data);
+
+          // Kiểm tra nếu res_docs.data là một mảng
+          if (Array.isArray(res_docs.data)) {
+            // Sắp xếp tài liệu theo thời gian tạo nếu có trường createdAt
+            const sortedDocs = [...res_docs.data].sort((a, b) =>
+              a.createdAt && b.createdAt
+                ? new Date(a.createdAt) - new Date(b.createdAt)
+                : 0
+            );
+            setDocs(sortedDocs);
+          } else {
+            console.error(
+              "Cấu trúc dữ liệu tài liệu không đúng:",
+              res_docs.data
+            );
+            setDocs([]);
           }
-        );
+        } catch (docsError) {
+          console.error("Lỗi khi lấy danh sách tài liệu:", docsError);
+          setDocs([]);
+        }
 
-        // Sắp xếp bài học theo thời gian tạo
-        const docsCourse = res_docs.data.docsCourse.sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-        );
+        // Lấy danh sách bài học
+        try {
+          const lessonsRes = await axios.get(
+            `http://localhost:3000/api/lessons/${courseId}/lessons`,
+            {
+              withCredentials: true,
+            }
+          );
+          console.log("Dữ liệu bài học:", lessonsRes.data);
+          setLessons(lessonsRes.data);
+        } catch (lessonsError) {
+          console.error("Lỗi khi lấy danh sách bài học:", lessonsError);
+          setLessons([]);
+        }
 
-        setDocs(docsCourse);
         setCourse(res.data);
         setUser(res_user.data);
 
@@ -59,6 +94,22 @@ function CourseDetail() {
             }
           );
           setEnrollment(enrollments.data);
+        }
+
+        // Kiểm tra trạng thái đăng ký khóa học của học viên
+        if (res_user.data.role === "STUDENT") {
+          try {
+            const enrollmentRes = await axios.get(
+              `http://localhost:3000/api/enrollments/status/${courseId}`,
+              {
+                withCredentials: true,
+              }
+            );
+            setEnrollmentStatus(enrollmentRes.data.status);
+          } catch (enrollError) {
+            console.error("Lỗi khi kiểm tra trạng thái đăng ký:", enrollError);
+            setEnrollmentStatus(null);
+          }
         }
 
         setLoading(false);
@@ -74,17 +125,21 @@ function CourseDetail() {
 
   const handleDeleteDocs = async (id) => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/docsCourse/${courseId}/${id}`,
-        {
-          withCredentials: true,
-        }
+      if (user.role !== "TEACHER" || user.id !== course.teacher?.id) {
+        alert("Bạn không có quyền xóa tài liệu này.");
+        return;
+      }
+      await axios.patch(
+        `http://localhost:3000/api/docs/soft-delete/${id}`,
+        { docIds: [id] },
+        { withCredentials: true }
       );
 
-      // Cập nhật danh sách bài học sau khi xóa
+      // Cập nhật danh sách tài liệu sau khi xóa
       setDocs(docs.filter((doc) => doc.id !== id));
     } catch (error) {
-      console.log("Lỗi khi xóa bài giảng", error);
+      console.error("Lỗi khi xóa tài liệu:", error);
+      alert("Có lỗi xảy ra khi xóa tài liệu");
     }
   };
 
@@ -190,7 +245,7 @@ function CourseDetail() {
 
           <div className="course-detail__lessons">
             <div className="course-detail__lessons-header">
-              <h3>Bài học</h3>
+              <h3>Tài liệu</h3>
             </div>
 
             {docs && docs.length > 0 ? (
@@ -199,7 +254,7 @@ function CourseDetail() {
                   <li key={index} className="course-detail__lessons-item">
                     <Link to={item.id} className="course-detail__lessons-link">
                       <i className="fa-solid fa-book"></i>
-                      <span>{`Bài ${index + 1}: ${item.title}`}</span>
+                      <span>{`Tài liệu ${index + 1}: ${item.title}`}</span>
                     </Link>
                     {user.role === "TEACHER" &&
                       user.id === course.teacher?.id && (
@@ -210,6 +265,41 @@ function CourseDetail() {
                           <i className="fa-solid fa-minus"></i>
                         </button>
                       )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="course-detail__lessons-empty">
+                <p>Chưa có tài liệu nào cho khóa học này.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Hiển thị danh sách bài học */}
+          <div className="course-detail__lessons">
+            <div className="course-detail__lessons-header">
+              <h3>Bài học</h3>
+            </div>
+
+            {lessons && lessons.length > 0 ? (
+              <ul className="course-detail__lessons-list">
+                {lessons.map((lesson, index) => (
+                  <li key={lesson.id} className="course-detail__lessons-item">
+                    <div className="course-detail__lessons-link">
+                      <i className="fa-solid fa-chalkboard-teacher"></i>
+                      <span>{`Bài học ${index + 1}: ${lesson.title}`}</span>
+                      <div
+                        className="course-detail__lessons-date"
+                        style={{
+                          backgroundColor: "#919191",
+                          marginLeft: "20px",
+                          padding: "5px 8px",
+                          borderRadius: "5px",
+                        }}
+                      >
+                        {format(new Date(lesson.date), "dd/MM/yyyy")}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -277,7 +367,7 @@ function CourseDetail() {
               {docs && (
                 <li className="course-detail__info-item">
                   <i className="fa-solid fa-book"></i>
-                  <span>Số bài học: {docs.length}</span>
+                  <span>Số bài học: {lessons.length}</span>
                 </li>
               )}
             </ul>

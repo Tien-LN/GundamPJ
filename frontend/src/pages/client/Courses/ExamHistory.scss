@@ -1,0 +1,164 @@
+.examHistory {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 30px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 15px;
+  }
+
+  &__title {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+  }
+
+  &__back-button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+
+  &__exam-details {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+
+    h2 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 20px;
+      border-bottom: 2px solid #eaeaea;
+      padding-bottom: 10px;
+    }
+  }
+
+  &__exam-description {
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  &__exam-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  &__exam-time,
+  &__exam-dates {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  &__loading,
+  &__error,
+  &__no-attempts {
+    text-align: center;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  &__loading {
+    color: #3498db;
+    i {
+      margin-right: 8px;
+    }
+  }
+
+  &__error {
+    color: #e74c3c;
+  }
+
+  &__attempts-list {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+      color: #333;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+  }
+
+  &__score {
+    font-weight: 600;
+    color: #2980b9;
+  }
+
+  &__view-button {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #2980b9;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .examHistory {
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    &__exam-info {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    &__table {
+      th, td {
+        padding: 8px 10px;
+      }
+    }
+  }
+}

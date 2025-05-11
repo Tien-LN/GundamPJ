@@ -18,4 +18,7 @@ router.post("/logout", verifyUser, controller.logout);
 // refresh token
 router.post("/refresh-token", controller.refreshToken);
 
+// check connection
+router.get("/check", controller.checkConnection);
+
 module.exports = router;

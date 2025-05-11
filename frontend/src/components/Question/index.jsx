@@ -1,3 +1,5 @@
+import "./Question.css";
+
 function Question({answers, fnUp, fnDown, type, handleChange}){
     // console.log(answers);
     // console.log(type);

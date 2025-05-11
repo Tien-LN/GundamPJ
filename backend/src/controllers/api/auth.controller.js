@@ -234,9 +234,23 @@ const refreshToken = async (req, res) => {
   }
 };
 
+// [GET] /api/auth/check
+const checkConnection = async (req, res) => {
+  try {
+    res.status(200).json({
+      status: "ok",
+      message: "API server is running",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   login,
   changePassword,
   logout,
   refreshToken, // Add this to the exports
+  checkConnection, // Add this to the exports
 };

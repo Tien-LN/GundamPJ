@@ -51,7 +51,7 @@ const validateEmail = async (email) => {
     // console.log(response);
 
     if (!response.data) {
-      return { valid: false, message: "❌ Không nhận được phản hồi từ API." };
+      return { valid: false, message: "Không nhận được phản hồi từ API." };
     }
 
     const { is_valid_format, is_mx_found, is_smtp_valid, is_disposable_email } =
@@ -59,19 +59,19 @@ const validateEmail = async (email) => {
 
     let result;
     if (!is_valid_format.value) {
-      result = { valid: false, message: "❌ Định dạng email không hợp lệ." };
+      result = { valid: false, message: "Định dạng email không hợp lệ." };
     } else if (!is_mx_found.value) {
       result = {
         valid: false,
-        message: "❌ Email không có bản ghi MX hợp lệ.",
+        message: "Email không có bản ghi MX hợp lệ.",
       };
     } else if (!is_smtp_valid.value) {
       result = {
         valid: false,
-        message: "❌ Email không tồn tại trên máy chủ.",
+        message: "Email không tồn tại trên máy chủ.",
       };
     } else if (is_disposable_email.value) {
-      result = { valid: false, message: "❌ Email là email tạm thời." };
+      result = { valid: false, message: "Email là email tạm thời." };
     } else {
       result = { valid: true, message: "✅ Email hợp lệ." };
     }
@@ -82,7 +82,7 @@ const validateEmail = async (email) => {
     return result;
   } catch (error) {
     console.error("Lỗi kiểm tra email: ", error.message);
-    return { valid: false, message: "❌ Lỗi server khi kiểm tra email." };
+    return { valid: false, message: "Lỗi server khi kiểm tra email." };
   }
 };
 

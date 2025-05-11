@@ -5,7 +5,6 @@ const getDocs = async (req, res) => {
   try {
     const docs = await prisma.doc.findMany({
       where: {
-        deleted: false,
         courseId: req.params.courseId,
       },
       select: {
@@ -17,6 +16,7 @@ const getDocs = async (req, res) => {
 
     res.json(docs);
   } catch (error) {
+    console.error("Lỗi khi lấy danh sách tài liệu:", error);
     res.status(500).json({ error: "Lỗi server" });
   }
 };
@@ -29,7 +29,6 @@ const readDoc = async (req, res) => {
     const doc = await prisma.doc.findFirst({
       where: {
         id: docId,
-        deleted: false,
       },
       include: {
         course: true, // Bao gồm thông tin khóa học nếu cần
@@ -58,27 +57,37 @@ const uploadDoc = async (req, res) => {
 
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: "documents" }, (error, cloudinaryResult) => {
-          if (error) reject(error);
-          else resolve(cloudinaryResult);
-        })
+        .upload_stream(
+          {
+            folder: "documents",
+            resource_type: "raw",
+            public_id: `${title}`,
+            upload_preset: "pdf_preset",
+            type: "upload",
+            access_mode: "public",
+            access_control: [
+              {
+                access_type: "anonymous",
+                start: Math.floor(Date.now() / 1000), // Lấy timestamp hiện tại
+                end: Math.floor(Date.now() / 1000) + 3600, // Timestamp cho 1 giờ sau
+              },
+            ],
+          },
+          (error, cloudinaryResult) => {
+            if (error) reject(error);
+            else resolve(cloudinaryResult);
+          }
+        )
         .end(req.file.buffer);
     });
 
-    const newDoc = await prisma.doc.create({
-      data: {
-        title,
-        courseId,
-        fileUrl: result.secure_url,
-      },
+    return res.status(200).json({
+      message: "Document uploaded successfully",
+      doc: result,
     });
-
-    res
-      .status(201)
-      .json({ message: "Document uploaded successfully", doc: newDoc });
   } catch (error) {
-    console.error("Error uploading document:", error); // Log lỗi chi tiết
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Upload error:", error);
+    return res.status(500).json({ message: "Upload failed", error });
   }
 };
 

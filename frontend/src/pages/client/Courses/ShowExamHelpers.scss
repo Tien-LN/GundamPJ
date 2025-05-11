@@ -1,0 +1,86 @@
+/* Styles for reordering and matching elements */
+/* Notification styles */
+.delete-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ef4444;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    
+    &.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Highlight effect for changes */
+.highlight-change {
+    animation: highlight 0.8s ease-in-out;
+}
+
+@keyframes highlight {
+    0% { background-color: transparent; }
+    25% { background-color: rgba(79, 70, 229, 0.2); }
+    75% { background-color: rgba(79, 70, 229, 0.2); }
+    100% { background-color: transparent; }
+}
+.reordering__box {
+    position: relative;
+    
+    &--filled {
+        padding-right: 30px !important;
+        cursor: pointer !important;
+        border: 1px solid #4f46e5;
+        
+        &:hover {
+            background-color: #f9fafb !important;
+            color: #ef4444 !important;
+            
+            .delete-icon {
+                display: flex;
+                color: #ef4444;
+            }
+        }
+    }
+}
+
+.delete-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.matching-cell {
+    position: relative;
+    
+    &--filled {
+        padding-right: 30px !important;
+        cursor: pointer;
+        color: #4f46e5;
+        
+        &:hover {
+            background-color: #f9fafb;
+            color: #ef4444;
+            
+            .delete-icon {
+                display: flex;
+                color: #ef4444;
+            }
+        }
+    }
+}

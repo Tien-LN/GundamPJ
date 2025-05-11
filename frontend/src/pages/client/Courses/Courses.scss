@@ -187,7 +187,8 @@
 
     .course-actions {
       display: flex;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
 
       a {
         flex: 1;
@@ -221,6 +222,24 @@
 
         &:hover {
           background-color: #e5e5e5;
+        }
+      }
+
+      .btn-document {
+        background-color: #28a745;
+        color: white;
+
+        &:hover {
+          background-color: darken(#28a745, 10%);
+        }
+      }
+
+      .btn-exam {
+        background-color: #fd7e14;
+        color: white;
+
+        &:hover {
+          background-color: darken(#fd7e14, 10%);
         }
       }
     }
@@ -340,4 +359,67 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.teacher-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0 1.5rem 0;
+}
+
+.teacher-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.teacher-actions .manage-button {
+  background: #f5f5f5;
+  color: #333;
+}
+.teacher-actions .manage-button:hover {
+  background: #e5e5e5;
+  color: #222;
+}
+.teacher-actions .add-button {
+  background: #4a6cf7;
+  color: #fff;
+}
+.teacher-actions .add-button:hover {
+  background: #274bb5;
+  color: #fff;
+}
+
+.student-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0 1.5rem 0;
+}
+
+.student-actions .view-button {
+  background: #4a6cf7;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.student-actions .view-button:hover {
+  background: #274bb5;
+  color: #fff;
 }

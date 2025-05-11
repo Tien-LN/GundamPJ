@@ -6,78 +6,109 @@ $error-color: #e74c3c;
 $text-color: #333;
 $light-gray: #f5f5f5;
 $border-color: #ddd;
-$box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+$box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
 
 .create-exam {
   max-width: 800px;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 2.5rem;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: $box-shadow;
+  transition: $transition;
 
   &__title {
-    font-size: 1.8rem;
-    color: $text-color;
-    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: $primary-color;
+    margin-bottom: 1.8rem;
     text-align: center;
+    font-weight: 600;
+    position: relative;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background-color: $primary-color;
+      border-radius: 3px;
+    }
   }
 
   &__course-info {
-    background-color: $light-gray;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
-
+    background-color: rgba($primary-color, 0.05);
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid $primary-color;
+    
     h2 {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       margin-bottom: 0.5rem;
+      color: $primary-color;
     }
 
     p {
       color: #666;
       margin: 0;
+      font-size: 1.05rem;
     }
   }
-
   &__success {
     background-color: rgba($success-color, 0.1);
     color: $success-color;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
     display: flex;
     align-items: center;
+    border-left: 4px solid $success-color;
+    animation: fadeIn 0.5s ease-in-out;
 
     i {
-      margin-right: 0.5rem;
-      font-size: 1.2rem;
+      margin-right: 0.8rem;
+      font-size: 1.3rem;
+    }
+    
+    span {
+      font-weight: 500;
     }
   }
 
   &__error {
     background-color: rgba($error-color, 0.1);
     color: $error-color;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
     display: flex;
     align-items: center;
+    border-left: 4px solid $error-color;
+    animation: fadeIn 0.5s ease-in-out;
 
     i {
-      margin-right: 0.5rem;
-      font-size: 1.2rem;
+      margin-right: 0.8rem;
+      font-size: 1.3rem;
+    }
+    
+    span {
+      font-weight: 500;
     }
   }
-
   &__form {
     &-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
 
       label {
         display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+        margin-bottom: 0.7rem;
+        font-weight: 600;
+        color: #555;
+        font-size: 1.05rem;
       }
 
       input[type="text"],
@@ -85,26 +116,45 @@ $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       input[type="datetime-local"],
       textarea {
         width: 100%;
-        padding: 0.8rem;
+        padding: 1rem;
         border: 1px solid $border-color;
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 1rem;
+        transition: $transition;
+        background-color: #fcfcfc;
 
         &:focus {
           outline: none;
           border-color: $primary-color;
-          box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+          background-color: white;
+        }
+        
+        &::placeholder {
+          color: #aab2bd;
         }
       }
 
       textarea {
         resize: vertical;
+        min-height: 120px;
+      }
+      
+      input[type="datetime-local"] {
+        color: #555;
+      }
+      
+      input[type="number"] {
+        text-align: center;
+        font-weight: 500;
+        color: $primary-color;
+        font-size: 1.1rem;
       }
     }
 
     &-row {
       display: flex;
-      gap: 1rem;
+      gap: 1.5rem;
 
       .create-exam__form-group {
         flex: 1;
@@ -113,29 +163,40 @@ $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
     &-actions {
       display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
     }
   }
-
   &__submit-btn {
     background-color: $primary-color;
     color: white;
     border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 4px;
+    padding: 1rem 2rem;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    transition: $transition;
+    flex: 2;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 5px rgba($primary-color, 0.3);
 
     &:hover {
       background-color: $secondary-color;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba($primary-color, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba($primary-color, 0.3);
     }
 
     &:disabled {
       background-color: #95a5a6;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     i {
@@ -144,18 +205,37 @@ $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 
   &__cancel-btn {
-    background-color: #ecf0f1;
-    color: #7f8c8d;
+    background-color: #f2f4f6;
+    color: #606060;
     border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 4px;
+    padding: 1rem 2rem;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    transition: $transition;
+    flex: 1;
+    font-size: 1.05rem;
+    border: 1px solid #e1e4e8;
 
     &:hover {
-      background-color: #bdc3c7;
+      background-color: #e1e4e8;
+      color: #454545;
     }
+    
+    &:active {
+      background-color: #d5d8dc;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -165,24 +245,40 @@ $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
+  padding: 4rem;
   text-align: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: $box-shadow;
+  margin: 3rem auto;
+  max-width: 600px;
 
   .spinner {
-    font-size: 2rem;
+    font-size: 3rem;
     color: $primary-color;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    animation: spin 1s infinite linear;
   }
 
   i {
-    font-size: 2rem;
+    font-size: 3rem;
     color: $error-color;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   p {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: $text-color;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -191,20 +287,68 @@ $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   .create-exam {
     padding: 1.5rem;
     margin: 1rem;
+    border-radius: 8px;
+
+    &__title {
+      font-size: 1.6rem;
+      
+      &:after {
+        width: 60px;
+      }
+    }
+    
+    &__course-info {
+      padding: 1rem;
+      
+      h2 {
+        font-size: 1.3rem;
+      }
+      
+      p {
+        font-size: 0.95rem;
+      }
+    }
 
     &__form-row {
       flex-direction: column;
       gap: 0;
     }
+    
+    &__form-group {
+      label {
+        font-size: 1rem;
+      }
+      
+      input, textarea {
+        padding: 0.9rem;
+      }
+    }
 
     &__form-actions {
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
+      margin-top: 2rem;
     }
 
     &__submit-btn,
     &__cancel-btn {
       width: 100%;
+      flex: none;
+      padding: 0.9rem;
+    }
+  }
+  
+  .create-exam-loading,
+  .create-exam-error {
+    padding: 2.5rem 1.5rem;
+    margin: 1.5rem 1rem;
+    
+    .spinner, i {
+      font-size: 2.5rem;
+    }
+    
+    p {
+      font-size: 1.1rem;
     }
   }
 }

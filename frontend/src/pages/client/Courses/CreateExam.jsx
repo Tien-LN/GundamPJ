@@ -82,17 +82,29 @@ function CreateExam() {
       ...examData,
       timeLimit: minutes * 60, // Chuyển đổi phút thành giây
     });
-  };
-
-  const handleSubmit = async (e) => {
+  };  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!examData.startDate || !examData.endDate) {
       setError("Vui lòng chọn ngày bắt đầu và ngày kết thúc!");
       return;
     }
+    
+    // Validate the date formats
+    const startDateObj = new Date(examData.startDate);
+    const endDateObj = new Date(examData.endDate);
+    
+    if (isNaN(startDateObj.getTime())) {
+      setError("Định dạng ngày bắt đầu không hợp lệ!");
+      return;
+    }
+    
+    if (isNaN(endDateObj.getTime())) {
+      setError("Định dạng ngày kết thúc không hợp lệ!");
+      return;
+    }
 
-    if (new Date(examData.endDate) < new Date(examData.startDate)) {
+    if (endDateObj < startDateObj) {
       setError("Ngày kết thúc không thể sớm hơn ngày bắt đầu!");
       return;
     }
@@ -101,7 +113,14 @@ function CreateExam() {
       setLoading(true);
       setError(null);
 
-      await axios.post("http://localhost:3000/api/exams/create", examData, {
+      // Ensure dates are properly formatted in ISO-8601 format
+      const formattedData = {
+        ...examData,
+        startDate: new Date(examData.startDate).toISOString(),
+        endDate: new Date(examData.endDate).toISOString()
+      };
+
+      await axios.post("http://localhost:3000/api/exams/create", formattedData, {
         withCredentials: true,
       });
 
@@ -119,14 +138,25 @@ function CreateExam() {
         navigate(`/courses/${courseId}/exams`);
       }, 2000);
 
-      setLoading(false);
-    } catch (error) {
+      setLoading(false);    } catch (error) {
       console.error("Lỗi khi tạo đề thi:", error);
-      setError(error.response?.data?.message || "Có lỗi xảy ra khi tạo đề thi");
+      
+      // Handle different kinds of errors with better messages
+      if (error.response) {
+        if (error.response.data?.details && error.response.data.details.includes('DateTime')) {
+          setError("Lỗi định dạng ngày giờ. Vui lòng kiểm tra lại thời gian bắt đầu và kết thúc.");
+        } else {
+          setError(error.response.data?.message || "Có lỗi xảy ra khi tạo đề thi");
+        }
+      } else if (error.message && error.message.includes('date')) {
+        setError("Lỗi định dạng ngày giờ. Vui lòng kiểm tra lại thời gian bắt đầu và kết thúc.");
+      } else {
+        setError("Có lỗi xảy ra khi tạo đề thi. Vui lòng thử lại sau.");
+      }
+      
       setLoading(false);
     }
   };
-
   // Hiển thị trạng thái loading
   if (loading) {
     return (
@@ -134,7 +164,7 @@ function CreateExam() {
         <div className="spinner">
           <i className="fa-solid fa-spinner fa-spin"></i>
         </div>
-        <p>Đang xử lý...</p>
+        <p>Đang xử lý yêu cầu của bạn...</p>
       </div>
     );
   }
@@ -148,10 +178,10 @@ function CreateExam() {
       </div>
     );
   }
-
   return (
     <div className="create-exam">
       <h1 className="create-exam__title">Tạo Đề Thi Mới</h1>
+      
       <div className="create-exam__course-info">
         <h2>{course.title}</h2>
         <p>Giáo viên: {course.teacher?.name}</p>
@@ -180,7 +210,7 @@ function CreateExam() {
             name="title"
             value={examData.title}
             onChange={handleChange}
-            placeholder="Nhập tiêu đề đề thi"
+            placeholder="Nhập tiêu đề đề thi (vd: Kiểm tra giữa kỳ)"
             required
           />
         </div>
@@ -192,14 +222,14 @@ function CreateExam() {
             name="description"
             value={examData.description}
             onChange={handleChange}
-            placeholder="Nhập mô tả cho đề thi"
+            placeholder="Nhập mô tả chi tiết cho đề thi (nội dung, yêu cầu, hướng dẫn...)"
             rows="4"
           ></textarea>
         </div>
 
         <div className="create-exam__form-row">
           <div className="create-exam__form-group">
-            <label htmlFor="startDate">Ngày bắt đầu:</label>
+            <label htmlFor="startDate">Thời gian bắt đầu:</label>
             <input
               type="datetime-local"
               id="startDate"
@@ -211,7 +241,7 @@ function CreateExam() {
           </div>
 
           <div className="create-exam__form-group">
-            <label htmlFor="endDate">Ngày kết thúc:</label>
+            <label htmlFor="endDate">Thời gian kết thúc:</label>
             <input
               type="datetime-local"
               id="endDate"
@@ -242,8 +272,9 @@ function CreateExam() {
             className="create-exam__cancel-btn"
             onClick={() => navigate(`/courses/${courseId}/exams`)}
           >
-            Hủy
+            <i className="fa-solid fa-arrow-left"></i> Quay lại
           </button>
+          
           <button
             type="submit"
             className="create-exam__submit-btn"
@@ -254,7 +285,9 @@ function CreateExam() {
                 <i className="fa-solid fa-spinner fa-spin"></i> Đang tạo...
               </>
             ) : (
-              "Tạo Đề Thi"
+              <>
+                <i className="fa-solid fa-plus-circle"></i> Tạo Đề Thi
+              </>
             )}
           </button>
         </div>

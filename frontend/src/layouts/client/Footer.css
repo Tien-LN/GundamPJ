@@ -3,6 +3,8 @@
   color: #fff;
   padding: 70px 0 0;
   font-family: "Roboto", sans-serif;
+  margin-bottom: 0; /* Ensure no margin at the bottom */
+  width: 100%; /* Full width */
 }
 
 .footer-container {
@@ -142,6 +144,8 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 0;
 }
 
 .copyright p {

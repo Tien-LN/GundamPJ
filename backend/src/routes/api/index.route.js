@@ -13,10 +13,12 @@ const lessonRoutes = require("./lesson.route");
 const statisticsRoutes = require("./statistics.route");
 const docsCourseRoutes = require("./docsCourse.route");
 const userExam = require("./userExam.route");
+const attendanceRoutes = require("./attendance.route");
+const cloudinaryRoutes = require("./cloudinary.route");
 module.exports = (app) => {
   app.use(systemConfig.API_route + "/announcements", announRoutes);
 
-  // app.use(systemConfig.API_route + "/docs", docRoutes);
+  app.use(systemConfig.API_route + "/docs", docRoutes);
 
   app.use(systemConfig.API_route + "/auth", authRoutes);
 
@@ -25,6 +27,8 @@ module.exports = (app) => {
   app.use(systemConfig.API_route + "/users", userRoutes);
 
   app.use(systemConfig.API_route + "/courses", courseRoutes);
+
+  app.use(systemConfig.API_route + "/cloudinary", cloudinaryRoutes);
 
   app.use(systemConfig.API_route + "/enrollments", enrollmentRoutes);
 
@@ -37,8 +41,10 @@ module.exports = (app) => {
   app.use(systemConfig.API_route + "/docsCourse", docsCourseRoutes);
 
   app.use(systemConfig.API_route + "/lessons", lessonRoutes);
-
   app.use(systemConfig.API_route + "/statistics", statisticsRoutes);
-
   app.use(systemConfig.API_route + "/userExams", userExam);
+
+  app.use(systemConfig.API_route + "/attendance", attendanceRoutes);
+
+  app.use(systemConfig.API_route + "/cloudinary", cloudinaryRoutes);
 };

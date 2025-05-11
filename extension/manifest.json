@@ -1,14 +1,12 @@
-{
-  "manifest_version": 3,
+{  "manifest_version": 3,
   "name": "Pstudy Meet Statistics",
   "version": "1.0",
   "description": "Hiển thị thống kê học viên trong Google Meet",
-  "permissions": ["tabs", "activeTab", "storage"],
-  "host_permissions": ["https://meet.google.com/*", "http://localhost:3000/*"],
-  "content_scripts": [
+  "permissions": ["tabs", "activeTab", "storage", "cookies", "camera"],
+  "host_permissions": ["https://meet.google.com/*", "http://localhost:3000/*"],"content_scripts": [
     {
       "matches": ["https://meet.google.com/*"],
-      "js": ["js/auth.js", "js/api.js", "content.js"],
+      "js": ["js/config.js", "js/auth.js", "js/api.js", "content.js"],
       "css": ["styles.css"]
     }
   ],

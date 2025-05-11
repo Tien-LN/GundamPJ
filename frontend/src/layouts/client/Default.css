@@ -1,0 +1,27 @@
+/* Layout styles */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
+
+.header {
+  width: 100%;
+}
+
+.main {
+  flex: 1; /* Takes available space */
+  width: 100%;
+}
+
+.site-footer {
+  width: 100%;
+  margin-top: auto; /* Push to bottom */
+}
+
+/* Fix for footer positioning */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}

@@ -10,6 +10,7 @@ function EditExam(){
     const {courseId, examId} = useParams();
     const [user, setUser] = useState({});   
     const [questions, setQuestions] = useState([]);
+    const [loading, setLoading] = useState(false); // Add loading state
     const [addQuestion, setAddQuestion] = useState({
         QuestionType: "OBJECTIVE",
         content: "",
@@ -185,20 +186,70 @@ function EditExam(){
                 ...prevState,
                 answers: updatedAnswers, 
             };
-        })
-    }
-    const handleSubmit = (e) => {
+        })    }
+        const handleSubmit = (e) => {
         e.preventDefault();
 
         const fetchApi = async() => {
             try{
-                const res = await axios.post(`http://localhost:3000/api/exams/${examId}/createQuestion`, addQuestion, {
+                // Kiểm tra dữ liệu trước khi gửi
+                if (!addQuestion.content.trim()) {
+                    alert("Vui lòng nhập nội dung câu hỏi!");
+                    return;
+                }
+                
+                setLoading(true); // Bật trạng thái loading
+                  // Đảm bảo courseId được đặt đúng trong request
+                const questionData = {
+                    ...addQuestion,
+                    courseId: courseId // Đảm bảo courseId được gửi đi
+                };
+                
+                // Xử lý ngày tháng nếu có
+                if (questionData.startDate) {
+                    questionData.startDate = new Date(questionData.startDate).toISOString();
+                }
+                if (questionData.endDate) {
+                    questionData.endDate = new Date(questionData.endDate).toISOString();
+                }
+                  // Gửi yêu cầu tạo câu hỏi
+                console.log("Đang gửi yêu cầu tạo câu hỏi:", questionData);
+                // Debug logging to check the examId and courseId values
+                console.log("examId used for API endpoint:", examId);
+                console.log("courseId used for API endpoint:", courseId);
+                
+                // Fix: Using the correct URL structure that matches the backend route format
+                const res = await axios.post(`http://localhost:3000/api/exams/${courseId}/exams/${examId}/createQuestion`, questionData, {
                     withCredentials: true
                 });
                 console.log(res.data);
+                alert("Tạo câu hỏi thành công!");
                 window.location.reload();
+                
             } catch(error) {
-                console.log("Lỗi khi tạo câu hỏi", error);
+                console.error("Lỗi khi tạo câu hỏi", error);
+                  // Xử lý các loại lỗi cụ thể
+                if (error.response) {
+                    // Server trả về lỗi với status code
+                    if (error.response.status === 404) {
+                        alert("Không tìm thấy đề thi. Vui lòng kiểm tra lại URL hoặc tải lại trang.");
+                        console.log("URL gửi đi:", `http://localhost:3000/api/exams/${courseId}/exams/${examId}/createQuestion`);
+                        console.log("examId value:", examId);
+                        console.log("courseId value:", courseId);
+                    } else if (error.response.status === 400) {
+                        alert("Dữ liệu không hợp lệ: " + (error.response.data.message || "Vui lòng kiểm tra lại thông tin câu hỏi"));
+                    } else {
+                        alert("Lỗi máy chủ: " + (error.response.data.message || "Vui lòng thử lại sau"));
+                    }
+                } else if (error.request) {
+                    // Không nhận được phản hồi
+                    alert("Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác
+                    alert("Lỗi khi tạo câu hỏi: " + error.message);
+                }
+                
+                setLoading(false); // Tắt trạng thái loading khi có lỗi
             }
         }
         fetchApi();
@@ -313,9 +364,16 @@ function EditExam(){
                         </div>
                         <div className="editExams__box">
                             <Question answers={addQuestion.answers} fnUp={fnRowsUp} fnDown={fnRowsDown} type={addQuestion.QuestionType} handleChange={handleQuestionChange}/>
-                        </div>
-                        <div className="editExams__box">
-                            <button type="submit" className="editExams__submit">Tạo mới</button>
+                        </div>                        <div className="editExams__box">
+                            <button type="submit" className="editExams__submit" disabled={loading}>
+                                {loading ? (
+                                    <>
+                                        <i className="fa-solid fa-spinner fa-spin"></i> Đang xử lý...
+                                    </>
+                                ) : (
+                                    "Tạo mới"
+                                )}
+                            </button>
                         </div>
                     </form>
                 </div>

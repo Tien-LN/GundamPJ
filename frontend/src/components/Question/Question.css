@@ -1,0 +1,93 @@
+/* Question component styling */
+.editExams__questions {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.editExams__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.editExams__table th {
+    background-color: #f3f4f6;
+    padding: 12px;
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.editExams__table td {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.editExams__table input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.editExams__table input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0 auto;
+    accent-color: #4f46e5;
+}
+
+.editExams__questions-action {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.editExams__questions-up,
+.editExams__questions-down {
+    padding: 8px 16px;
+    background-color: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editExams__questions-up {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.editExams__questions-up:hover {
+    background-color: #bfdbfe;
+}
+
+.editExams__questions-down {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.editExams__questions-down:hover {
+    background-color: #fecaca;
+}
+
+.question__corect {
+    color: #059669;
+    font-weight: 500;
+}

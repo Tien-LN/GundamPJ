@@ -1,0 +1,134 @@
+.addDocs {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  position: relative;
+
+  &__dropzone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 123, 255, 0.1);
+    border: 2px dashed #007bff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+
+    i {
+      font-size: 48px;
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #007bff;
+    }
+  }
+
+  &__drop-hint {
+    padding: 15px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    text-align: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: #007bff;
+      background: rgba(0, 123, 255, 0.05);
+    }
+  }
+
+  &__file-list {
+    margin-bottom: 20px;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 4px;
+        margin-bottom: 8px;
+
+        span {
+          flex: 1;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  &__remove-file {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    margin-left: 10px;
+
+    &:hover {
+      color: darken(#dc3545, 10%);
+    }
+  }
+
+  &__form {
+    margin-top: 20px;
+  }
+
+  &__box {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+  }
+
+  &__title {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  &__submit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken(#007bff, 10%);
+    }
+  }
+
+  &__error {
+    color: #dc3545;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 8px;
+    }
+  }
+}

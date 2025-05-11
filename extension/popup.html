@@ -24,11 +24,16 @@
     </div>
 
     <!-- Phần hiển thị thống kê -->
-    <div id="statisticsContent" class="content" style="display: none">
-      <!-- Thông tin người dùng -->
+    <div id="statisticsContent" class="content" style="display: none">      <!-- Thông tin người dùng -->
       <div class="user-info">
         <span id="userName"></span>
         <button id="logoutBtn" class="btn-secondary">Đăng xuất</button>
+      </div>
+      
+      <!-- Trạng thái kết nối API -->
+      <div class="connection-status">
+        <span id="connectionStatus" class="status-indicator offline">Đang kiểm tra kết nối...</span>
+        <button id="checkConnectionBtn" class="btn-secondary small">Kiểm tra</button>
       </div>
 
       <!-- Phần dành cho Student -->
@@ -57,9 +62,9 @@
         <div id="studentList" class="student-list">
           <!-- Danh sách học viên sẽ được thêm vào đây -->
         </div>
-      </div>
-    </div>
+      </div>    </div>
 
+    <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     <script src="js/popup.js"></script>

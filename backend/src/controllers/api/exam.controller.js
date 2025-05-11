@@ -3,11 +3,11 @@ const { prisma } = require("../../config/db");
 const index = async (req, res) => {
   try {
     const courseId = req.query.courseId;
-    
+
     const course = await prisma.course.findFirst({
-      where: { 
+      where: {
         id: courseId,
-        deleted: false
+        deleted: false,
       },
       include: {
         exams: true,
@@ -25,37 +25,99 @@ const index = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  if(!req.body.courseId || !req.body.startDate || !req.body.endDate){
-    return res.status(404).json({message: "Bad request"});
-  }
-  if (req.body.questions && req.body.questions.length == 0)
-    delete req.body.questions;
-  if (req.body.UserExam && req.body.UserExam.length == 0)
-    delete req.body.UserExam;
+  try {
+    if (!req.body.courseId || !req.body.startDate || !req.body.endDate) {
+      return res
+        .status(404)
+        .json({ message: "Bad request - Missing required fields" });
+    }
 
-  const course = await prisma.course.findUnique({
-    where: { id: req.body.courseId },
-  });
-  if (!course) {
-    return res.status(400).json({ message: "Lỗi không tìm thấy khóa học" });
+    // Clean up nested arrays if empty
+    if (req.body.questions && req.body.questions.length == 0)
+      delete req.body.questions;
+    if (req.body.UserExam && req.body.UserExam.length == 0)
+      delete req.body.UserExam;
+
+    const course = await prisma.course.findUnique({
+      where: { id: req.body.courseId },
+    });
+
+    if (!course) {
+      return res.status(400).json({ message: "Lỗi không tìm thấy khóa học" });
+    }
+
+    // Validate date formats
+    try {
+      // Create a data object with properly formatted dates
+      const examData = {
+        ...req.body,
+        startDate: new Date(req.body.startDate),
+        endDate: new Date(req.body.endDate),
+      };
+
+      const createdExam = await prisma.exam.create({
+        data: examData,
+      });
+
+      res.status(200).json({
+        message: "Đã tạo bài thi thành công",
+        examId: createdExam.id,
+      });
+    } catch (validationError) {
+      console.error("Validation error:", validationError);
+      return res.status(400).json({
+        message: "Lỗi định dạng dữ liệu",
+        details: validationError.message,
+      });
+    }
+  } catch (error) {
+    console.error("Error creating exam:", error);
+    return res.status(500).json({
+      message: "Lỗi server khi tạo bài thi",
+      details: error.message,
+    });
   }
-  await prisma.exam.create({
-    data: req.body,
-  });
-  res.send("Đã tạo bài thi thành công");
 };
 
 const createQuestion = async (req, res) => {
   try {
-    const id = req.params.id;
-    if(req.body.courseId) delete req.body.courseId;
+    // Handle both URL formats: /:id/createQuestion and /:courseId/exams/:examId/createQuestion
+    const id = req.params.id || req.params.examId;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ message: "Missing exam ID in request params" });
+    }
+
+    console.log("Creating question for exam ID:", id);
+
+    // Remove courseId from request body as it's not needed for question creation
+    if (req.body.courseId) delete req.body.courseId;
+
+    // Handle date format conversion if there are any dates in the request
+    if (req.body.startDate) {
+      try {
+        req.body.startDate = new Date(req.body.startDate);
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid startDate format" });
+      }
+    }
+
+    if (req.body.endDate) {
+      try {
+        req.body.endDate = new Date(req.body.endDate);
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid endDate format" });
+      }
+    }
     const exam = await prisma.exam.findUnique({
       where: { id: id },
     });
     if (!exam) {
       return res.status(400).json({ message: "Không tìm thấy bài thi!" });
     }
-    
+
     if (!req.body.QuestionType) req.body.QuestionType = "OBJECTIVE";
     const questionType = req.body.QuestionType;
     const question = await prisma.question.create({
@@ -65,7 +127,7 @@ const createQuestion = async (req, res) => {
         content: req.body.content,
       },
     });
-  
+
     if (questionType == "OBJECTIVE" || questionType == "DROPDOWN") {
       if (!req.body.answers || req.body.answers.length <= 1) {
         return res.status(400).json({ message: "Cần thêm câu trả lời" });
@@ -77,9 +139,9 @@ const createQuestion = async (req, res) => {
             data: {
               questionId: question.id,
               content: item[0],
-              isCorrect: (item[1]=='true'),
+              isCorrect: item[1] == "true",
             },
-          })  
+          })
         )
       );
     } else if (questionType == "FILL") {
@@ -132,28 +194,31 @@ const createQuestion = async (req, res) => {
     }
     res.send("Đã tạo thành công");
   } catch (error) {
-    return res.status(400).json({ message: "Lỗi j đó rồi", error });
+    console.error("Error in createQuestion:", error);
+    return res
+      .status(400)
+      .json({ message: "Lỗi j đó rồi", error: error.message });
   }
 };
 
 const getQuestions = async (req, res) => {
   try {
     const examId = req.params.examId;
-    
+
     const questions = await prisma.exam.findFirst({
       where: {
         id: examId,
-        deleted: false
+        deleted: false,
       },
       include: {
         questions: {
           include: {
-            options: true
-          }
-        }
-      }
-    })
-  
+            options: true,
+          },
+        },
+      },
+    });
+
     return res.send(questions);
   } catch (error) {
     res.status(500).json({ error: "Lỗi server" });
@@ -281,66 +346,64 @@ const changeQuestionPatch = async (req, res) => {
 const deleteQuestion = async (req, res) => {
   try {
     const questionId = req.params.questionId;
-    
+
     await prisma.questionOption.deleteMany({
       where: {
-        questionId: questionId
-      }
+        questionId: questionId,
+      },
     });
     const result = await prisma.question.delete({
       where: {
-        id: questionId
-      }
+        id: questionId,
+      },
     });
-    
-    
+
     return res.send("Đã xóa thành công!!");
-  } catch(error) {
-    return res.status(500).json({message: "server error!"});
+  } catch (error) {
+    return res.status(500).json({ message: "server error!" });
   }
-}
+};
 
 // [DELETE] api/exams/:courseId/exams/:examId
-const deleteExam = async(req, res) => {
+const deleteExam = async (req, res) => {
   try {
     const examId = req.params.examId;
     const questions = await prisma.question.findMany({
       where: {
-        examId: examId
+        examId: examId,
       },
       select: {
-        id: true
-      }
+        id: true,
+      },
     });
 
-    
-    const questionIds = questions.map(q => q.id);
-    
-    if(questionIds.length > 0){
+    const questionIds = questions.map((q) => q.id);
+
+    if (questionIds.length > 0) {
       await Promise.all(
-        questionIds.map(id => 
+        questionIds.map((id) =>
           prisma.questionOption.deleteMany({
             where: {
-              questionId: id
-            }
+              questionId: id,
+            },
           })
         )
       );
 
       await prisma.question.deleteMany({
-        where: {id: {in: questionIds}}
+        where: { id: { in: questionIds } },
       });
     }
     await prisma.exam.delete({
       where: {
-        id: examId
-      }
+        id: examId,
+      },
     });
     return res.send("Đã xóa thành công!!");
-  } catch(error){ 
-    return res.status(500).json({message: "server error!"});
+  } catch (error) {
+    return res.status(500).json({ message: "server error!" });
   }
-}
+};
 module.exports = {
   index,
   createPost,
@@ -348,5 +411,5 @@ module.exports = {
   getQuestions,
   changeQuestionPatch,
   deleteQuestion,
-  deleteExam
+  deleteExam,
 };
